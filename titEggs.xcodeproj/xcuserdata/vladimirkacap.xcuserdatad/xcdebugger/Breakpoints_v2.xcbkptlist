@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Bucket
+   uuid = "89556946-23F7-40F2-ABB1-42118CEED285"
+   type = "1"
+   version = "2.0">
+   <Breakpoints>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "71CF4BFB-D5D9-4637-A326-C6E7E9754648"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "titEggs/Extensions/Extensions.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "88"
+            endingLineNumber = "88"
+            landmarkName = "font"
+            landmarkType = "24">
+            <Locations>
+               <Location
+                  uuid = "71CF4BFB-D5D9-4637-A326-C6E7E9754648 - e8e1ab8275e1cf89"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "titEggs.AppFont.font.getter : __C.UIFont"
+                  moduleName = "titEggs"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/vladimirkacap/Desktop/titEggs/titEggs/Extensions/Extensions.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "89"
+                  endingLineNumber = "89"
+                  offsetFromSymbolStart = "616">
+               </Location>
+               <Location
+                  uuid = "71CF4BFB-D5D9-4637-A326-C6E7E9754648 - e8e1ab8275e1cfaa"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "titEggs.AppFont.font.getter : __C.UIFont"
+                  moduleName = "titEggs"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/vladimirkacap/Desktop/titEggs/titEggs/Extensions/Extensions.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "88"
+                  endingLineNumber = "88"
+                  offsetFromSymbolStart = "732">
+               </Location>
+            </Locations>
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "2073A723-EE93-450F-A67C-F0DAEE762393"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "titEggs/Extensions/Extensions.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "70"
+            endingLineNumber = "70"
+            landmarkName = "font"
+            landmarkType = "24">
+         </BreakpointContent>
+      </BreakpointProxy>
+   </Breakpoints>
+</Bucket>
