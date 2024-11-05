@@ -127,3 +127,20 @@ extension UIViewController {
         self.navigationController?.setNavigationBarHidden(false, animated: true)
     }
 }
+
+
+extension UIButton {
+    func addTouchFeedback() {
+        self.addTarget(self, action: #selector(didTouchDown), for: .touchDown)
+        self.addTarget(self, action: #selector(didTouchUp), for: .touchUpInside)
+        self.addTarget(self, action: #selector(didTouchUp), for: .touchUpOutside)
+    }
+
+    @objc private func didTouchDown() {
+        self.alpha = 0.7
+    }
+
+    @objc private func didTouchUp() {
+        self.alpha = 1.0
+    }
+}

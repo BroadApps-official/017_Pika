@@ -16,6 +16,11 @@
 		152C785E2CD949A900A2A977 /* ModelDataOnb.swift in Sources */ = {isa = PBXBuildFile; fileRef = 152C785D2CD949A900A2A977 /* ModelDataOnb.swift */; };
 		152C78602CD9528A00A2A977 /* NotifyOnbViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 152C785F2CD9528A00A2A977 /* NotifyOnbViewController.swift */; };
 		152C78632CD95E9B00A2A977 /* PaywallViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 152C78622CD95E9B00A2A977 /* PaywallViewController.swift */; };
+		152C78662CDA309700A2A977 /* SwiftyStoreKit in Frameworks */ = {isa = PBXBuildFile; productRef = 152C78652CDA309700A2A977 /* SwiftyStoreKit */; };
+		152C78692CDA332500A2A977 /* PurchaseManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 152C78682CDA332500A2A977 /* PurchaseManager.swift */; };
+		152C786B2CDA365100A2A977 /* PaywallButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 152C786A2CDA365100A2A977 /* PaywallButton.swift */; };
+		152C786D2CDA3A8000A2A977 /* CustomLikeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 152C786C2CDA3A8000A2A977 /* CustomLikeViewController.swift */; };
+		152C78702CDA43D100A2A977 /* SettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 152C786F2CDA43D100A2A977 /* SettingsViewController.swift */; };
 		15D0BFAF2CD8F6CD0011227E /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15D0BFAE2CD8F6CD0011227E /* AppDelegate.swift */; };
 		15D0BFB12CD8F6CD0011227E /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15D0BFB02CD8F6CD0011227E /* SceneDelegate.swift */; };
 		15D0BFB62CD8F6CD0011227E /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 15D0BFB42CD8F6CD0011227E /* Main.storyboard */; };
@@ -37,6 +42,11 @@
 		152C785D2CD949A900A2A977 /* ModelDataOnb.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelDataOnb.swift; sourceTree = "<group>"; };
 		152C785F2CD9528A00A2A977 /* NotifyOnbViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotifyOnbViewController.swift; sourceTree = "<group>"; };
 		152C78622CD95E9B00A2A977 /* PaywallViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaywallViewController.swift; sourceTree = "<group>"; };
+		152C78682CDA332500A2A977 /* PurchaseManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PurchaseManager.swift; sourceTree = "<group>"; };
+		152C786A2CDA365100A2A977 /* PaywallButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaywallButton.swift; sourceTree = "<group>"; };
+		152C786C2CDA3A8000A2A977 /* CustomLikeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomLikeViewController.swift; sourceTree = "<group>"; };
+		152C786F2CDA43D100A2A977 /* SettingsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewController.swift; sourceTree = "<group>"; };
+		152C78712CDA6D5000A2A977 /* MainConfiguration.storekit */ = {isa = PBXFileReference; lastKnownFileType = text; path = MainConfiguration.storekit; sourceTree = "<group>"; };
 		15D0BFAB2CD8F6CD0011227E /* titEggs.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = titEggs.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		15D0BFAE2CD8F6CD0011227E /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		15D0BFB02CD8F6CD0011227E /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -55,6 +65,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				15D0BFCD2CD909390011227E /* SnapKit in Frameworks */,
+				152C78662CDA309700A2A977 /* SwiftyStoreKit in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -86,6 +97,7 @@
 			isa = PBXGroup;
 			children = (
 				152C785B2CD9469800A2A977 /* CreateElements.swift */,
+				152C786C2CDA3A8000A2A977 /* CustomLikeViewController.swift */,
 			);
 			path = CreateElements;
 			sourceTree = "<group>";
@@ -94,13 +106,31 @@
 			isa = PBXGroup;
 			children = (
 				152C78622CD95E9B00A2A977 /* PaywallViewController.swift */,
+				152C786A2CDA365100A2A977 /* PaywallButton.swift */,
 			);
 			path = Paywall;
+			sourceTree = "<group>";
+		};
+		152C78672CDA322100A2A977 /* PurchaseManager */ = {
+			isa = PBXGroup;
+			children = (
+				152C78682CDA332500A2A977 /* PurchaseManager.swift */,
+			);
+			path = PurchaseManager;
+			sourceTree = "<group>";
+		};
+		152C786E2CDA43C600A2A977 /* Settings */ = {
+			isa = PBXGroup;
+			children = (
+				152C786F2CDA43D100A2A977 /* SettingsViewController.swift */,
+			);
+			path = Settings;
 			sourceTree = "<group>";
 		};
 		15D0BFA22CD8F6CD0011227E = {
 			isa = PBXGroup;
 			children = (
+				152C78712CDA6D5000A2A977 /* MainConfiguration.storekit */,
 				15D0BFAD2CD8F6CD0011227E /* titEggs */,
 				15D0BFAC2CD8F6CD0011227E /* Products */,
 			);
@@ -117,6 +147,8 @@
 		15D0BFAD2CD8F6CD0011227E /* titEggs */ = {
 			isa = PBXGroup;
 			children = (
+				152C786E2CDA43C600A2A977 /* Settings */,
+				152C78672CDA322100A2A977 /* PurchaseManager */,
 				152C78612CD95E8500A2A977 /* Paywall */,
 				152C785A2CD9468400A2A977 /* CreateElements */,
 				152C78552CD9183800A2A977 /* Onboarding */,
@@ -184,6 +216,7 @@
 			name = titEggs;
 			packageProductDependencies = (
 				15D0BFCC2CD909390011227E /* SnapKit */,
+				152C78652CDA309700A2A977 /* SwiftyStoreKit */,
 			);
 			productName = titEggs;
 			productReference = 15D0BFAB2CD8F6CD0011227E /* titEggs.app */;
@@ -215,6 +248,7 @@
 			mainGroup = 15D0BFA22CD8F6CD0011227E;
 			packageReferences = (
 				15D0BFCB2CD909390011227E /* XCRemoteSwiftPackageReference "SnapKit" */,
+				152C78642CDA309700A2A977 /* XCRemoteSwiftPackageReference "SwiftyStoreKit" */,
 			);
 			productRefGroup = 15D0BFAC2CD8F6CD0011227E /* Products */;
 			projectDirPath = "";
@@ -246,16 +280,20 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				152C786D2CDA3A8000A2A977 /* CustomLikeViewController.swift in Sources */,
 				152C785E2CD949A900A2A977 /* ModelDataOnb.swift in Sources */,
 				152C785C2CD9469800A2A977 /* CreateElements.swift in Sources */,
 				152C78572CD9184D00A2A977 /* LoadViewController.swift in Sources */,
 				15D0BFD02CD90AE90011227E /* CreateViewController.swift in Sources */,
 				15D0BFCA2CD9017A0011227E /* TabBarViewController.swift in Sources */,
 				152C78602CD9528A00A2A977 /* NotifyOnbViewController.swift in Sources */,
+				152C786B2CDA365100A2A977 /* PaywallButton.swift in Sources */,
+				152C78702CDA43D100A2A977 /* SettingsViewController.swift in Sources */,
 				15D0BFAF2CD8F6CD0011227E /* AppDelegate.swift in Sources */,
 				152C78592CD943D000A2A977 /* OnboardingViewController.swift in Sources */,
 				152C78632CD95E9B00A2A977 /* PaywallViewController.swift in Sources */,
 				15D0BFB12CD8F6CD0011227E /* SceneDelegate.swift in Sources */,
+				152C78692CDA332500A2A977 /* PurchaseManager.swift in Sources */,
 				15D0BFC82CD8F9820011227E /* Extensions.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -410,6 +448,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = titEggs/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "Синицы";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
@@ -440,6 +479,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = titEggs/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "Синицы";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
@@ -485,6 +525,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		152C78642CDA309700A2A977 /* XCRemoteSwiftPackageReference "SwiftyStoreKit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/bizz84/SwiftyStoreKit";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.16.4;
+			};
+		};
 		15D0BFCB2CD909390011227E /* XCRemoteSwiftPackageReference "SnapKit" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/SnapKit/SnapKit";
@@ -496,6 +544,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		152C78652CDA309700A2A977 /* SwiftyStoreKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 152C78642CDA309700A2A977 /* XCRemoteSwiftPackageReference "SwiftyStoreKit" */;
+			productName = SwiftyStoreKit;
+		};
 		15D0BFCC2CD909390011227E /* SnapKit */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 15D0BFCB2CD909390011227E /* XCRemoteSwiftPackageReference "SnapKit" */;

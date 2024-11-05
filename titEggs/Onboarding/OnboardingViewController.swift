@@ -10,6 +10,17 @@ import StoreKit
 
 class OnboardingViewController: UIViewController {
     
+    var paywall: PurchaseManager
+    
+    init(paywall: PurchaseManager) {
+        self.paywall = paywall
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     private let arr: [OnbData] = [OnbData(image: "futureVideo", topText: "Pick a photo &\nblow it up", botText: "Create unreal videos"),
     OnbData(image: "futureVideo", topText: "Turn everything\nyou see", botText: "Quick and easy"),
     OnbData(image: "futureVideo", topText: "Take a photo &\nCake-ify it", botText: "Surprise your friends"),
@@ -85,7 +96,7 @@ class OnboardingViewController: UIViewController {
         case 4:
             requestReview()
         case 5:
-            self.navigationController?.setViewControllers([NotifyOnbViewController()], animated: true)
+            self.navigationController?.setViewControllers([NotifyOnbViewController(paywall: paywall)], animated: true)
         default:
             return
         }

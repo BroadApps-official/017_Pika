@@ -9,6 +9,8 @@ import UIKit
 
 class LoadViewController: UIViewController {
     
+    private var paywall = PurchaseManager()
+    
     private var timer: Timer?
 
     override func viewDidLoad() {
@@ -45,12 +47,27 @@ class LoadViewController: UIViewController {
     private func setTimer() {
         timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: false, block: { timer in //7
             if UserDefaults.standard.object(forKey: "onb") != nil {
-                self.navigationController?.setViewControllers([TabBarViewController()], animated: true)
+                if UserDefaults.standard.object(forKey: "rewiew") == nil {
+                    let counOpen: Int = UserDefaults.standard.integer(forKey: "count")
+                    if counOpen % 3 == 0 {
+                        self.openCustomLike()
+                    }
+                }
+                self.navigationController?.setViewControllers([TabBarViewController(manager: self.paywall)], animated: true)
             } else {
-                self.navigationController?.setViewControllers([OnboardingViewController()], animated: true)
+                self.navigationController?.setViewControllers([OnboardingViewController(paywall: self.paywall)], animated: true)
             }
         })
     }
     
+    private func openCustomLike() {
+        let customViewController = CustomLikeViewController()
+        customViewController.modalPresentationStyle = .fullScreen
+        customViewController.modalTransitionStyle = .coverVertical
+        if #available(iOS 13.0, *) {
+            customViewController.isModalInPresentation = true
+        }
+        present(customViewController, animated: true, completion: nil)
+    }
     
 }

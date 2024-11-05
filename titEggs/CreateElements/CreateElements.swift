@@ -31,8 +31,8 @@ class CreateElements {
     }
     
     
-    static func openPaywall() -> UIViewController {
-        let paywallViewController = PaywallViewController()
+    static func openPaywall(manager: PurchaseManager) -> UIViewController {
+        let paywallViewController = PaywallViewController(manager: manager)
         paywallViewController.modalPresentationStyle = .fullScreen
         paywallViewController.modalTransitionStyle = .coverVertical
         if #available(iOS 13.0, *) {

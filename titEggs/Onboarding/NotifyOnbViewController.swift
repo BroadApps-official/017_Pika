@@ -10,6 +10,17 @@ import UserNotifications
 
 class NotifyOnbViewController: UIViewController {
     
+    var paywall: PurchaseManager
+    
+    init(paywall: PurchaseManager) {
+        self.paywall = paywall
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     private let laterButton: UIButton = {
         let button = UIButton(type: .system)
         button.backgroundColor = .clear
@@ -100,19 +111,13 @@ class NotifyOnbViewController: UIViewController {
     }
     
     @objc private func hideVc() {
-        self.navigationController?.setViewControllers([TabBarViewController()], animated: true)
-        openPaywall()
+        self.navigationController?.setViewControllers([TabBarViewController(manager: self.paywall)], animated: true)
+        paywallButtonTapped()
         UserDefaults.standard.setValue(1, forKey: "onb")
     }
     
-    private func openPaywall() {
-        let paywallViewController = PaywallViewController()
-        paywallViewController.modalPresentationStyle = .fullScreen
-        paywallViewController.modalTransitionStyle = .coverVertical
-        if #available(iOS 13.0, *) {
-            paywallViewController.isModalInPresentation = true
-        }
-        present(paywallViewController, animated: true, completion: nil)
+    @objc private func paywallButtonTapped() {
+        self.present(CreateElements.openPaywall(manager: paywall ), animated: true)
     }
     
     private func requestNotificationAuthorization(completion: @escaping () -> Void) {

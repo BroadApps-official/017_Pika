@@ -9,16 +9,35 @@ import UIKit
 import SnapKit
 
 class TabBarViewController: UITabBarController {
-
+    
+    private var manager: PurchaseManager
+    
+    init(manager: PurchaseManager) {
+        self.manager = manager
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        hideNavigationBar()
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
+        updateBuy()
     }
     
     private func setupUI() {
         tabBar.unselectedItemTintColor = .white.withAlphaComponent(0.4)
         tabBar.tintColor = .primary
         tabBar.backgroundColor = .bgChromeMaterialbar
+        tabBar.isTranslucent = false
+        tabBar.barTintColor = UIColor.bgChromeMaterialbar
         
         let separatorView = UIView()
         separatorView.backgroundColor = .white.withAlphaComponent(0.24)
@@ -29,9 +48,15 @@ class TabBarViewController: UITabBarController {
             make.top.equalToSuperview()
         }
         
-        let createVc = createVC(VC: CreateViewController(), image: .create.resize(targetSize: CGSize(width: 32, height: 32)), title: "Create")
+        let createVCNo = CreateViewController(purchaseManager: manager)
+        let settingsVCNo = SettingsViewController(purchaseManager: manager)
+        
+        let createVc = createVC(VC: createVCNo, image: .create.resize(targetSize: CGSize(width: 32, height: 32)), title: "Create")
         let videosVc = createVC(VC: UIViewController(), image: .myVideos.resize(targetSize: CGSize(width: 32, height: 32)), title: "My Videos")
-        let settingsVc = createVC(VC: UIViewController(), image: .settings.resize(targetSize: CGSize(width: 20, height: 20)), title: "Settings")
+        let settingsVc = createVC(VC: settingsVCNo, image: .settings.resize(targetSize: CGSize(width: 20, height: 20)), title: "Settings")
+        
+        createVCNo.purchaseManager = manager
+        settingsVCNo.purchaseManager = manager
         
         viewControllers = [createVc, videosVc, settingsVc]
     }
@@ -41,5 +66,12 @@ class TabBarViewController: UITabBarController {
         VC.tabBarItem = tapItem
         return UINavigationController(rootViewController: VC)
     }
+    
+    private func updateBuy() {
+        Task {
+            await manager.updatePurchasedProducts()
+        }
+    }
+
 
 }

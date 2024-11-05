@@ -1,0 +1,517 @@
+//
+//  SettingsViewController.swift
+//  titEggs
+//
+//  Created by Владимир Кацап on 05.11.2024.
+//
+
+import UIKit
+import StoreKit
+import WebKit
+import UserNotifications
+
+class SettingsViewController: UIViewController {
+    
+    var purchaseManager: PurchaseManager
+    
+    private let rightButton = PaywallButton()
+    
+    private let arrGeaders = ["Purchases", "Actions", "Support us", "Info & legal"]
+    
+    
+    
+    init(purchaseManager: PurchaseManager) {
+        self.purchaseManager = purchaseManager
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    private lazy var colelction: UICollectionView = {
+        let layout = UICollectionViewFlowLayout()
+        let collection = UICollectionView(frame: .zero, collectionViewLayout: layout)
+        collection.showsVerticalScrollIndicator = false
+        layout.scrollDirection = .vertical
+        collection.register(UICollectionViewCell.self, forCellWithReuseIdentifier: "1")
+        collection.backgroundColor = .clear
+        collection.delegate = self
+        collection.dataSource = self
+        layout.minimumLineSpacing = 10
+        layout.sectionInset = UIEdgeInsets(top: 15, left: 0, bottom: 15, right: 0)
+        return collection
+    }()
+    
+    private lazy var cacheLabel: UILabel = {
+        let label = UILabel()
+        label.textColor = .white.withAlphaComponent(0.4)
+        label.font = .appFont(.BodyRegular)
+        return label
+    }()
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        cacheLabel.text = getCache()
+        if purchaseManager.hasUnlockedPro {
+            rightButton.alpha = 0
+        } else {
+            rightButton.alpha = 1
+        }
+    }
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        view.backgroundColor = .bgPrimary
+        setupNavController()
+        setupUI()
+    }
+    
+    private func setupNavController() {
+        self.title = "Settings"
+        navigationController?.navigationBar.prefersLargeTitles = true
+        let appearance = UINavigationBarAppearance()
+        appearance.configureWithOpaqueBackground()
+        appearance.backgroundColor = .clear
+        appearance.titleTextAttributes = [
+            .foregroundColor: UIColor.white,
+            .font: UIFont.appFont(.HeadlineRegular)
+        ]
+        appearance.largeTitleTextAttributes = [
+            .foregroundColor: UIColor.white,
+            .font: UIFont.appFont(.LargeTitleEmphasized)
+        ]
+        navigationController?.navigationBar.standardAppearance = appearance
+        navigationController?.navigationBar.scrollEdgeAppearance = appearance
+        
+        if purchaseManager.hasUnlockedPro == false {
+            rightButton.addTarget(self, action: #selector(paywallButtonTapped), for: .touchUpInside)
+            
+            let barButtonItem = UIBarButtonItem(customView: rightButton)
+            
+            navigationItem.rightBarButtonItem = barButtonItem
+            rightButton.snp.makeConstraints { make in
+                make.width.equalTo(80)
+                make.height.equalTo(32)
+            }
+            rightButton.addTouchFeedback()
+        }
+        
+        
+    }
+    
+    @objc private func paywallButtonTapped() {
+        self.present(CreateElements.openPaywall(manager: purchaseManager ), animated: true)
+    }
+    
+    @objc private func restorePur() {
+        purchaseManager.restoreArrPurchase()
+    }
+    
+    
+    private func setupUI() {
+        view.addSubview(colelction)
+        colelction.snp.makeConstraints { make in
+            make.left.right.equalToSuperview().inset(15)
+            make.top.equalTo(view.safeAreaLayoutGuide.snp.top)
+            make.bottom.equalToSuperview()
+        }
+    }
+    
+    private func createTopLabel(text: String) -> UILabel {
+        let label = UILabel()
+        label.text = text
+        label.textColor = .white.withAlphaComponent(0.8)
+        label.font = .appFont(.FootnoteEmphasized)
+        return label
+    }
+    
+    private func createCellViews(cell: Int) -> UIView {
+        
+        let view = UIView()
+        view.backgroundColor = .bgTeriary
+        view.layer.cornerRadius = 10
+        view.clipsToBounds = true
+        
+        let stackView = UIStackView()
+        stackView.axis = .vertical
+        stackView.spacing = 0
+        stackView.distribution = .fillEqually
+        
+        view.addSubview(stackView)
+        stackView.snp.makeConstraints { make in
+            make.edges.equalToSuperview()
+        }
+        
+        switch cell {
+        case 0:
+            let viewOne = createSubView(text: "Upgrade plan", isArrow: true, image: .t1R1, isBotSeparator: true)
+            let viewTwo = createSubView(text: "Restore purchases", isArrow: true, image: .t1R2, isBotSeparator: false)
+            stackView.addArrangedSubview(viewOne)
+            stackView.addArrangedSubview(viewTwo)
+            viewOne.addTarget(self, action: #selector(paywallButtonTapped), for: .touchUpInside)
+            viewTwo.addTarget(self, action: #selector(restorePur), for: .touchUpInside)
+        case 1:
+            let viewOne = createSubView(text: "Notifications", isArrow: false, image: .t2R1, isBotSeparator: true)
+            let swithcer = UISwitch()
+            swithcer.addTarget(self, action: #selector(enableNotify(sender:)), for: .valueChanged)
+            checkAlert { result in
+                DispatchQueue.main.async {
+                    swithcer.isOn = result
+                }
+            }
+            swithcer.onTintColor = UIColor(red: 39/255, green: 165/255, blue: 255/255, alpha: 1)
+            viewOne.addSubview(swithcer)
+            swithcer.snp.makeConstraints { make in
+                make.centerY.equalToSuperview()
+                make.right.equalToSuperview().inset(15)
+                make.height.equalTo(31)
+                make.width.equalTo(51)
+            }
+            
+            let viewTwo = createSubView(text: "Clear cache", isArrow: true, image: .t2R2, isBotSeparator: false)
+            viewTwo.addSubview(cacheLabel)
+            cacheLabel.snp.makeConstraints { make in
+                make.centerY.equalToSuperview()
+                make.right.equalToSuperview().inset(35)
+            }
+            viewTwo.addTarget(self, action: #selector(clearCache), for: .touchUpInside)
+            stackView.addArrangedSubview(viewOne)
+            stackView.addArrangedSubview(viewTwo)
+        case 2:
+            let viewOne = createSubView(text: "Rate app", isArrow: true, image: .t3R1, isBotSeparator: true)
+            viewOne.addTarget(self, action: #selector(rateApp), for: .touchUpInside)
+            let viewTwo = createSubView(text: "Share with friends", isArrow: true, image: .t3R2, isBotSeparator: false)
+            viewTwo.addTarget(self, action: #selector(shareFriends), for: .touchUpInside)
+            stackView.addArrangedSubview(viewOne)
+            stackView.addArrangedSubview(viewTwo)
+        case 3:
+            let viewOne = createSubView(text: "Contact us", isArrow: true, image: .t4R1, isBotSeparator: true)
+            viewOne.addTarget(self, action: #selector(contactUs), for: .touchUpInside)
+            let viewTwo = createSubView(text: "Privacy Policy", isArrow: true, image: .t4R2, isBotSeparator: true)
+            viewTwo.addTarget(self, action: #selector(privacyPol), for: .touchUpInside)
+            let viewThree = createSubView(text: "Usage Policy", isArrow: true, image: .t4R3, isBotSeparator: false)
+            viewThree.addTarget(self, action: #selector(usagePol), for: .touchUpInside)
+            stackView.addArrangedSubview(viewOne)
+            stackView.addArrangedSubview(viewTwo)
+            stackView.addArrangedSubview(viewThree)
+        default:
+            print(4)
+        }
+        
+        return view
+    }
+    
+    private func getCache() -> String {
+        let fileManager = FileManager.default
+        let cacheURL = fileManager.urls(for: .cachesDirectory, in: .userDomainMask).first!
+        let tempURL = fileManager.temporaryDirectory
+
+        var totalSize: Int64 = 0
+
+        do {
+            let cacheFiles = try fileManager.contentsOfDirectory(at: cacheURL, includingPropertiesForKeys: nil)
+            for fileURL in cacheFiles {
+                let fileAttributes = try fileManager.attributesOfItem(atPath: fileURL.path)
+                if let fileSize = fileAttributes[FileAttributeKey.size] as? Int64 {
+                    totalSize += fileSize
+                }
+            }
+            let tempFiles = try fileManager.contentsOfDirectory(at: tempURL, includingPropertiesForKeys: nil)
+            for fileURL in tempFiles {
+                let fileAttributes = try fileManager.attributesOfItem(atPath: fileURL.path)
+                if let fileSize = fileAttributes[FileAttributeKey.size] as? Int64 {
+                    totalSize += fileSize
+                }
+            }
+        } catch {
+            print("Ошибка при получении размера кэша: \(error.localizedDescription)")
+        }
+
+        let cacheSizeString: String
+        if totalSize < 1024 {
+            cacheSizeString = "\(totalSize) B"
+        } else if totalSize < 1024 * 1024 {
+            cacheSizeString = String(format: "%.1f KB", Double(totalSize) / 1024.0)
+        } else {
+            cacheSizeString = String(format: "%.1f MB", Double(totalSize) / (1024.0 * 1024.0))
+        }
+
+        return cacheSizeString
+    }
+    
+    @objc private func clearCache() {
+        
+        let alertController = UIAlertController(title: "Clear cache?", message: "The cached files of your videos will be deleted from your phone's memory. But your download history will be retained.", preferredStyle: .alert)
+        
+        let cancelButton = UIAlertAction(title: "Cancel", style: .cancel)
+        alertController.addAction(cancelButton)
+        
+        let clearButtpn = UIAlertAction(title: "Clear", style: .destructive) { _ in
+            let fileManager = FileManager.default
+            let cacheURL = fileManager.urls(for: .cachesDirectory, in: .userDomainMask).first!
+            do {
+                let cacheFiles = try fileManager.contentsOfDirectory(at: cacheURL, includingPropertiesForKeys: nil)
+                for fileURL in cacheFiles {
+                    try fileManager.removeItem(at: fileURL)
+                }
+                self.cacheLabel.text = self.getCache()
+            } catch {
+                print("Ошибка при очистке кэша: \(error.localizedDescription)")
+            }
+        }
+        alertController.addAction(clearButtpn)
+        
+        self.present(alertController, animated: true)
+    }
+    
+    @objc private func contactUs() {
+        let email = "example@example.com" // POST
+        let emailURL = "mailto:\(email)"
+        if let url = URL(string: emailURL.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!) {
+            if UIApplication.shared.canOpenURL(url) {
+                UIApplication.shared.open(url, options: [:], completionHandler: nil)
+            } else {
+                print("Не удалось открыть почтовое приложение.")
+            }
+        }
+    }
+
+
+
+
+    @objc private func enableNotify(sender: UISwitch) {
+        let notificationCenter = UNUserNotificationCenter.current()
+        
+        // Проверяем текущее состояние разрешений на уведомления
+        notificationCenter.getNotificationSettings { settings in
+            switch settings.authorizationStatus {
+            case .authorized:
+                DispatchQueue.main.async {
+                    if sender.isOn == true {
+                        let alert = UIAlertController(title: "Allow notifications?",
+                                                      message: "This app will be able to send you messages in your notification center",
+                                                      preferredStyle: .alert)
+                        alert.addAction(UIAlertAction(title: "Allow", style: .default) { _ in
+                            sender.isOn = true
+                        })
+                        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel) { _ in
+                            sender.isOn = false
+                        })
+                        self.present(alert, animated: true, completion: nil)
+                    } else {
+                        sender.isOn = false
+                    }
+                }
+                
+            case .denied:
+                // Уведомления были отключены, вы можете показать предупреждение
+                print("Уведомления отключены. Пожалуйста, включите их в настройках.")
+                DispatchQueue.main.async {
+                    sender.isOn = false // Обновляем переключатель
+                }
+            case .notDetermined:
+                // Запрашиваем разрешение на отправку уведомлений
+                notificationCenter.requestAuthorization(options: [.alert, .sound, .badge]) { granted, error in
+                    DispatchQueue.main.async {
+                        if granted {
+                            sender.isOn = true // Если разрешение получено, устанавливаем переключатель в состояние "включено"
+                            print("Уведомления включены.")
+                        } else {
+                            sender.isOn = false // Если разрешение не получено, устанавливаем переключатель в состояние "выключено"
+                            print("Уведомления не были включены.")
+                        }
+                    }
+                }
+            case .provisional:
+                // Временные уведомления разрешены
+                print("Временные уведомления разрешены.")
+            case .ephemeral:
+                // Эфемерные уведомления разрешены
+                print("Эфемерные уведомления разрешены.")
+            @unknown default:
+                break
+            }
+        }
+    }
+    
+    private func checkAlert(completion: @escaping (Bool) -> Void) {
+        let center = UNUserNotificationCenter.current()
+        center.getNotificationSettings { (settings) in
+            switch settings.authorizationStatus {
+            case .authorized:
+                completion(true) // Уведомления разрешены
+            case .denied, .notDetermined:
+                completion(false) // Уведомления не разрешены или статус еще не определен
+            case .provisional:
+                completion(true) // Временные уведомления разрешены (только для iOS 12 и выше)
+            case .ephemeral:
+                completion(true) // Эфемерные уведомления разрешены (только для iOS 14 и выше)
+            @unknown default:
+                completion(false) // Обработка других, неизвестных статусов
+            }
+        }
+    }
+    
+    //supp
+    @objc private func rateApp() {
+        if #available(iOS 14, *) {
+            if let scene = UIApplication.shared.connectedScenes.first(where: { $0.activationState == .foregroundActive }) as? UIWindowScene {
+                DispatchQueue.main.async {
+                    SKStoreReviewController.requestReview(in: scene)
+                }
+            }
+        } else {
+            let appID = "ID"
+            if let url = URL(string: "itms-apps://itunes.apple.com/app/id\(appID)?action=write-review") {
+                UIApplication.shared.open(url, options: [:], completionHandler: nil)
+            }
+        }
+    }
+    
+    
+    @objc private func shareFriends() {
+        guard let appName = Bundle.main.infoDictionary?["CFBundleDisplayName"] as? String else {
+            return
+        }
+        let appID = "ID_приложения"
+        let appURL = "https://apps.apple.com/app/id\(appID)"
+        let shareText = "\(appName)\n\(appURL)"
+        let activityViewController = UIActivityViewController(activityItems: [shareText], applicationActivities: nil)
+        activityViewController.popoverPresentationController?.sourceView = self.view
+        present(activityViewController, animated: true, completion: nil)
+    }
+    
+    @objc private func privacyPol() {
+        let webVC = WebViewController()
+        webVC.urlString = "PRIVA"
+        present(webVC, animated: true, completion: nil)
+    }
+
+    @objc private func usagePol() {
+        let webVC = WebViewController()
+        webVC.urlString = "USAGE"
+        present(webVC, animated: true, completion: nil)
+    }
+    
+    private func createSubView(text: String, isArrow: Bool, image: UIImage, isBotSeparator: Bool) -> UIButton {
+        let button = UIButton(type: .system)
+        button.addTouchFeedback()
+        button.backgroundColor = .clear
+        
+        let imageView = UIImageView(image: image)
+        button.addSubview(imageView)
+        imageView.snp.makeConstraints { make in
+            make.height.equalTo(44)
+            make.width.equalTo(36)
+            make.left.equalToSuperview().inset(15)
+            make.centerY.equalToSuperview()
+        }
+        
+        let labelText = UILabel()
+        labelText.text = text
+        labelText.textColor = .white
+        labelText.font = .appFont(.BodyRegular)
+        
+        button.addSubview(labelText)
+        labelText.snp.makeConstraints { make in
+            make.left.equalTo(imageView.snp.right)
+            make.centerY.equalToSuperview()
+        }
+        
+        if isArrow {
+            let arrowImageView = UIImageView(image: .rightArrow)
+            button.addSubview(arrowImageView)
+            arrowImageView.snp.makeConstraints { make in
+                make.right.equalToSuperview()
+                make.height.equalTo(44)
+                make.width.equalTo(24)
+                make.centerY.equalToSuperview()
+            }
+        }
+        
+        if isBotSeparator {
+            let viewSep = UIView()
+            viewSep.backgroundColor = .white
+            button.addSubview(viewSep)
+            viewSep.snp.makeConstraints { make in
+                make.height.equalTo(0.33)
+                make.bottom.equalToSuperview()
+                make.right.equalToSuperview()
+                make.left.equalTo(labelText.snp.left)
+            }
+        }
+        return button
+    }
+    
+}
+
+
+extension SettingsViewController: UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
+    
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        return 4
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "1", for: indexPath)
+        cell.subviews.forEach { $0.removeFromSuperview() }
+        cell.backgroundColor = .bgPrimary
+        
+        let topLabel = createTopLabel(text: arrGeaders[indexPath.row])
+        cell.addSubview(topLabel)
+        topLabel.snp.makeConstraints { make in
+            make.left.top.equalToSuperview()
+        }
+        
+        let viewCell = createCellViews(cell: indexPath.row)
+        cell.addSubview(viewCell)
+        viewCell.snp.makeConstraints { make in
+            make.left.right.equalToSuperview()
+            make.top.equalTo(topLabel.snp.bottom).inset(-5)
+            make.height.equalTo(indexPath.row == 3 ? 132 : 88)
+        }
+        //cell.backgroundColor = .red
+        
+        if indexPath.row == 3 {
+            let versionlabel = UILabel()
+            versionlabel.textColor = .white.withAlphaComponent(0.6)
+            versionlabel.font = .appFont(.FootnoteRegular)
+            if let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String {
+                versionlabel.text = "App Version: \(version)"
+            } else {
+                versionlabel.text = "App Version: Unknown"
+            }
+            
+            cell.addSubview(versionlabel)
+            versionlabel.snp.makeConstraints { make in
+                make.centerX.equalToSuperview()
+                make.bottom.equalToSuperview().inset(20)
+            }
+        }
+        
+        return cell
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        return CGSize(width: collectionView.bounds.width, height: indexPath.row != 3 ? 112 : 206)
+    }
+}
+
+
+class WebViewController: UIViewController, WKNavigationDelegate {
+    var webView: WKWebView!
+    var urlString: String?
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        webView = WKWebView()
+        webView.navigationDelegate = self
+        view = webView
+
+        if let urlString = urlString, let url = URL(string: urlString) {
+            webView.load(URLRequest(url: url))
+        }
+    }
+}

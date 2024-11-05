@@ -6,6 +6,8 @@
 //
 
 import UIKit
+import StoreKit
+import WebKit
 
 class PaywallViewController: UIViewController {
     
@@ -25,6 +27,7 @@ class PaywallViewController: UIViewController {
     private lazy var termsButton = createMiniButtons(title: "Terms of Use", color: .white.withAlphaComponent(0.4), font: .appFont(.Caption2Regular), isACancelAnytime: false)
     private lazy var restoreButton = createMiniButtons(title: "Restore Purchases", color: .white.withAlphaComponent(0.6), font: .appFont(.Caption1Regular), isACancelAnytime: false)
     
+    
     private lazy var continueButton = CreateElements.createPrimaryButton(title: "Continue")
     private lazy var cancelAnytimeButton = createMiniButtons(title: "Cancel Anytime", color: .white.withAlphaComponent(0.4), font: .appFont(.Caption1Regular), isACancelAnytime: true)
     
@@ -33,19 +36,67 @@ class PaywallViewController: UIViewController {
     private lazy var selectedSubscribe = true  // тру -1 кнопка ; фолс - вторая
     private lazy var buttonsTopStackView = UIStackView(arrangedSubviews: [annualButton, weeklyButton])
     
+    private lazy var progressView: UIActivityIndicatorView = {
+        let view = UIActivityIndicatorView(style: .medium)
+        view.color = .primary
+        return view
+    }()
+    
+    
     private lazy var closePaywall: UIButton = {
         let button = UIButton(type: .system)
         button.setBackgroundImage(.closePaywall, for: .normal)
         button.alpha = 0
         return button
     }()
-
+    
+    //MARK: -Store
+    private let manager:PurchaseManager
+    private lazy var products: [Product] = []
+    
+    
+    init(manager: PurchaseManager) {
+        self.manager = manager
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    
     override func viewDidLoad() {
         super.viewDidLoad()
+        someMethod()
         view.backgroundColor = .bgPrimary
         setupUI()
         setupTimer()
     }
+    
+    private func someMethod() {
+        Task {
+            await loadProd()
+        }
+    }
+    
+    private func loadProd() async {
+        await loadProducts()
+    }
+    
+    
+    private func loadProducts() async {
+        do {
+            try await manager.loadProducts()
+            self.products = manager.products
+            self.buttonsTopStackView.alpha = 1
+            self.selectPlan(sender: self.annualButton)
+            self.progressView.alpha = 0
+        } catch {
+            print("Ошибка при загрузке продуктов: \(error)")
+        }
+    }
+    
+
     
     private func setupTimer() {
         timer = Timer.scheduledTimer(withTimeInterval: 2, repeats: false, block: { _ in
@@ -56,7 +107,7 @@ class PaywallViewController: UIViewController {
         })
     }
     
-
+    
     private func setupUI() {
         let imageView = UIImageView(image: .paywallVideo)
         imageView.contentMode = .scaleAspectFill
@@ -70,13 +121,14 @@ class PaywallViewController: UIViewController {
         view.addSubview(shadowImageView)
         shadowImageView.snp.makeConstraints { make in
             make.left.bottom.right.equalToSuperview()
-
+            
             make.height.equalTo(view.snp.height).multipliedBy(4.1 / 5.0).priority(.low)
             make.height.lessThanOrEqualTo(600)
         }
         
         policyButton.addTarget(self, action: #selector(openPolicy), for: .touchUpInside)
         termsButton.addTarget(self, action: #selector(openTerms), for: .touchUpInside)
+        restoreButton.addTarget(self, action: #selector(restore), for: .touchUpInside)
         
         let stackViewBot = UIStackView(arrangedSubviews: [policyButton, restoreButton, termsButton])
         stackViewBot.backgroundColor = .clear
@@ -95,6 +147,7 @@ class PaywallViewController: UIViewController {
             make.height.equalTo(48)
             make.bottom.equalTo(stackViewBot.snp.top).inset(-10)
         }
+        continueButton.addTarget(self, action: #selector(createPurchase), for: .touchUpInside)
         
         cancelAnytimeButton.isUserInteractionEnabled = false
         view.addSubview(cancelAnytimeButton)
@@ -102,7 +155,19 @@ class PaywallViewController: UIViewController {
             make.centerX.equalToSuperview()
             make.bottom.equalTo(continueButton.snp.top).inset(-10)
         }
-
+        
+        
+        view.addSubview(progressView)
+        progressView.startAnimating()
+        progressView.snp.makeConstraints { make in
+            make.height.equalTo(120)
+            make.left.right.equalToSuperview().inset(15)
+            make.bottom.equalTo(cancelAnytimeButton.snp.top).inset(-20)
+        }
+        
+        
+        
+        buttonsTopStackView.alpha = 0
         buttonsTopStackView.axis = .vertical
         buttonsTopStackView.distribution = .fillEqually
         buttonsTopStackView.spacing = 8
@@ -122,7 +187,7 @@ class PaywallViewController: UIViewController {
         view.addSubview(topStackView)
         topStackView.snp.makeConstraints { make in
             make.centerX.equalToSuperview()
-            make.bottom.equalTo(buttonsTopStackView.snp.top).inset(-20)
+            make.bottom.equalTo(progressView.snp.top).inset(-20)
             make.height.equalTo(100)
             make.width.equalTo(174)
         }
@@ -143,16 +208,44 @@ class PaywallViewController: UIViewController {
         }
     }
     
+    @objc private func createPurchase() {
+        Task {
+            do {
+                let productToPurchase = selectedSubscribe ? products.first : products.last
+                guard let product = productToPurchase else { return }
+                try await manager.purchase(product)
+                self.dismiss(animated: true)
+            } catch {
+                print("Ошибка при покупке: \(error)")
+            }
+        }
+    }
+
+
+
+    
+    private func createStackView() {
+        
+    }
+    
     @objc private func close() {
         self.dismiss(animated: true)
     }
     
     @objc private func openPolicy() {
-        
+        let webVC = WebViewController()
+        webVC.urlString = "PRIVA"
+        present(webVC, animated: true, completion: nil)
     }
     
     @objc private func openTerms() {
-        
+        let webVC = WebViewController()
+        webVC.urlString = "TERMS"
+        present(webVC, animated: true, completion: nil)
+    }
+    
+    @objc private func restore() {
+        manager.restoreArrPurchase()
     }
     
     
@@ -188,7 +281,7 @@ class PaywallViewController: UIViewController {
         button.layer.borderWidth = selected ? 1 : 0
         
         let typeLabel = UILabel()
-        typeLabel.text = type ? "Annual" : "Weekly"
+        typeLabel.text = type ? products.first?.displayName : products.last?.displayName
         typeLabel.textColor = .white
         typeLabel.font = .appFont(.BodyRegular)
         button.addSubview(typeLabel)
@@ -217,7 +310,7 @@ class PaywallViewController: UIViewController {
         let countlabel = UILabel()
         countlabel.font = .appFont(.BodyEmphasized)
         countlabel.textColor = .white
-        countlabel.text = type ? "$19.99" : "$4.99"
+        countlabel.text = type ? products.first?.displayPrice : products.last?.displayPrice
         button.addSubview(countlabel)
         countlabel.snp.makeConstraints { make in
             make.right.equalToSuperview().inset(15)
@@ -255,19 +348,19 @@ class PaywallViewController: UIViewController {
     @objc private func selectPlan(sender: UIButton) {
         buttonsTopStackView.arrangedSubviews.forEach { $0.removeFromSuperview() }
         if sender.tag == 1 {
+            selectedSubscribe = true
             annualButton = createSubscribeButtons(type: true, selected: true)
             weeklyButton = createSubscribeButtons(type: false, selected: false)
         } else {
+            selectedSubscribe = false
             weeklyButton = createSubscribeButtons(type: false, selected: true)
             annualButton = createSubscribeButtons(type: true, selected: false)
         }
-
+        
         buttonsTopStackView.addArrangedSubview(annualButton)
         buttonsTopStackView.addArrangedSubview(weeklyButton)
-        
-        print(sender.tag)
     }
-
+    
     @objc private func buttonTouchDown(_ sender: UIButton) {
         sender.alpha = 0.7
     }
@@ -314,5 +407,6 @@ class PaywallViewController: UIViewController {
         
         return view
     }
-
+    
 }
+
