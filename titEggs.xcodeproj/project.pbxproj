@@ -21,6 +21,15 @@
 		152C786B2CDA365100A2A977 /* PaywallButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 152C786A2CDA365100A2A977 /* PaywallButton.swift */; };
 		152C786D2CDA3A8000A2A977 /* CustomLikeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 152C786C2CDA3A8000A2A977 /* CustomLikeViewController.swift */; };
 		152C78702CDA43D100A2A977 /* SettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 152C786F2CDA43D100A2A977 /* SettingsViewController.swift */; };
+		152C78742CDB7D7C00A2A977 /* MyVideosViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 152C78732CDB7D7C00A2A977 /* MyVideosViewController.swift */; };
+		152C78782CDB887E00A2A977 /* MainModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 152C78772CDB887E00A2A977 /* MainModel.swift */; };
+		152C78812CDCCAFD00A2A977 /* NetWorking.swift in Sources */ = {isa = PBXBuildFile; fileRef = 152C78802CDCCAFD00A2A977 /* NetWorking.swift */; };
+		152C78842CDCCB1400A2A977 /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = 152C78832CDCCB1400A2A977 /* Alamofire */; };
+		152C78872CDCCC3900A2A977 /* DataModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 152C78862CDCCC3900A2A977 /* DataModel.swift */; };
+		15542B192CDCEFFB0045598C /* GenerateVideoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15542B182CDCEFFB0045598C /* GenerateVideoViewController.swift */; };
+		15542B1C2CDCF3D20045598C /* Lottie in Frameworks */ = {isa = PBXBuildFile; productRef = 15542B1B2CDCF3D20045598C /* Lottie */; };
+		15542B1F2CDCF4C80045598C /* OpenedViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15542B1E2CDCF4C80045598C /* OpenedViewController.swift */; };
+		15542B222CDCFB390045598C /* Generate.json in Resources */ = {isa = PBXBuildFile; fileRef = 15542B212CDCFB390045598C /* Generate.json */; };
 		15D0BFAF2CD8F6CD0011227E /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15D0BFAE2CD8F6CD0011227E /* AppDelegate.swift */; };
 		15D0BFB12CD8F6CD0011227E /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15D0BFB02CD8F6CD0011227E /* SceneDelegate.swift */; };
 		15D0BFB62CD8F6CD0011227E /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 15D0BFB42CD8F6CD0011227E /* Main.storyboard */; };
@@ -47,6 +56,13 @@
 		152C786C2CDA3A8000A2A977 /* CustomLikeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomLikeViewController.swift; sourceTree = "<group>"; };
 		152C786F2CDA43D100A2A977 /* SettingsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewController.swift; sourceTree = "<group>"; };
 		152C78712CDA6D5000A2A977 /* MainConfiguration.storekit */ = {isa = PBXFileReference; lastKnownFileType = text; path = MainConfiguration.storekit; sourceTree = "<group>"; };
+		152C78732CDB7D7C00A2A977 /* MyVideosViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyVideosViewController.swift; sourceTree = "<group>"; };
+		152C78772CDB887E00A2A977 /* MainModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainModel.swift; sourceTree = "<group>"; };
+		152C78802CDCCAFD00A2A977 /* NetWorking.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetWorking.swift; sourceTree = "<group>"; };
+		152C78862CDCCC3900A2A977 /* DataModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataModel.swift; sourceTree = "<group>"; };
+		15542B182CDCEFFB0045598C /* GenerateVideoViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GenerateVideoViewController.swift; sourceTree = "<group>"; };
+		15542B1E2CDCF4C80045598C /* OpenedViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenedViewController.swift; sourceTree = "<group>"; };
+		15542B212CDCFB390045598C /* Generate.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = Generate.json; sourceTree = "<group>"; };
 		15D0BFAB2CD8F6CD0011227E /* titEggs.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = titEggs.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		15D0BFAE2CD8F6CD0011227E /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		15D0BFB02CD8F6CD0011227E /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -64,8 +80,10 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				152C78842CDCCB1400A2A977 /* Alamofire in Frameworks */,
 				15D0BFCD2CD909390011227E /* SnapKit in Frameworks */,
 				152C78662CDA309700A2A977 /* SwiftyStoreKit in Frameworks */,
+				15542B1C2CDCF3D20045598C /* Lottie in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -96,6 +114,7 @@
 		152C785A2CD9468400A2A977 /* CreateElements */ = {
 			isa = PBXGroup;
 			children = (
+				15542B172CDCED760045598C /* GenerationVideo */,
 				152C785B2CD9469800A2A977 /* CreateElements.swift */,
 				152C786C2CDA3A8000A2A977 /* CustomLikeViewController.swift */,
 			);
@@ -127,6 +146,48 @@
 			path = Settings;
 			sourceTree = "<group>";
 		};
+		152C78722CDB7D6600A2A977 /* MyVideos */ = {
+			isa = PBXGroup;
+			children = (
+				152C78732CDB7D7C00A2A977 /* MyVideosViewController.swift */,
+			);
+			path = MyVideos;
+			sourceTree = "<group>";
+		};
+		152C78852CDCCBEC00A2A977 /* MainModel */ = {
+			isa = PBXGroup;
+			children = (
+				152C78802CDCCAFD00A2A977 /* NetWorking.swift */,
+				152C78772CDB887E00A2A977 /* MainModel.swift */,
+				152C78862CDCCC3900A2A977 /* DataModel.swift */,
+			);
+			path = MainModel;
+			sourceTree = "<group>";
+		};
+		15542B172CDCED760045598C /* GenerationVideo */ = {
+			isa = PBXGroup;
+			children = (
+				15542B182CDCEFFB0045598C /* GenerateVideoViewController.swift */,
+			);
+			path = GenerationVideo;
+			sourceTree = "<group>";
+		};
+		15542B1D2CDCF4B30045598C /* FullVideo */ = {
+			isa = PBXGroup;
+			children = (
+				15542B1E2CDCF4C80045598C /* OpenedViewController.swift */,
+			);
+			path = FullVideo;
+			sourceTree = "<group>";
+		};
+		15542B202CDCF8770045598C /* Lottie */ = {
+			isa = PBXGroup;
+			children = (
+				15542B212CDCFB390045598C /* Generate.json */,
+			);
+			path = Lottie;
+			sourceTree = "<group>";
+		};
 		15D0BFA22CD8F6CD0011227E = {
 			isa = PBXGroup;
 			children = (
@@ -147,6 +208,9 @@
 		15D0BFAD2CD8F6CD0011227E /* titEggs */ = {
 			isa = PBXGroup;
 			children = (
+				15542B1D2CDCF4B30045598C /* FullVideo */,
+				152C78852CDCCBEC00A2A977 /* MainModel */,
+				152C78722CDB7D6600A2A977 /* MyVideos */,
 				152C786E2CDA43C600A2A977 /* Settings */,
 				152C78672CDA322100A2A977 /* PurchaseManager */,
 				152C78612CD95E8500A2A977 /* Paywall */,
@@ -164,6 +228,7 @@
 		15D0BFC22CD8F76B0011227E /* Other */ = {
 			isa = PBXGroup;
 			children = (
+				15542B202CDCF8770045598C /* Lottie */,
 				152C784E2CD9122B00A2A977 /* Fonts */,
 				15D0BFB42CD8F6CD0011227E /* Main.storyboard */,
 				15D0BFB72CD8F6CF0011227E /* Assets.xcassets */,
@@ -217,6 +282,8 @@
 			packageProductDependencies = (
 				15D0BFCC2CD909390011227E /* SnapKit */,
 				152C78652CDA309700A2A977 /* SwiftyStoreKit */,
+				152C78832CDCCB1400A2A977 /* Alamofire */,
+				15542B1B2CDCF3D20045598C /* Lottie */,
 			);
 			productName = titEggs;
 			productReference = 15D0BFAB2CD8F6CD0011227E /* titEggs.app */;
@@ -249,6 +316,8 @@
 			packageReferences = (
 				15D0BFCB2CD909390011227E /* XCRemoteSwiftPackageReference "SnapKit" */,
 				152C78642CDA309700A2A977 /* XCRemoteSwiftPackageReference "SwiftyStoreKit" */,
+				152C78822CDCCB1400A2A977 /* XCRemoteSwiftPackageReference "Alamofire" */,
+				15542B1A2CDCF3D20045598C /* XCRemoteSwiftPackageReference "lottie-ios" */,
 			);
 			productRefGroup = 15D0BFAC2CD8F6CD0011227E /* Products */;
 			projectDirPath = "";
@@ -268,6 +337,7 @@
 				15D0BFB82CD8F6CF0011227E /* Assets.xcassets in Resources */,
 				152C78542CD9128F00A2A977 /* SF-Pro-Text-Medium.otf in Resources */,
 				152C78532CD9128F00A2A977 /* SF-Pro-Text-Semibold.otf in Resources */,
+				15542B222CDCFB390045598C /* Generate.json in Resources */,
 				152C78522CD9128F00A2A977 /* SF-Pro-Text-Regular.otf in Resources */,
 				15D0BFB62CD8F6CD0011227E /* Main.storyboard in Resources */,
 			);
@@ -286,11 +356,17 @@
 				152C78572CD9184D00A2A977 /* LoadViewController.swift in Sources */,
 				15D0BFD02CD90AE90011227E /* CreateViewController.swift in Sources */,
 				15D0BFCA2CD9017A0011227E /* TabBarViewController.swift in Sources */,
+				15542B1F2CDCF4C80045598C /* OpenedViewController.swift in Sources */,
+				152C78742CDB7D7C00A2A977 /* MyVideosViewController.swift in Sources */,
+				15542B192CDCEFFB0045598C /* GenerateVideoViewController.swift in Sources */,
 				152C78602CD9528A00A2A977 /* NotifyOnbViewController.swift in Sources */,
 				152C786B2CDA365100A2A977 /* PaywallButton.swift in Sources */,
 				152C78702CDA43D100A2A977 /* SettingsViewController.swift in Sources */,
 				15D0BFAF2CD8F6CD0011227E /* AppDelegate.swift in Sources */,
+				152C78812CDCCAFD00A2A977 /* NetWorking.swift in Sources */,
+				152C78782CDB887E00A2A977 /* MainModel.swift in Sources */,
 				152C78592CD943D000A2A977 /* OnboardingViewController.swift in Sources */,
+				152C78872CDCCC3900A2A977 /* DataModel.swift in Sources */,
 				152C78632CD95E9B00A2A977 /* PaywallViewController.swift in Sources */,
 				15D0BFB12CD8F6CD0011227E /* SceneDelegate.swift in Sources */,
 				152C78692CDA332500A2A977 /* PurchaseManager.swift in Sources */,
@@ -446,6 +522,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 6YA7577C98;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = titEggs/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Синицы";
@@ -477,6 +554,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 6YA7577C98;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = titEggs/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Синицы";
@@ -533,6 +611,22 @@
 				minimumVersion = 0.16.4;
 			};
 		};
+		152C78822CDCCB1400A2A977 /* XCRemoteSwiftPackageReference "Alamofire" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/Alamofire/Alamofire";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.10.1;
+			};
+		};
+		15542B1A2CDCF3D20045598C /* XCRemoteSwiftPackageReference "lottie-ios" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/airbnb/lottie-ios";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 4.5.0;
+			};
+		};
 		15D0BFCB2CD909390011227E /* XCRemoteSwiftPackageReference "SnapKit" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/SnapKit/SnapKit";
@@ -548,6 +642,16 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 152C78642CDA309700A2A977 /* XCRemoteSwiftPackageReference "SwiftyStoreKit" */;
 			productName = SwiftyStoreKit;
+		};
+		152C78832CDCCB1400A2A977 /* Alamofire */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 152C78822CDCCB1400A2A977 /* XCRemoteSwiftPackageReference "Alamofire" */;
+			productName = Alamofire;
+		};
+		15542B1B2CDCF3D20045598C /* Lottie */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 15542B1A2CDCF3D20045598C /* XCRemoteSwiftPackageReference "lottie-ios" */;
+			productName = Lottie;
 		};
 		15D0BFCC2CD909390011227E /* SnapKit */ = {
 			isa = XCSwiftPackageProductDependency;

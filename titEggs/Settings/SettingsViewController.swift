@@ -9,6 +9,7 @@ import UIKit
 import StoreKit
 import WebKit
 import UserNotifications
+import Combine
 
 class SettingsViewController: UIViewController {
     
@@ -18,10 +19,19 @@ class SettingsViewController: UIViewController {
     
     private let arrGeaders = ["Purchases", "Actions", "Support us", "Info & legal"]
     
+    private lazy var cancellable = [AnyCancellable]()
+    
+    var model: MainModel
     
     
-    init(purchaseManager: PurchaseManager) {
+    
+    private lazy var isNotification: Bool = {
+        UserDefaults.standard.object(forKey: "isNotificaion") as? Bool ?? false
+    }()
+    
+    init(purchaseManager: PurchaseManager, model: MainModel) {
         self.purchaseManager = purchaseManager
+        self.model = model
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -53,11 +63,8 @@ class SettingsViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         cacheLabel.text = getCache()
-        if purchaseManager.hasUnlockedPro {
-            rightButton.alpha = 0
-        } else {
-            rightButton.alpha = 1
-        }
+        checkManager()
+        print( UserDefaults.standard.object(forKey: "isNotificaion") as? Bool ?? false)
     }
     
     override func viewDidLoad() {
@@ -65,6 +72,26 @@ class SettingsViewController: UIViewController {
         view.backgroundColor = .bgPrimary
         setupNavController()
         setupUI()
+        subscribe()
+    }
+    
+    private func subscribe() {
+        buyPublisher
+            .sink { _ in
+                self.checkManager()
+            }
+            .store(in: &cancellable)
+    }
+    
+    private func checkManager() {
+        
+        print(purchaseManager.hasUnlockedPro, "- есть или нет покупок")
+        
+        if purchaseManager.hasUnlockedPro {
+            rightButton.alpha = 0
+        } else {
+            rightButton.alpha = 1
+        }
     }
     
     private func setupNavController() {
@@ -155,11 +182,7 @@ class SettingsViewController: UIViewController {
             let viewOne = createSubView(text: "Notifications", isArrow: false, image: .t2R1, isBotSeparator: true)
             let swithcer = UISwitch()
             swithcer.addTarget(self, action: #selector(enableNotify(sender:)), for: .valueChanged)
-            checkAlert { result in
-                DispatchQueue.main.async {
-                    swithcer.isOn = result
-                }
-            }
+            swithcer.isOn = isNotification
             swithcer.onTintColor = UIColor(red: 39/255, green: 165/255, blue: 255/255, alpha: 1)
             viewOne.addSubview(swithcer)
             swithcer.snp.makeConstraints { make in
@@ -241,29 +264,32 @@ class SettingsViewController: UIViewController {
     }
     
     @objc private func clearCache() {
-        
-        let alertController = UIAlertController(title: "Clear cache?", message: "The cached files of your videos will be deleted from your phone's memory. But your download history will be retained.", preferredStyle: .alert)
-        
-        let cancelButton = UIAlertAction(title: "Cancel", style: .cancel)
-        alertController.addAction(cancelButton)
-        
-        let clearButtpn = UIAlertAction(title: "Clear", style: .destructive) { _ in
-            let fileManager = FileManager.default
-            let cacheURL = fileManager.urls(for: .cachesDirectory, in: .userDomainMask).first!
-            do {
-                let cacheFiles = try fileManager.contentsOfDirectory(at: cacheURL, includingPropertiesForKeys: nil)
-                for fileURL in cacheFiles {
-                    try fileManager.removeItem(at: fileURL)
+            
+            let alertController = UIAlertController(title: "Clear cache?", message: "The cached files of your videos will be deleted from your phone's memory. But your download history will be retained.", preferredStyle: .alert)
+            
+            let cancelButton = UIAlertAction(title: "Cancel", style: .cancel)
+            alertController.addAction(cancelButton)
+            
+            let clearButtpn = UIAlertAction(title: "Clear", style: .destructive) { _ in
+                let fileManager = FileManager.default
+                let cacheURL = fileManager.urls(for: .cachesDirectory, in: .userDomainMask).first!
+                do {
+                    let cacheFiles = try fileManager.contentsOfDirectory(at: cacheURL, includingPropertiesForKeys: nil)
+                    for fileURL in cacheFiles {
+                        try fileManager.removeItem(at: fileURL)
+                    }
+                    self.cacheLabel.text = self.getCache()
+                } catch {
+                    self.cacheLabel.text = self.getCache()
+                    print("Ошибка при очистке кэша: \(error.localizedDescription)")
                 }
-                self.cacheLabel.text = self.getCache()
-            } catch {
-                print("Ошибка при очистке кэша: \(error.localizedDescription)")
             }
+            alertController.addAction(clearButtpn)
+            
+            self.present(alertController, animated: true)
         }
-        alertController.addAction(clearButtpn)
-        
-        self.present(alertController, animated: true)
-    }
+
+
     
     @objc private func contactUs() {
         let email = "example@example.com" // POST
@@ -277,7 +303,14 @@ class SettingsViewController: UIViewController {
         }
     }
 
-
+    private func requestNotificationAuthorization(completion: @escaping () -> Void) {
+        let center = UNUserNotificationCenter.current()
+        center.requestAuthorization(options: [.alert, .sound, .badge]) { _, _ in
+            DispatchQueue.main.async {
+                completion()
+            }
+        }
+    }
 
 
     @objc private func enableNotify(sender: UISwitch) {
@@ -293,13 +326,25 @@ class SettingsViewController: UIViewController {
                                                       message: "This app will be able to send you messages in your notification center",
                                                       preferredStyle: .alert)
                         alert.addAction(UIAlertAction(title: "Allow", style: .default) { _ in
-                            sender.isOn = true
+                    
+                            self.requestNotificationAuthorization {
+                                self.isNotification = true
+                                sender.isOn = true
+                                UserDefaults.standard.setValue(self.isNotification, forKey: "isNotificaion")
+                            }
+                            
                         })
                         alert.addAction(UIAlertAction(title: "Cancel", style: .cancel) { _ in
+                            self.isNotification = false
                             sender.isOn = false
+                            UserDefaults.standard.setValue(self.isNotification, forKey: "isNotificaion")
                         })
+                        print( UserDefaults.standard.object(forKey: "isNotificaion") as? Bool ?? false)
                         self.present(alert, animated: true, completion: nil)
                     } else {
+                        self.isNotification = false
+                        UserDefaults.standard.setValue(self.isNotification, forKey: "isNotificaion")
+                        print( UserDefaults.standard.object(forKey: "isNotificaion") as? Bool ?? false)
                         sender.isOn = false
                     }
                 }

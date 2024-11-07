@@ -11,6 +11,7 @@ import SnapKit
 class TabBarViewController: UITabBarController {
     
     private var manager: PurchaseManager
+    private var model = MainModel()
     
     init(manager: PurchaseManager) {
         self.manager = manager
@@ -23,7 +24,9 @@ class TabBarViewController: UITabBarController {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        hideNavigationBar()
+        let backItem = UIBarButtonItem()
+        backItem.title = "Back"
+        navigationItem.backBarButtonItem = backItem
     }
     
     override func viewDidLoad() {
@@ -48,15 +51,14 @@ class TabBarViewController: UITabBarController {
             make.top.equalToSuperview()
         }
         
-        let createVCNo = CreateViewController(purchaseManager: manager)
-        let settingsVCNo = SettingsViewController(purchaseManager: manager)
+        let createVCNo = CreateViewController(purchaseManager: manager, model: model)
+        let settingsVCNo = SettingsViewController(purchaseManager: manager, model: model)
+        let myVideosVCNo = MyVideosViewController(purchaseManager: manager, model: model)
         
         let createVc = createVC(VC: createVCNo, image: .create.resize(targetSize: CGSize(width: 32, height: 32)), title: "Create")
-        let videosVc = createVC(VC: UIViewController(), image: .myVideos.resize(targetSize: CGSize(width: 32, height: 32)), title: "My Videos")
+        let videosVc = createVC(VC: myVideosVCNo, image: .myVideos.resize(targetSize: CGSize(width: 32, height: 32)), title: "My Videos")
         let settingsVc = createVC(VC: settingsVCNo, image: .settings.resize(targetSize: CGSize(width: 20, height: 20)), title: "Settings")
-        
-        createVCNo.purchaseManager = manager
-        settingsVCNo.purchaseManager = manager
+
         
         viewControllers = [createVc, videosVc, settingsVc]
     }
@@ -64,7 +66,7 @@ class TabBarViewController: UITabBarController {
     private func createVC(VC: UIViewController, image: UIImage, title: String) -> UIViewController {
         let tapItem = UITabBarItem(title: title, image: image, tag: 0)
         VC.tabBarItem = tapItem
-        return UINavigationController(rootViewController: VC)
+        return VC
     }
     
     private func updateBuy() {

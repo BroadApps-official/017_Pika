@@ -107,6 +107,7 @@ class NotifyOnbViewController: UIViewController {
     @objc private func requestAlert() {
         requestNotificationAuthorization {
             self.hideVc()
+            UserDefaults.standard.setValue(true, forKey: "isNotificaion")
         }
     }
     
