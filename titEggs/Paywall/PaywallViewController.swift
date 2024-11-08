@@ -133,7 +133,7 @@ class PaywallViewController: UIViewController {
         videoContainerView.snp.makeConstraints { make in
             make.left.right.equalToSuperview()
             make.top.equalToSuperview()
-            make.height.equalTo(view.snp.width).multipliedBy(4.2 / 5.0)
+            make.height.equalTo(view.snp.width).multipliedBy(4.3 / 5.0)
         }
 
         // Создаем AVPlayerLayer и добавляем его в videoContainerView
@@ -156,15 +156,17 @@ class PaywallViewController: UIViewController {
 
         // Создаем изображение тени и добавляем поверх видео
         let shadowImageView = UIImageView(image: .shadowPaywall)
+        shadowImageView.clipsToBounds = false
         view.addSubview(shadowImageView)
         view.bringSubviewToFront(shadowImageView) // Убедитесь, что тень на переднем плане
         shadowImageView.snp.makeConstraints { make in
             make.left.bottom.right.equalToSuperview()
-            make.height.equalTo(view.snp.height).multipliedBy(4.1 / 5.0).priority(.low)
+            make.height.equalTo(view.snp.height).multipliedBy(4.0 / 5.0)
             make.height.lessThanOrEqualTo(600)
         }
 
-        
+        view.layoutIfNeeded()
+
         policyButton.addTarget(self, action: #selector(openPolicy), for: .touchUpInside)
         termsButton.addTarget(self, action: #selector(openTerms), for: .touchUpInside)
         restoreButton.addTarget(self, action: #selector(restore), for: .touchUpInside)

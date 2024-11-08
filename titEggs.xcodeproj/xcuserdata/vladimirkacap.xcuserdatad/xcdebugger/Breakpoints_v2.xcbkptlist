@@ -78,8 +78,8 @@
             filePath = "titEggs/Paywall/PaywallViewController.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "255"
-            endingLineNumber = "255"
+            startingLineNumber = "257"
+            endingLineNumber = "257"
             landmarkName = "createPurchase()"
             landmarkType = "7">
             <Locations>
