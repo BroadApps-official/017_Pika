@@ -86,12 +86,13 @@ class MainModel {
                         self.arr[index].video = data
                         self.saveArr()
                         self.publisherVideo.send(1)
+                        self.checkStatus()
                         workItem?.cancel()
                     }
                 }
             } else if !(workItem?.isCancelled ?? true) {
                 print("Повторный запрос для индекса \(index) через 5 секунд...")
-                DispatchQueue.global().asyncAfter(deadline: .now() + 5, execute: workItem!)
+                DispatchQueue.global().asyncAfter(deadline: .now() + 20, execute: workItem!)
             }
         }
     }
@@ -132,6 +133,7 @@ class MainModel {
                                 print("Index \(index) out of range in completion")
                                 return
                             }
+                            
                             
                             self.arr[index].generationID = idVideo // Присваиваем полученный generationID
                             self.saveArr()

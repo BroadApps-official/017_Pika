@@ -40,7 +40,6 @@ class GenerateVideoViewController: UIViewController {
         fatalError("init(coder:) has not been implemented")
     }
     
-   //ТУТ СЕДАЛТЬ ПОДПИСКУ НА ПАБЛИШЕР В МОДЕЛЕ И ЕСЛИ ID ITEM  БУДЕТ ПОЛНЫМ - ОТКРЫВАТЬ ЭКРАН ПРОСМОТРА
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -49,33 +48,9 @@ class GenerateVideoViewController: UIViewController {
         setupUI()
         setupTimer()
         openLike()
-        subscribe()
     }
     
-    private func subscribe() {
-        model.publisherVideo
-            .sink { _ in
-                self.openVideo()
-            }
-            .store(in: &cancellabel)
-    }
     
-    private func openVideo() {
-        for i in model.arr {
-            if i.effectID == index && i.image == image && i.video != nil {
-                var ind = 0
-                for _ in 0..<model.arr.count {
-                    if model.arr[ind].effectID == index && model.arr[ind].image == image && model.arr[ind].video != nil {
-                        print(model.arr[ind])
-                        break
-                    }
-                    ind += 1
-                }
-                self.dismiss(animated: true)
-                model.videoCreatedPublisher.send(ind)
-            }
-        }
-    }
     
     private func addImageInarr() {
         model.createVideo(image: image, idEffect: index, escaping: { result in
@@ -169,12 +144,12 @@ class GenerateVideoViewController: UIViewController {
     
     private func openLike() {
         if UserDefaults.standard.object(forKey: "rewiew") == nil {
-            var like: Int = UserDefaults.standard.integer(forKey: "count")
+            var like: Int = UserDefaults.standard.integer(forKey: "likes")
             like += 1
             if like % 3 == 0 {
                 self.openCustomLike()
             }
-            UserDefaults.standard.setValue(like, forKey: "generate")
+            UserDefaults.standard.setValue(like, forKey: "likes")
             print(like, "like")
         }
     }
@@ -188,7 +163,10 @@ class GenerateVideoViewController: UIViewController {
         if #available(iOS 13.0, *) {
             customViewController.isModalInPresentation = true
         }
-        present(customViewController, animated: true, completion: nil)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+            self.present(customViewController, animated: true, completion: nil)
+        }
+        
     }
 
     

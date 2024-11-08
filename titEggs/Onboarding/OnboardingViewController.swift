@@ -7,6 +7,8 @@
 
 import UIKit
 import StoreKit
+import AVFoundation
+import AVKit
 
 class OnboardingViewController: UIViewController {
     
@@ -21,10 +23,10 @@ class OnboardingViewController: UIViewController {
         fatalError("init(coder:) has not been implemented")
     }
     
-    private let arr: [OnbData] = [OnbData(image: "futureVideo", topText: "Pick a photo &\nblow it up", botText: "Create unreal videos"),
-    OnbData(image: "futureVideo", topText: "Turn everything\nyou see", botText: "Quick and easy"),
-    OnbData(image: "futureVideo", topText: "Take a photo &\nCake-ify it", botText: "Surprise your friends"),
-    OnbData(image: "futureVideo", topText: "Rate our app in\nthe AppStore", botText: "Lots of satisfied users")]
+    private let arr: [OnbData] = [OnbData(image: "onboardingVideo1", topText: "Pick a photo &\nblow it up", botText: "Create unreal videos"),
+    OnbData(image: "onboardingVideo2", topText: "Turn everything\nyou see", botText: "Quick and easy"),
+    OnbData(image: "onboardingVideo3", topText: "Take a photo &\nCake-ify it", botText: "Surprise your friends"),
+    OnbData(image: "onboardingImage4", topText: "Rate our app in\nthe AppStore", botText: "Lots of satisfied users")]
     
     private lazy var pageControl: UIPageControl = {
         let control = UIPageControl()
@@ -130,13 +132,50 @@ extension OnboardingViewController: UICollectionViewDelegate, UICollectionViewDa
     
         let item = arr[indexPath.row]
         
-        let imageView = UIImageView(image: UIImage(named: item.image))
-        imageView.contentMode = .scaleAspectFill
-        cell.addSubview(imageView)
-        imageView.snp.makeConstraints { make in
-            make.left.right.equalToSuperview()
-            make.top.equalToSuperview()
-            make.height.equalTo(imageView.snp.width).multipliedBy(3.0/2.0)
+        if indexPath.row != 3 {
+            let player = AVPlayer(url: URL(fileURLWithPath: Bundle.main.path(forResource: item.image, ofType: "mp4")!))
+            player.isMuted = true
+            
+            // Создаем UIView для отображения видео
+            let videoContainerView = UIView()
+            cell.addSubview(videoContainerView)
+            videoContainerView.snp.makeConstraints { make in
+                make.left.right.equalToSuperview()
+                make.top.equalToSuperview()
+                make.height.equalTo(videoContainerView.snp.width).multipliedBy(3.0 / 2.0)
+            }
+            
+            // Создаем AVPlayerLayer и добавляем его в videoContainerView
+            let playerLayer = AVPlayerLayer(player: player)
+            playerLayer.frame = videoContainerView.bounds
+            playerLayer.videoGravity = .resizeAspectFill
+            videoContainerView.layer.addSublayer(playerLayer)
+            
+            DispatchQueue.main.async {
+                playerLayer.frame = videoContainerView.bounds
+            }
+            
+            // Добавляем зацикливание видео
+            NotificationCenter.default.addObserver(forName: .AVPlayerItemDidPlayToEndTime, object: player.currentItem, queue: .main) { _ in
+                player.seek(to: .zero)
+                player.play()
+            }
+            
+            // Запускаем воспроизведение
+            player.play()
+            
+        }
+        
+        if indexPath.row == 3 {
+            let imageView = UIImageView(image: UIImage(named: item.image))
+            imageView.contentMode = .scaleAspectFill
+            cell.addSubview(imageView)
+            imageView.snp.makeConstraints { make in
+                make.left.right.equalToSuperview()
+                make.top.equalToSuperview()
+                make.height.equalTo(imageView.snp.width).multipliedBy(3.0/2.0)
+            }
+            
         }
         
         let shadowImageView = UIImageView(image: .onbShadow)

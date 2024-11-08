@@ -27,6 +27,7 @@ class TabBarViewController: UITabBarController {
         let backItem = UIBarButtonItem()
         backItem.title = "Back"
         navigationItem.backBarButtonItem = backItem
+        self.navigationItem.setHidesBackButton(true, animated: true)
     }
     
     override func viewDidLoad() {

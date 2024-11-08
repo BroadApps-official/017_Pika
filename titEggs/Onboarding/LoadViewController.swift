@@ -22,7 +22,7 @@ class LoadViewController: UIViewController {
     
 
     private func setupUI() {
-        let imageView = UIImageView(image: .appIcon)
+        let imageView = UIImageView(image: .appicon)
         imageView.layer.cornerRadius = 40
         imageView.clipsToBounds = true
         

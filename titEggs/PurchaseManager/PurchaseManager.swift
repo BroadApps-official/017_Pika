@@ -8,24 +8,31 @@
 import Foundation
 import StoreKit
 import Combine
+import ApphudSDK
+
 
 class PurchaseManager: NSObject {
+    
+    let paywallID = "main"
     
     private var updates: Task<Void, Never>?
     
     private(set) var purchasedProductIDs = Set<String>()
     private let productIds = ["pro_lifetime", "pro_weekly"]
-    var products: [Product] = []
+    var productsApphud: [ApphudProduct] = []
+
     
     override init() {
         super.init()
         //SKPaymentQueue.default().add(self)
         updates = observeTransactionUpdates()
+        
+        Task {
+            await self.loadPaywalls()
+        }
+        
     }
     
-    func loadProducts() async throws {
-        self.products = try await Product.products(for: productIds)
-    }
     
     var hasUnlockedPro: Bool {
         print(purchasedProductIDs)
@@ -61,33 +68,41 @@ class PurchaseManager: NSObject {
     
     //оплата
     
-    func purchase(_ product: Product) async throws {
-        let result = try await product.purchase()
-        
-        switch result {
-        case let .success(.verified(transaction)):
-            await transaction.finish()
-            //purchasedProductIDs.insert(transaction.productID)
-            await self.updatePurchasedProducts()
-            print("Покупка сделана")
-        case .success(.unverified(_, let error)):
-            print("Ошибка верификации покупки: \(error)")
-        case .pending:
-            print("Покупка находится в ожидании")
-        case .userCancelled:
-            print("Покупка отменена пользователем")
-        @unknown default:
-            break
+    @MainActor func startPurchase(produst: ApphudProduct) {
+        let selectedProduct = produst
+        Apphud.purchase(selectedProduct) { [weak self] result in
+            if let error = result.error {
+                debugPrint(error.localizedDescription)
+                // подписка не активка либо другая ошибка - обработка ошибку
+            }
+            debugPrint(result)
+            if let subscription = result.subscription, subscription.isActive() {
+                // подписка активка -> можно закрыть пейвол
+            } else if let purchase = result.nonRenewingPurchase, purchase.isActive() {
+                // подписка активка -> можно закрыть пейвол
+            } else {
+                if Apphud.hasActiveSubscription() {
+                    // подписка активка -> можно закрыть пейвол
+                }
+            }
         }
     }
     
     //vосстановление покупок
-    func restoreArrPurchase() {
-        Task {
-            do {
-                try await AppStore.sync()
-            } catch {
-                print(error)
+    @MainActor func restorePurchase() {
+        print("restore")
+        Apphud.restorePurchases {  subscriptions, _, error in
+            if let error = error {
+                debugPrint(error.localizedDescription)
+                // подписка не активка либо другая ошибка - обработка ошибку
+            }
+            if subscriptions?.first?.isActive() ?? false {
+                // подписка активка -> можно закрыть пейвол
+                return
+            }
+            
+            if Apphud.hasActiveSubscription() {
+                // подписка активка -> можно закрыть пейвол
             }
         }
     }
@@ -96,8 +111,28 @@ class PurchaseManager: NSObject {
         updates?.cancel()
     }
     
+
+    @MainActor
+    func loadPaywalls() {
+        Apphud.paywallsDidLoadCallback { paywalls, arg in
+            if let paywall = paywalls.first(where: { $0.identifier == self.paywallID }) {
+                Apphud.paywallShown(paywall)
+                
+                let products = paywall.products
+                self.productsApphud = products
+                for i in products {
+                    print(i.skProduct?.productIdentifier, "ProdID")
+                    print(i.skProduct?.price.stringValue, "cena")
+                }
+ 
+            }
+        }
+    }
+
+    
+    
+    
+    
 }
-
-
 
 

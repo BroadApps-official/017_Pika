@@ -132,7 +132,7 @@ class SettingsViewController: UIViewController {
     }
     
     @objc private func restorePur() {
-        purchaseManager.restoreArrPurchase()
+        purchaseManager.restorePurchase()
     }
     
     
@@ -408,7 +408,7 @@ class SettingsViewController: UIViewController {
             }
         } else {
             let appID = "ID"
-            if let url = URL(string: "itms-apps://itunes.apple.com/app/id\(appID)?action=write-review") {
+            if let url = URL(string: "itms-apps://itunes.apple.com/app/id\(6737900240)?action=write-review") {
                 UIApplication.shared.open(url, options: [:], completionHandler: nil)
             }
         }
@@ -419,7 +419,7 @@ class SettingsViewController: UIViewController {
         guard let appName = Bundle.main.infoDictionary?["CFBundleDisplayName"] as? String else {
             return
         }
-        let appID = "ID_приложения"
+        let appID = "6737900240"
         let appURL = "https://apps.apple.com/app/id\(appID)"
         let shareText = "\(appName)\n\(appURL)"
         let activityViewController = UIActivityViewController(activityItems: [shareText], applicationActivities: nil)
@@ -429,13 +429,13 @@ class SettingsViewController: UIViewController {
     
     @objc private func privacyPol() {
         let webVC = WebViewController()
-        webVC.urlString = "PRIVA"
+        webVC.urlString = "https://www.termsfeed.com/live/84172d38-c955-48c8-bad2-34beb03770c9"
         present(webVC, animated: true, completion: nil)
     }
 
     @objc private func usagePol() {
         let webVC = WebViewController()
-        webVC.urlString = "USAGE"
+        webVC.urlString = "https://www.termsfeed.com/live/b1287ca9-a8f5-49d4-ab0c-82f9f8fec119"
         present(webVC, animated: true, completion: nil)
     }
     

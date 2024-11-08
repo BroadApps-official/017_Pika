@@ -50,16 +50,21 @@ class OpenedViewController: UIViewController {
         fatalError("init(coder:) has not been implemented")
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        setupNavController()
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .bgPrimary
         hidesBottomBarWhenPushed = true
-        setupNavController()
         setupUI()
     }
     
     private func setupNavController() {
         self.title = "Result"
+        self.navigationItem.setHidesBackButton(false, animated: true)
         navigationController?.navigationBar.prefersLargeTitles = false
         let appearance = UINavigationBarAppearance()
         appearance.configureWithOpaqueBackground()
@@ -195,11 +200,13 @@ class OpenedViewController: UIViewController {
             .addToReadingList,
         ]
         self.present(activityViewController, animated: true, completion: {
-            var share: Int = UserDefaults.standard.integer(forKey: "share")
-            share += 1
-            UserDefaults.standard.setValue(share, forKey: "share")
-            if share == 1 || share == 5 {
-                self.rateApp()
+            if UserDefaults.standard.object(forKey: "rewiew") == nil {
+                var share: Int = UserDefaults.standard.integer(forKey: "share")
+                share += 1
+                UserDefaults.standard.setValue(share, forKey: "share")
+                if share == 1 || share == 5 {
+                    self.rateApp()
+                }
             }
         })
     }

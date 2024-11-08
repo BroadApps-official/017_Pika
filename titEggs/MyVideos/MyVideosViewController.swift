@@ -30,7 +30,7 @@ class MyVideosViewController: UIViewController {
         layout.scrollDirection = .vertical
         collection.register(UICollectionViewCell.self, forCellWithReuseIdentifier: "1")
         collection.backgroundColor = .clear
-        collection.clipsToBounds = false
+        collection.clipsToBounds = true
         collection.delegate = self
         collection.dataSource = self
         collection.showsVerticalScrollIndicator = false

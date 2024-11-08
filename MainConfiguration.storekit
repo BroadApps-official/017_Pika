@@ -5,24 +5,9 @@
   ],
   "products" : [
     {
-      "displayPrice" : "1",
+      "displayPrice" : "5.99",
       "familyShareable" : false,
       "internalID" : "11B7E841",
-      "localizations" : [
-        {
-          "description" : "",
-          "displayName" : "Annual",
-          "locale" : "en_US"
-        }
-      ],
-      "productID" : "pro_lifetime",
-      "referenceName" : "Annual",
-      "type" : "Consumable"
-    },
-    {
-      "displayPrice" : "2",
-      "familyShareable" : false,
-      "internalID" : "E4B13BBF",
       "localizations" : [
         {
           "description" : "",
@@ -30,8 +15,23 @@
           "locale" : "en_US"
         }
       ],
-      "productID" : "pro_weekly",
+      "productID" : "week_5.59_nottrial",
       "referenceName" : "Weekly",
+      "type" : "Consumable"
+    },
+    {
+      "displayPrice" : "49.99",
+      "familyShareable" : false,
+      "internalID" : "E4B13BBF",
+      "localizations" : [
+        {
+          "description" : "",
+          "displayName" : "Annual",
+          "locale" : "en_US"
+        }
+      ],
+      "productID" : "year_50_nottrial",
+      "referenceName" : "Annual",
       "type" : "Consumable"
     }
   ],

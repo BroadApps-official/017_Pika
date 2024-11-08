@@ -21,6 +21,11 @@ class NotifyOnbViewController: UIViewController {
         fatalError("init(coder:) has not been implemented")
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        self.navigationItem.setHidesBackButton(true, animated: true)
+    }
+    
     private let laterButton: UIButton = {
         let button = UIButton(type: .system)
         button.backgroundColor = .clear

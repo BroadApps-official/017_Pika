@@ -8,6 +8,9 @@
 import UIKit
 import StoreKit
 import Combine
+import ApphudSDK
+import AppTrackingTransparency
+import AdSupport
 
 let buyPublisher = PassthroughSubject<Any, Never>()
 
@@ -16,13 +19,32 @@ let buyPublisher = PassthroughSubject<Any, Never>()
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        var open = UserDefaults.standard.integer(forKey: "count") 
+        
+        Apphud.start(apiKey: "app_Ya3A7cxvYehiiDp7nq6MARXH8adoTQ")
+        Apphud.setDeviceIdentifiers(idfa: nil, idfv: UIDevice.current.identifierForVendor?.uuidString)
+        fetchIDFA()
+        
+        var open = UserDefaults.standard.integer(forKey: "count")
         open += 1
         UserDefaults.standard.setValue(open, forKey: "count")
+       
         
         return true
     }
-
+    
+    func fetchIDFA() {
+            if #available(iOS 14.5, *) {
+                DispatchQueue.main.asyncAfter(deadline: .now()+2.0) {
+                    ATTrackingManager.requestTrackingAuthorization { status in
+                        guard status == .authorized else {return}
+                        let idfa = ASIdentifierManager.shared().advertisingIdentifier.uuidString
+                        Apphud.setDeviceIdentifiers(idfa: idfa, idfv: UIDevice.current.identifierForVendor?.uuidString)
+                    }
+                }
+            }
+        }
+    
+    
     // MARK: UISceneSession Lifecycle
 
     func application(_ application: UIApplication, configurationForConnecting connectingSceneSession: UISceneSession, options: UIScene.ConnectionOptions) -> UISceneConfiguration {

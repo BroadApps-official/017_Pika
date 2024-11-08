@@ -8,6 +8,9 @@
 import UIKit
 import StoreKit
 import WebKit
+import ApphudSDK
+import AVFoundation
+import AVKit
 
 class PaywallViewController: UIViewController {
     
@@ -52,7 +55,7 @@ class PaywallViewController: UIViewController {
     
     //MARK: -Store
     private let manager:PurchaseManager
-    private lazy var products: [Product] = []
+    private lazy var products: [ApphudProduct] = []
     
     
     init(manager: PurchaseManager) {
@@ -85,15 +88,19 @@ class PaywallViewController: UIViewController {
     
     
     private func loadProducts() async {
-        do {
-            try await manager.loadProducts()
-            self.products = manager.products
-            self.buttonsTopStackView.alpha = 1
-            self.selectPlan(sender: self.annualButton)
-            self.progressView.alpha = 0
-        } catch {
-            print("Ошибка при загрузке продуктов: \(error)")
-        }
+        self.products = manager.productsApphud
+        self.buttonsTopStackView.alpha = 1
+        self.selectPlan(sender: self.annualButton)
+        self.progressView.alpha = 0
+        
+//        do {
+//            self.products = manager.productsApphud
+//            self.buttonsTopStackView.alpha = 1
+//            self.selectPlan(sender: self.annualButton)
+//            self.progressView.alpha = 0
+//        } catch {
+//            print("Ошибка при загрузке продуктов: \(error)")
+//        }
     }
     
 
@@ -109,22 +116,54 @@ class PaywallViewController: UIViewController {
     
     
     private func setupUI() {
-        let imageView = UIImageView(image: .paywallVideo)
-        imageView.contentMode = .scaleAspectFill
-        view.addSubview(imageView)
-        imageView.snp.makeConstraints { make in
-            make.left.right.top.equalToSuperview()
-            make.height.equalTo(imageView.snp.width).multipliedBy(4.0/5.0)
-        }
         
+        // Проверка наличия видеофайла
+        guard let path = Bundle.main.path(forResource: "Paywall", ofType: "mp4") else {
+            print("Video not found")
+            return
+        }
+
+        let player = AVPlayer(url: URL(fileURLWithPath: path))
+        player.isMuted = true
+
+        // Создаем контейнер для видео
+        let videoContainerView = UIView()
+        videoContainerView.clipsToBounds = false
+        view.addSubview(videoContainerView)
+        videoContainerView.snp.makeConstraints { make in
+            make.left.right.equalToSuperview()
+            make.top.equalToSuperview()
+            make.height.equalTo(view.snp.width).multipliedBy(4.2 / 5.0)
+        }
+
+        // Создаем AVPlayerLayer и добавляем его в videoContainerView
+        let playerLayer = AVPlayerLayer(player: player)
+        playerLayer.videoGravity = .resizeAspectFill
+        videoContainerView.layer.addSublayer(playerLayer)
+
+        // Обновляем размер слоя после применения ограничений
+        view.layoutIfNeeded()
+        playerLayer.frame = videoContainerView.bounds
+
+        // Добавляем зацикливание видео
+        NotificationCenter.default.addObserver(forName: .AVPlayerItemDidPlayToEndTime, object: player.currentItem, queue: .main) { _ in
+            player.seek(to: .zero)
+            player.play()
+        }
+
+        // Запускаем воспроизведение
+        player.play()
+
+        // Создаем изображение тени и добавляем поверх видео
         let shadowImageView = UIImageView(image: .shadowPaywall)
         view.addSubview(shadowImageView)
+        view.bringSubviewToFront(shadowImageView) // Убедитесь, что тень на переднем плане
         shadowImageView.snp.makeConstraints { make in
             make.left.bottom.right.equalToSuperview()
-            
             make.height.equalTo(view.snp.height).multipliedBy(4.1 / 5.0).priority(.low)
             make.height.lessThanOrEqualTo(600)
         }
+
         
         policyButton.addTarget(self, action: #selector(openPolicy), for: .touchUpInside)
         termsButton.addTarget(self, action: #selector(openTerms), for: .touchUpInside)
@@ -213,7 +252,7 @@ class PaywallViewController: UIViewController {
             do {
                 let productToPurchase = selectedSubscribe ? products.first : products.last
                 guard let product = productToPurchase else { return }
-                try await manager.purchase(product)
+                manager.startPurchase(produst: product)
                 self.dismiss(animated: true)
             } catch {
                 print("Ошибка при покупке: \(error)")
@@ -234,18 +273,18 @@ class PaywallViewController: UIViewController {
     
     @objc private func openPolicy() {
         let webVC = WebViewController()
-        webVC.urlString = "PRIVA"
+        webVC.urlString = "https://www.termsfeed.com/live/b1287ca9-a8f5-49d4-ab0c-82f9f8fec119"
         present(webVC, animated: true, completion: nil)
     }
     
     @objc private func openTerms() {
         let webVC = WebViewController()
-        webVC.urlString = "TERMS"
+        webVC.urlString = "https://www.termsfeed.com/live/84172d38-c955-48c8-bad2-34beb03770c9"
         present(webVC, animated: true, completion: nil)
     }
     
     @objc private func restore() {
-        manager.restoreArrPurchase()
+        manager.restorePurchase()
     }
     
     
@@ -281,7 +320,7 @@ class PaywallViewController: UIViewController {
         button.layer.borderWidth = selected ? 1 : 0
         
         let typeLabel = UILabel()
-        typeLabel.text = type ? products.first?.displayName : products.last?.displayName
+        typeLabel.text = type ? products.first?.skProduct?.localizedTitle : products.last?.skProduct?.localizedTitle
         typeLabel.textColor = .white
         typeLabel.font = .appFont(.BodyRegular)
         button.addSubview(typeLabel)
@@ -310,7 +349,26 @@ class PaywallViewController: UIViewController {
         let countlabel = UILabel()
         countlabel.font = .appFont(.BodyEmphasized)
         countlabel.textColor = .white
-        countlabel.text = type ? products.first?.displayPrice : products.last?.displayPrice
+        
+        
+       
+        if type {
+            let znak = products.first?.skProduct?.priceLocale.currencySymbol
+            if let price = products.first?.skProduct?.price.stringValue {
+                countlabel.text = (znak ?? "$") + price
+            } else {
+                countlabel.text = ""
+            }
+        } else {
+            let znak = products.last?.skProduct?.priceLocale.currencySymbol
+            if let price = products.last?.skProduct?.price.stringValue {
+                countlabel.text = (znak ?? "$") + price // Устанавливаем цену в UILabel
+            } else {
+                countlabel.text = ""
+            }
+        }
+
+        
         button.addSubview(countlabel)
         countlabel.snp.makeConstraints { make in
             make.right.equalToSuperview().inset(15)
