@@ -199,6 +199,14 @@ class OpenedViewController: UIViewController {
         activityViewController.excludedActivityTypes = [
             .addToReadingList,
         ]
+        
+        // Настройка для iPad
+        if let popoverController = activityViewController.popoverPresentationController {
+            popoverController.sourceView = self.view
+            popoverController.sourceRect = CGRect(x: self.view.bounds.midX, y: self.view.bounds.midY, width: 0, height: 0) // Центр экрана
+            popoverController.permittedArrowDirections = [] // Убираем стрелку поповера
+        }
+        
         self.present(activityViewController, animated: true, completion: {
             if UserDefaults.standard.object(forKey: "rewiew") == nil {
                 var share: Int = UserDefaults.standard.integer(forKey: "share")
@@ -210,6 +218,7 @@ class OpenedViewController: UIViewController {
             }
         })
     }
+
     
     private func rateApp() {
         if #available(iOS 14, *) {

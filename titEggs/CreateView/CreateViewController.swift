@@ -169,7 +169,6 @@ class CreateViewController: UIViewController, UIImagePickerControllerDelegate, U
         let photoAction = UIAlertAction(title: "Take a photo", style: .default) { _ in
             self.openCamera()
         }
-        
         photoAction.setValue(dynamicTextColor, forKey: "titleTextColor")
         alert.addAction(photoAction)
         
@@ -183,8 +182,16 @@ class CreateViewController: UIViewController, UIImagePickerControllerDelegate, U
         cancelAction.setValue(dynamicTextColor, forKey: "titleTextColor")
         alert.addAction(cancelAction)
         
+        // Установка popoverPresentationController для iPad
+        if let popoverController = alert.popoverPresentationController {
+            popoverController.sourceView = self.view // Основное представление или тот элемент, на котором была нажата ячейка
+            popoverController.sourceRect = CGRect(x: self.view.bounds.midX, y: self.view.bounds.midY, width: 0, height: 0) // Центр экрана
+            popoverController.permittedArrowDirections = [] // Убирает стрелку поповера
+        }
+        
         self.present(alert, animated: true)
     }
+
     
     private func selectedPhoto(image: Data) {
         openGenerateVC(image: image)

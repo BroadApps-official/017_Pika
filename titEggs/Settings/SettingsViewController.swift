@@ -423,9 +423,17 @@ class SettingsViewController: UIViewController {
         let appURL = "https://apps.apple.com/app/id\(appID)"
         let shareText = "\(appName)\n\(appURL)"
         let activityViewController = UIActivityViewController(activityItems: [shareText], applicationActivities: nil)
-        activityViewController.popoverPresentationController?.sourceView = self.view
+        
+        // Настройка для iPad
+        if let popoverController = activityViewController.popoverPresentationController {
+            popoverController.sourceView = self.view
+            popoverController.sourceRect = CGRect(x: self.view.bounds.midX, y: self.view.bounds.midY, width: 0, height: 0) // Центр экрана
+            popoverController.permittedArrowDirections = [] // Убираем стрелку поповера
+        }
+        
         present(activityViewController, animated: true, completion: nil)
     }
+
     
     @objc private func privacyPol() {
         let webVC = WebViewController()
