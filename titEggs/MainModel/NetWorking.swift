@@ -11,25 +11,29 @@ import Alamofire
 class NetWorking {
     
     func loadEffectsArr(escaping: @escaping(_ escaping: [Effect]) -> Void) {
-        let token = "rE176kzVVqjtWeGToppo4lRcbz3HRLoBrZREEvgQ8fKdWuxySCw6tv52BdLKBkZTOHWda5ISwLUVTyRoZEF0A33Xpk63lF9wTCtDxOs8XK3YArAiqIXVb7ZS4IK61TYPQMu5WqzFWwXtZc1jo8w"
+//        let token = "rE176kzVVqjtWeGToppo4lRcbz3HRLoBrZREEvgQ8fKdWuxySCw6tv52BdLKBkZTOHWda5ISwLUVTyRoZEF0A33Xpk63lF9wTCtDxOs8XK3YArAiqIXVb7ZS4IK61TYPQMu5WqzFWwXtZc1jo8w"
+//        
+//        let header: HTTPHeaders = [(.authorization(bearerToken: token))]
+//        
+//        AF.request("https://vewapnew.online/api/templates", method: .get, headers: header).responseData { response in
+//            switch response.result {
+//            case .success(let data):
+//                do {
+//                    let effects = try JSONDecoder().decode(DataEffect.self, from: data)
+//                    escaping(effects.data)
+//                } catch {
+//                    print("Ошибка декодирования JSON:", error.localizedDescription)
+//                    escaping([])
+//                }
+//                
+//            case  .failure(_):
+//                escaping([])
+//            }
+//        }
         
-        let header: HTTPHeaders = [(.authorization(bearerToken: token))]
+        let arr =  [Effect(id: 1, effect: "Levitate"), Effect(id: 2, effect: "Decapitate"), Effect(id: 3, effect: "Eye-pop"), Effect(id: 4, effect: "Inflate"), Effect(id: 5, effect: "Melt"), Effect(id: 6, effect: "Explode"), Effect(id: 7, effect: "Squish"), Effect(id: 8, effect: "Crush"), Effect(id: 9, effect: "Cake-ify"), Effect(id: 10, effect: "Ta-da"), Effect(id: 11, effect: "Deflate"), Effect(id: 12, effect: "Crumble"), Effect(id: 13, effect: "Dissolve")]
+        escaping(arr)
         
-        AF.request("https://vewapnew.online/api/templates", method: .get, headers: header).responseData { response in
-            switch response.result {
-            case .success(let data):
-                do {
-                    let effects = try JSONDecoder().decode(DataEffect.self, from: data)
-                    escaping(effects.data)
-                } catch {
-                    print("Ошибка декодирования JSON:", error.localizedDescription)
-                    escaping([])
-                }
-                
-            case  .failure(_):
-                escaping([])
-            }
-        }
     }
     
     

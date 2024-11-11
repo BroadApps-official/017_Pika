@@ -58,6 +58,7 @@
 		15D0BFCA2CD9017A0011227E /* TabBarViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15D0BFC92CD9017A0011227E /* TabBarViewController.swift */; };
 		15D0BFCD2CD909390011227E /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = 15D0BFCC2CD909390011227E /* SnapKit */; };
 		15D0BFD02CD90AE90011227E /* CreateViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15D0BFCF2CD90AE90011227E /* CreateViewController.swift */; };
+		15E627692CE29A4500A2C10C /* AlamofireNetworkActivityLogger in Frameworks */ = {isa = PBXBuildFile; productRef = 15E627682CE29A4500A2C10C /* AlamofireNetworkActivityLogger */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -120,6 +121,7 @@
 				152C78842CDCCB1400A2A977 /* Alamofire in Frameworks */,
 				15D0BFCD2CD909390011227E /* SnapKit in Frameworks */,
 				15542B252CDE19D70045598C /* ApphudSDK in Frameworks */,
+				15E627692CE29A4500A2C10C /* AlamofireNetworkActivityLogger in Frameworks */,
 				152C78662CDA309700A2A977 /* SwiftyStoreKit in Frameworks */,
 				15542B1C2CDCF3D20045598C /* Lottie in Frameworks */,
 			);
@@ -357,6 +359,7 @@
 				152C78832CDCCB1400A2A977 /* Alamofire */,
 				15542B1B2CDCF3D20045598C /* Lottie */,
 				15542B242CDE19D70045598C /* ApphudSDK */,
+				15E627682CE29A4500A2C10C /* AlamofireNetworkActivityLogger */,
 			);
 			productName = titEggs;
 			productReference = 15D0BFAB2CD8F6CD0011227E /* titEggs.app */;
@@ -392,6 +395,7 @@
 				152C78822CDCCB1400A2A977 /* XCRemoteSwiftPackageReference "Alamofire" */,
 				15542B1A2CDCF3D20045598C /* XCRemoteSwiftPackageReference "lottie-ios" */,
 				15542B232CDE19D70045598C /* XCRemoteSwiftPackageReference "ApphudSDK" */,
+				15E627672CE29A4500A2C10C /* XCRemoteSwiftPackageReference "AlamofireNetworkActivityLogger" */,
 			);
 			productRefGroup = 15D0BFAC2CD8F6CD0011227E /* Products */;
 			projectDirPath = "";
@@ -745,6 +749,14 @@
 				minimumVersion = 5.7.1;
 			};
 		};
+		15E627672CE29A4500A2C10C /* XCRemoteSwiftPackageReference "AlamofireNetworkActivityLogger" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/konkab/AlamofireNetworkActivityLogger";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 3.4.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -772,6 +784,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 15D0BFCB2CD909390011227E /* XCRemoteSwiftPackageReference "SnapKit" */;
 			productName = SnapKit;
+		};
+		15E627682CE29A4500A2C10C /* AlamofireNetworkActivityLogger */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 15E627672CE29A4500A2C10C /* XCRemoteSwiftPackageReference "AlamofireNetworkActivityLogger" */;
+			productName = AlamofireNetworkActivityLogger;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
