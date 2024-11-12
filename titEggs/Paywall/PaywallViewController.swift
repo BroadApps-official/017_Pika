@@ -143,7 +143,7 @@ class PaywallViewController: UIViewController {
 
         // Обновляем размер слоя после применения ограничений
         view.layoutIfNeeded()
-        playerLayer.frame = videoContainerView.bounds
+        playerLayer.frame = videoContainerView.frame
 
         // Добавляем зацикливание видео
         NotificationCenter.default.addObserver(forName: .AVPlayerItemDidPlayToEndTime, object: player.currentItem, queue: .main) { _ in
@@ -161,7 +161,7 @@ class PaywallViewController: UIViewController {
         view.bringSubviewToFront(shadowImageView) // Убедитесь, что тень на переднем плане
         shadowImageView.snp.makeConstraints { make in
             make.left.bottom.right.equalToSuperview()
-            make.height.equalTo(view.snp.height).multipliedBy(4.0 / 5.0)
+            make.height.equalTo(view.snp.height).multipliedBy(3.8 / 5.0)
             make.height.lessThanOrEqualTo(600)
         }
 
