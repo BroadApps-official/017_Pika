@@ -44,18 +44,23 @@ class GenerateVideoViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .bgPrimary
-        addImageInarr()
         setupUI()
         setupTimer()
         openLike()
+        addImageInarr()
     }
     
     
     
     private func addImageInarr() {
+        
         model.createVideo(image: image, idEffect: index, escaping: { result in
-            if !result {
-                self.openAlert()
+            print(result, "13243243211f")
+            if result == false {
+                DispatchQueue.main.async {
+                    self.openAlert()
+                    
+                }
             }
         })
     }
@@ -63,7 +68,9 @@ class GenerateVideoViewController: UIViewController {
     private func openAlert() {
         let alert = UIAlertController(title: "Video generation error", message: "Something went wrong or the server is not responding. Try again or do it later.", preferredStyle: .alert)
         
-        let cancelButton = UIAlertAction(title: "Cancel", style: .cancel)
+        let cancelButton = UIAlertAction(title: "Cancel", style: .cancel) { _ in
+            self.dismiss(animated: true)
+        }
         alert.addAction(cancelButton)
         
         let repeatButton = UIAlertAction(title: "Try Again", style: .default) { _ in
@@ -184,3 +191,7 @@ class GenerateVideoViewController: UIViewController {
     }
     
 }
+
+
+
+

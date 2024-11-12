@@ -49,6 +49,12 @@
             ReferencedContainer = "container:titEggs.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
+      <CommandLineArguments>
+         <CommandLineArgument
+            argument = "-FIRDebugEnabled"
+            isEnabled = "YES">
+         </CommandLineArgument>
+      </CommandLineArguments>
       <StoreKitConfigurationFileReference
          identifier = "../../MainConfiguration.storekit">
       </StoreKitConfigurationFileReference>

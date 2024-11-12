@@ -10,12 +10,20 @@ import UIKit
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     var window: UIWindow?
-
+    let paywall = PurchaseManager()
 
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
         guard let windowScene = (scene as? UIWindowScene) else { return }
         let window = UIWindow(windowScene: windowScene)
-        window.rootViewController = UINavigationController(rootViewController: LoadViewController())
+        
+        if UserDefaults.standard.object(forKey: "onb") != nil {
+            window.rootViewController = UINavigationController(rootViewController: TabBarViewController(manager: paywall))
+        } else {
+            window.rootViewController = UINavigationController(rootViewController: OnboardingViewController(paywall: paywall))
+        }
+        
+        
+       
         self.window = window
         self.window?.makeKeyAndVisible()
     }

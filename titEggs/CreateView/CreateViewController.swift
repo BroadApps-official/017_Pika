@@ -84,6 +84,8 @@ class CreateViewController: UIViewController, UIImagePickerControllerDelegate, U
         setupNavController()
     }
     
+
+    
     private func loadArr() {
         view.addSubview(activity)
         activity.snp.makeConstraints { make in

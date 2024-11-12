@@ -7,6 +7,7 @@
 
 import Foundation
 import Combine
+import Network
 
 class MainModel {
     
@@ -34,23 +35,71 @@ class MainModel {
         }
     }
     
-    
-    
-    func createVideo(image:Data, idEffect: Int, escaping: @escaping(Bool) -> Void) {
-        var nameEffect = "Effect"
+
+    func checkConnect(completion: @escaping (Bool) -> Void) {
+        let monitor = NWPathMonitor()
+        let queue = DispatchQueue(label: "NetworkMonitor")
         
-        for i in effectsArr {
-            if i.id == idEffect {
-                nameEffect = i.effect
+        monitor.pathUpdateHandler = { path in
+            if path.status == .satisfied {
+                completion(true)
+            } else {
+                completion(false)
             }
+            monitor.cancel() // Остановим мониторинг, чтобы избежать утечек памяти
         }
         
-        let video = Video(image: image, effectID: idEffect, video: nil, generationID: nil, resultURL: nil, dataGenerate: self.getTodayFormattedData(), effectName: nameEffect)
+        monitor.start(queue: queue)
+    }
+
+    
+    func createVideo(image:Data, idEffect: Int, escaping: @escaping(Bool) -> Void) {
         
-        self.arr.append(video)
-        self.saveArr()
-        checkStatus()
-        publisherVideo.send(1)
+        checkConnect { isConnected in
+            if isConnected == true {
+                var nameEffect = "Effect"
+                
+                for i in self.effectsArr {
+                    if i.id == idEffect {
+                        nameEffect = i.effect
+                    }
+                }
+                
+                let video = Video(image: image, effectID: idEffect, video: nil, generationID: nil, resultURL: nil, dataGenerate: self.getTodayFormattedData(), effectName: nameEffect)
+                
+                DispatchQueue.main.async {
+                    self.arr.append(video)
+                    self.saveArr()
+                    self.checkStatus()
+                    self.publisherVideo.send(1)
+                    escaping(true)
+                }
+
+            } else {
+                escaping(false)
+            }
+        }
+
+        
+//        if checkConnect() == true {
+//            var nameEffect = "Effect"
+//            
+//            for i in self.effectsArr {
+//                if i.id == idEffect {
+//                    nameEffect = i.effect
+//                }
+//            }
+//            
+//            let video = Video(image: image, effectID: idEffect, video: nil, generationID: nil, resultURL: nil, dataGenerate: self.getTodayFormattedData(), effectName: nameEffect)
+//            
+//            self.arr.append(video)
+//            self.saveArr()
+//            self.checkStatus()
+//            self.publisherVideo.send(1)
+//            escaping(true)
+//        } else {
+//            escaping(false)
+//        }
         
     }
     

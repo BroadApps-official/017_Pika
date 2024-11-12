@@ -12,6 +12,7 @@ import ApphudSDK
 import AppTrackingTransparency
 import AdSupport
 import AlamofireNetworkActivityLogger
+import Firebase
 
 let buyPublisher = PassthroughSubject<Any, Never>()
 
@@ -25,8 +26,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         Apphud.setDeviceIdentifiers(idfa: nil, idfv: UIDevice.current.identifierForVendor?.uuidString)
         fetchIDFA()
         
-        NetworkActivityLogger.shared.level = .debug
-        NetworkActivityLogger.shared.startLogging()
+        FirebaseApp.configure()
+        
         
         var open = UserDefaults.standard.integer(forKey: "count")
         open += 1
