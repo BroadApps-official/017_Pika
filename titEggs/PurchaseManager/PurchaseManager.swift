@@ -24,8 +24,7 @@ class PurchaseManager: NSObject {
     
     override init() {
         super.init()
-        //SKPaymentQueue.default().add(self)
-        updates = observeTransactionUpdates()
+
         
         Task {
             await self.loadPaywalls()
@@ -35,74 +34,53 @@ class PurchaseManager: NSObject {
     
     
     var hasUnlockedPro: Bool {
-        print(purchasedProductIDs)
-        return !self.purchasedProductIDs.isEmpty
+        return Apphud.hasPremiumAccess()
     }
     
-    func updatePurchasedProducts() async {
-        print(Transaction.currentEntitlements, "trasactions")
-        for await result in Transaction.currentEntitlements {
-            guard case .verified(let transaction) = result else {
-                continue
-            }
 
-            if transaction.revocationDate == nil {
-                buyPublisher.send(1)
-                self.purchasedProductIDs.insert(transaction.productID)
-            } else {
-                self.purchasedProductIDs.remove(transaction.productID)
-            }
-            print("Обновленные купленные продукты: \(self.purchasedProductIDs)")
-        }
-    }
-
-    
-    private func observeTransactionUpdates() -> Task<Void, Never> {
-        Task(priority: .background) { [unowned self] in
-            for await _ in Transaction.updates {
-                await self.updatePurchasedProducts()
-            }
-        }
-    }
-
-    
     //оплата
     
-    @MainActor func startPurchase(produst: ApphudProduct) {
+    @MainActor func startPurchase(produst: ApphudProduct, escaping: @escaping(Bool) -> Void) {
         let selectedProduct = produst
-        Apphud.purchase(selectedProduct) { [weak self] result in
+        Apphud.purchase(selectedProduct) { result in
             if let error = result.error {
                 debugPrint(error.localizedDescription)
-                // подписка не активка либо другая ошибка - обработка ошибку
+               escaping(false)
             }
             debugPrint(result)
             if let subscription = result.subscription, subscription.isActive() {
-                // подписка активка -> можно закрыть пейвол
+                buyPublisher.send(1)
+                escaping(true)
             } else if let purchase = result.nonRenewingPurchase, purchase.isActive() {
-                // подписка активка -> можно закрыть пейвол
+                buyPublisher.send(1)
+                escaping(true)
             } else {
                 if Apphud.hasActiveSubscription() {
-                    // подписка активка -> можно закрыть пейвол
+                    buyPublisher.send(1)
+                    escaping(true)
                 }
             }
         }
     }
     
     //vосстановление покупок
-    @MainActor func restorePurchase() {
+    @MainActor func restorePurchase(escaping: @escaping(Bool) -> Void) {
         print("restore")
         Apphud.restorePurchases {  subscriptions, _, error in
             if let error = error {
                 debugPrint(error.localizedDescription)
-                // подписка не активка либо другая ошибка - обработка ошибку
+                escaping(false)
+                buyPublisher.send(1)
             }
             if subscriptions?.first?.isActive() ?? false {
-                // подписка активка -> можно закрыть пейвол
+                buyPublisher.send(1)
+                escaping(true)
                 return
             }
             
             if Apphud.hasActiveSubscription() {
-                // подписка активка -> можно закрыть пейвол
+                escaping(true)
+                buyPublisher.send(1)
             }
         }
     }

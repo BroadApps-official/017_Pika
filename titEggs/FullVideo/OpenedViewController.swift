@@ -10,11 +10,13 @@ import AVFoundation
 import StoreKit
 import Photos
 import MobileCoreServices
+import Combine
 
 class OpenedViewController: UIViewController {
     
     let model: MainModel
     let index: Int
+
     
     private var player: AVPlayer?
     private var playerLayer: AVPlayerLayer?

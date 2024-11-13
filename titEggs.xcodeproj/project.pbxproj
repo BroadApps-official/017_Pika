@@ -43,7 +43,6 @@
 		15542B6A2CDEBC640045598C /* Inflate_it1.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 15542B5D2CDEBC640045598C /* Inflate_it1.mp4 */; };
 		15542B6B2CDEBC640045598C /* eye-pop_it1.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 15542B5E2CDEBC640045598C /* eye-pop_it1.mp4 */; };
 		15542B6C2CDEBC640045598C /* dissolve_it1.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 15542B5F2CDEBC640045598C /* dissolve_it1.mp4 */; };
-		15542B722CDEBC7B0045598C /* onboardingVideo3.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 15542B6E2CDEBC7A0045598C /* onboardingVideo3.mp4 */; };
 		15542B732CDEBC7B0045598C /* onboardingVideo1.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 15542B6F2CDEBC7A0045598C /* onboardingVideo1.mp4 */; };
 		15542B742CDEBC7B0045598C /* onboardingVideo2.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 15542B702CDEBC7B0045598C /* onboardingVideo2.mp4 */; };
 		15542B752CDEBC7B0045598C /* Paywall.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 15542B712CDEBC7B0045598C /* Paywall.mp4 */; };
@@ -65,6 +64,8 @@
 		15E627792CE374DF00A2C10C /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 15E627782CE374DF00A2C10C /* GoogleService-Info.plist */; };
 		15E6277C2CE381DA00A2C10C /* FirebaseCrashlytics in Frameworks */ = {isa = PBXBuildFile; productRef = 15E6277B2CE381DA00A2C10C /* FirebaseCrashlytics */; };
 		15E627AE2CE3C61E00A2C10C /* Cake-ify_it1.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 15E627AD2CE3C61E00A2C10C /* Cake-ify_it1.mp4 */; };
+		15E627B22CE3D38C00A2C10C /* onbVideo3.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 15E627B12CE3D38C00A2C10C /* onbVideo3.mp4 */; };
+		15E9367D2CE4B4BA007B963B /* PreviewEffectViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15E9367C2CE4B4BA007B963B /* PreviewEffectViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -101,7 +102,6 @@
 		15542B5D2CDEBC640045598C /* Inflate_it1.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = Inflate_it1.mp4; sourceTree = "<group>"; };
 		15542B5E2CDEBC640045598C /* eye-pop_it1.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "eye-pop_it1.mp4"; sourceTree = "<group>"; };
 		15542B5F2CDEBC640045598C /* dissolve_it1.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = dissolve_it1.mp4; sourceTree = "<group>"; };
-		15542B6E2CDEBC7A0045598C /* onboardingVideo3.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = onboardingVideo3.mp4; sourceTree = "<group>"; };
 		15542B6F2CDEBC7A0045598C /* onboardingVideo1.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = onboardingVideo1.mp4; sourceTree = "<group>"; };
 		15542B702CDEBC7B0045598C /* onboardingVideo2.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = onboardingVideo2.mp4; sourceTree = "<group>"; };
 		15542B712CDEBC7B0045598C /* Paywall.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = Paywall.mp4; sourceTree = "<group>"; };
@@ -117,6 +117,8 @@
 		15D0BFCF2CD90AE90011227E /* CreateViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateViewController.swift; sourceTree = "<group>"; };
 		15E627782CE374DF00A2C10C /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		15E627AD2CE3C61E00A2C10C /* Cake-ify_it1.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Cake-ify_it1.mp4"; sourceTree = "<group>"; };
+		15E627B12CE3D38C00A2C10C /* onbVideo3.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = onbVideo3.mp4; sourceTree = "<group>"; };
+		15E9367C2CE4B4BA007B963B /* PreviewEffectViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreviewEffectViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -165,7 +167,6 @@
 		152C785A2CD9468400A2A977 /* CreateElements */ = {
 			isa = PBXGroup;
 			children = (
-				15542B172CDCED760045598C /* GenerationVideo */,
 				152C785B2CD9469800A2A977 /* CreateElements.swift */,
 				152C786C2CDA3A8000A2A977 /* CustomLikeViewController.swift */,
 			);
@@ -219,6 +220,7 @@
 			isa = PBXGroup;
 			children = (
 				15542B182CDCEFFB0045598C /* GenerateVideoViewController.swift */,
+				15E9367C2CE4B4BA007B963B /* PreviewEffectViewController.swift */,
 			);
 			path = GenerationVideo;
 			sourceTree = "<group>";
@@ -243,8 +245,8 @@
 			isa = PBXGroup;
 			children = (
 				15542B6F2CDEBC7A0045598C /* onboardingVideo1.mp4 */,
+				15E627B12CE3D38C00A2C10C /* onbVideo3.mp4 */,
 				15542B702CDEBC7B0045598C /* onboardingVideo2.mp4 */,
-				15542B6E2CDEBC7A0045598C /* onboardingVideo3.mp4 */,
 				15542B712CDEBC7B0045598C /* Paywall.mp4 */,
 				15542B2D2CDE27900045598C /* Cells */,
 			);
@@ -344,6 +346,7 @@
 		15D0BFCE2CD90AD60011227E /* CreateView */ = {
 			isa = PBXGroup;
 			children = (
+				15542B172CDCED760045598C /* GenerationVideo */,
 				15D0BFCF2CD90AE90011227E /* CreateViewController.swift */,
 				15542B482CDE2AC40045598C /* VideoCollectionViewCell.swift */,
 			);
@@ -443,12 +446,12 @@
 				15542B692CDEBC640045598C /* Squish_it1.mp4 in Resources */,
 				15E627792CE374DF00A2C10C /* GoogleService-Info.plist in Resources */,
 				15542B6C2CDEBC640045598C /* dissolve_it1.mp4 in Resources */,
-				15542B722CDEBC7B0045598C /* onboardingVideo3.mp4 in Resources */,
 				15E627AE2CE3C61E00A2C10C /* Cake-ify_it1.mp4 in Resources */,
 				15D0BFBB2CD8F6CF0011227E /* LaunchScreen.storyboard in Resources */,
 				15D0BFB82CD8F6CF0011227E /* Assets.xcassets in Resources */,
 				15542B742CDEBC7B0045598C /* onboardingVideo2.mp4 in Resources */,
 				15542B632CDEBC640045598C /* Deflate_it1.mp4 in Resources */,
+				15E627B22CE3D38C00A2C10C /* onbVideo3.mp4 in Resources */,
 				15542B622CDEBC640045598C /* decapitate_it1.mp4 in Resources */,
 				152C78542CD9128F00A2A977 /* SF-Pro-Text-Medium.otf in Resources */,
 				15542B642CDEBC640045598C /* levitate_it1.mp4 in Resources */,
@@ -503,6 +506,7 @@
 				152C786D2CDA3A8000A2A977 /* CustomLikeViewController.swift in Sources */,
 				152C785E2CD949A900A2A977 /* ModelDataOnb.swift in Sources */,
 				152C785C2CD9469800A2A977 /* CreateElements.swift in Sources */,
+				15E9367D2CE4B4BA007B963B /* PreviewEffectViewController.swift in Sources */,
 				15D0BFD02CD90AE90011227E /* CreateViewController.swift in Sources */,
 				15D0BFCA2CD9017A0011227E /* TabBarViewController.swift in Sources */,
 				15542B1F2CDCF4C80045598C /* OpenedViewController.swift in Sources */,

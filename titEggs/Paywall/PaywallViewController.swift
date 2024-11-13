@@ -53,6 +53,14 @@ class PaywallViewController: UIViewController {
         return button
     }()
     
+    private lazy var activity: UIActivityIndicatorView = {
+        let view = UIActivityIndicatorView(style: .large)
+        view.color = .primary
+        view.backgroundColor = .black.withAlphaComponent(0.4)
+        view.layer.cornerRadius = 16
+        return view
+    }()
+    
     //MARK: -Store
     private let manager:PurchaseManager
     private lazy var products: [ApphudProduct] = []
@@ -247,15 +255,34 @@ class PaywallViewController: UIViewController {
             make.right.equalToSuperview()
             make.top.equalTo(view.safeAreaLayoutGuide.snp.top)
         }
+        
+        view.addSubview(activity)
+        activity.startAnimating()
+        activity.alpha = 0
+        activity.snp.makeConstraints { make in
+            make.height.width.equalTo(60)
+            make.center.equalToSuperview()
+        }
     }
     
     @objc private func createPurchase() {
+        UIView.animate(withDuration: 0.3) {
+            self.activity.alpha = 1
+        }
         Task {
             do {
                 let productToPurchase = selectedSubscribe ? products.first : products.last
                 guard let product = productToPurchase else { return }
-                manager.startPurchase(produst: product)
-                self.dismiss(animated: true)
+                manager.startPurchase(produst: product) { result in
+                    if result == true {
+                        self.dismiss(animated: true)
+                    }
+                    
+                    UIView.animate(withDuration: 0.3) {
+                        self.activity.alpha = 0
+                    }
+                    
+                }
             } catch {
                 print("Ошибка при покупке: \(error)")
             }
@@ -286,8 +313,22 @@ class PaywallViewController: UIViewController {
     }
     
     @objc private func restore() {
-        manager.restorePurchase()
+        UIView.animate(withDuration: 0.3) {
+            self.activity.alpha = 1
+        }
+            
+        manager.restorePurchase { result in
+            if result == true {
+                self.dismiss(animated: true)
+            }
+            
+            UIView.animate(withDuration: 0.3) {
+                self.activity.alpha = 0
+            }
+            
+        }
     }
+
     
     
     private func createMiniButtons(title: String, color: UIColor, font: UIFont, isACancelAnytime: Bool) -> UIButton {

@@ -15,7 +15,7 @@ import AlamofireNetworkActivityLogger
 import Firebase
 
 let buyPublisher = PassthroughSubject<Any, Never>()
-
+var userID = ""
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -32,7 +32,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         var open = UserDefaults.standard.integer(forKey: "count")
         open += 1
         UserDefaults.standard.setValue(open, forKey: "count")
-       
+        
+        if let deviceID = UIDevice.current.identifierForVendor?.uuidString {
+            userID = deviceID
+        }
         
         return true
     }

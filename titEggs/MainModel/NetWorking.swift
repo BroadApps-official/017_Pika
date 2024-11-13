@@ -45,9 +45,10 @@ class NetWorking {
         AF.upload(multipartFormData: { multipartFormData in
             multipartFormData.append(Data(idEffect.utf8), withName: "templateId")
             multipartFormData.append(data, withName: "image", fileName: "image.jpg", mimeType: "image/jpeg")
+            multipartFormData.append(Data(userID.utf8), withName: "userId")
         }, to: "https://vewapnew.online/api/generate", headers: headers)
         .responseData { response in
-            //debugPrint(response)
+            debugPrint(response)
             switch response.result {
             case .success(let data):
                 do {
@@ -77,12 +78,12 @@ class NetWorking {
         
         
         AF.request("https://vewapnew.online/api/generationStatus", method: .get, parameters: param, headers: header).responseData { response in
-            debugPrint(response)
+            debugPrint(response, "statusGettttt")
             switch response.result {
             case .success(let data):
                 do {
                     let item = try JSONDecoder().decode(Status.self, from: data)
-                    escaping(item.data.status, item.data.resultUrl)
+                    escaping(item.data.status, item.data.resultUrl ?? "")
                 } catch {
                     print("Ошибка декодирования JSON:", error.localizedDescription)
                     escaping("fail", "fail")
@@ -103,6 +104,7 @@ class NetWorking {
         }
 
         AF.download(videoURL).responseData { response in
+            debugPrint(response, "downloadssssss")
             switch response.result {
             case .success(let data):
                 completion(data, nil)

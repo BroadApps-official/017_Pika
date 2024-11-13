@@ -21,7 +21,8 @@ struct Effect: Codable {
 
 
 //video
-struct Video: Codable {
+struct Video: Codable, Identifiable {
+    let id: UUID
     var image: Data
     var effectID: Int
     var effectName: String
@@ -29,8 +30,11 @@ struct Video: Codable {
     var generationID: String?
     var resultURL: String?
     var dataGenerate: String
+    var status: String?
     
-    init(image: Data, effectID: Int, video: Data?, generationID: String?, resultURL: String?, dataGenerate: String, effectName: String) {
+    init(image: Data, effectID: Int, video: Data?, generationID: String?, resultURL: String?, dataGenerate: String, effectName: String, status: String?) {
+        self.status = status
+        self.id = UUID()
         self.image = image
         self.effectID = effectID
         self.video = video
@@ -63,6 +67,7 @@ struct Status: Codable {
 
 struct StatusData: Codable {
     let status: String
-    let resultUrl: String
+    let error: String?
+    let resultUrl: String?
     let progress: Int?
 }

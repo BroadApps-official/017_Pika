@@ -20,6 +20,7 @@ class CreateViewController: UIViewController, UIImagePickerControllerDelegate, U
     private var selectedIndex = 0
     
     private lazy var cancellable = [AnyCancellable]()
+    private var publisher = PassthroughSubject<Bool, Never>()
     
     private lazy var activity: UIActivityIndicatorView = {
         let view = UIActivityIndicatorView(style: .large)
@@ -84,7 +85,7 @@ class CreateViewController: UIViewController, UIImagePickerControllerDelegate, U
         setupNavController()
     }
     
-
+    
     
     private func loadArr() {
         view.addSubview(activity)
@@ -112,6 +113,16 @@ class CreateViewController: UIViewController, UIImagePickerControllerDelegate, U
             }
             .store(in: &cancellable)
    
+        
+        publisher.sink { result in
+            print("ПАБЛИШЕР У КРЕЙТ ВС СДЕЛАН")
+            if result == true {
+                if let tabBarController = self.tabBarController {
+                    tabBarController.selectedIndex = 1
+                }
+            }
+        }
+        .store(in: &cancellable)
     }
     
     private func setupNavController() {
@@ -200,7 +211,7 @@ class CreateViewController: UIViewController, UIImagePickerControllerDelegate, U
     }
     
     private func openGenerateVC(image: Data) {
-        let generateVC = GenerateVideoViewController(model: model, image: image, index: selectedIndex)
+        let generateVC = GenerateVideoViewController(model: model, image: image, index: selectedIndex, publisher: publisher)
         print(image.count)
         generateVC.modalPresentationStyle = .fullScreen
         generateVC.modalTransitionStyle = .coverVertical
@@ -306,8 +317,29 @@ extension CreateViewController: UICollectionViewDelegate, UICollectionViewDataSo
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        selectedIndex = model.effectsArr[indexPath.row].id
-        self.cellTapped(index: indexPath.row)
+        
+        let videoName: String
+        
+        switch indexPath.row {
+        case 0: videoName = "levitate_it1"
+        case 1: videoName = "decapitate_it1"
+        case 2: videoName = "eye-pop_it1"
+        case 3: videoName = "Inflate_it1"
+        case 4: videoName = "Melt_it1"
+        case 5: videoName = "explode_it1"
+        case 6: videoName = "Squish_it1"
+        case 7: videoName = "Crush_it1"
+        case 8: videoName = "Cake-ify_it1"
+        case 9: videoName = "Ta-da_it1"
+        case 10: videoName = "Deflate_it1"
+        case 11: videoName = "crumble_it1"
+        case 12: videoName = "dissolve_it1"
+        default: videoName = "dissolve_it1"
+        }
+        
+        
+        self.navigationController?.pushViewController(PreviewEffectViewController(model: model, index: indexPath.row, purchaseManager: purchaseManager, previewVideoName: videoName, publisher: publisher), animated: true)
+
     }
     
 }

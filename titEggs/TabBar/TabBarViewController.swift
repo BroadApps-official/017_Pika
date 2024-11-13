@@ -33,7 +33,6 @@ class TabBarViewController: UITabBarController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
-        updateBuy()
     }
     
     private func setupUI() {
@@ -69,12 +68,4 @@ class TabBarViewController: UITabBarController {
         VC.tabBarItem = tapItem
         return VC
     }
-    
-    private func updateBuy() {
-        Task {
-            await manager.updatePurchasedProducts()
-        }
-    }
-
-
 }

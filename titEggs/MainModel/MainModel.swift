@@ -17,10 +17,12 @@ class MainModel {
     
     var effectsArr: [Effect] = []
     
-    private var workItems: [DispatchWorkItem] = []
+    var workItems: [DispatchWorkItem] = []
     
     var publisherVideo = PassthroughSubject<Any, Never>()
-    var videoCreatedPublisher = PassthroughSubject<Int, Never>()
+    
+    var errorPublisher = PassthroughSubject<(Bool, String), Never>()
+    var videoDownloadedPublisher = PassthroughSubject<String, Never>()
     
     init() {
         checkStatus()
@@ -53,19 +55,10 @@ class MainModel {
     }
 
     
-    func createVideo(image:Data, idEffect: Int, escaping: @escaping(Bool) -> Void) {
+    func createVideo(video: Video, escaping: @escaping(Bool) -> Void) {
         
         checkConnect { isConnected in
             if isConnected == true {
-                var nameEffect = "Effect"
-                
-                for i in self.effectsArr {
-                    if i.id == idEffect {
-                        nameEffect = i.effect
-                    }
-                }
-                
-                let video = Video(image: image, effectID: idEffect, video: nil, generationID: nil, resultURL: nil, dataGenerate: self.getTodayFormattedData(), effectName: nameEffect)
                 
                 DispatchQueue.main.async {
                     self.arr.append(video)
@@ -79,37 +72,11 @@ class MainModel {
                 escaping(false)
             }
         }
-
-        
-//        if checkConnect() == true {
-//            var nameEffect = "Effect"
-//            
-//            for i in self.effectsArr {
-//                if i.id == idEffect {
-//                    nameEffect = i.effect
-//                }
-//            }
-//            
-//            let video = Video(image: image, effectID: idEffect, video: nil, generationID: nil, resultURL: nil, dataGenerate: self.getTodayFormattedData(), effectName: nameEffect)
-//            
-//            self.arr.append(video)
-//            self.saveArr()
-//            self.checkStatus()
-//            self.publisherVideo.send(1)
-//            escaping(true)
-//        } else {
-//            escaping(false)
-//        }
         
     }
     
     
-    func getTodayFormattedData() -> String {
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "dd.MM.yy"
-        let today = Date()
-        return dateFormatter.string(from: today)
-    }
+    
 
     
     func saveArr() {
@@ -125,23 +92,34 @@ class MainModel {
     func checkStatusForIndex(index: Int, workItem: DispatchWorkItem?) {
         
         let itemId = self.arr[index].generationID ?? "" // Используем id элемента для запроса
-        print(itemId)
+        print(itemId, "fgvxbnv")
         self.netWorking.getStatus(itemId: itemId) { status, resultUrl in
-            if status != "fail" && resultUrl != "fail" {
-                print("Получены данные для индекса \(index): статус - \(status), URL - \(resultUrl)")
+            print(status, resultUrl, "fsfdsvfsdvccsv")
+            if status != "fail" && resultUrl != "fail" && resultUrl != "" {
+                
+                print("Получены данные для индекса \(index): статус - \(status), URL - \(resultUrl), idGen - \(self.arr[index].generationID)")
                 self.arr[index].resultURL = resultUrl
-                self.netWorking.downloadVideo(from: self.arr[index].resultURL ?? "") { data, error in
+                self.arr[index].status = status
+                self.saveArr()
+                
+                self.netWorking.downloadVideo(from: self.arr[index].resultURL!) { data, error in
                     if error == nil {
                         self.arr[index].video = data
                         self.saveArr()
                         self.publisherVideo.send(1)
                         self.checkStatus()
+                        self.videoDownloadedPublisher.send("\(self.arr[index].id)")
                         workItem?.cancel()
                     }
                 }
+            } else if status == "error" || status == "fail" {
+                workItem?.cancel()
+                self.arr[index].status = "error"
+                self.saveArr()
+                self.errorPublisher.send((false,  "\(self.arr[index].id)"))
             } else if !(workItem?.isCancelled ?? true) {
                 print("Повторный запрос для индекса \(index) через 5 секунд...")
-                DispatchQueue.global().asyncAfter(deadline: .now() + 20, execute: workItem!)
+                DispatchQueue.global().asyncAfter(deadline: .now() + 5, execute: workItem!)
             }
         }
     }
@@ -153,7 +131,7 @@ class MainModel {
         // Поиск индексов для проверки
         var indices: [Int] = []
         for (index, element) in arr.enumerated() {
-            if element.resultURL == nil || element.video == nil {
+            if (element.resultURL == nil || element.video == nil) && element.status != "error" {
                 indices.append(index)
             }
         }

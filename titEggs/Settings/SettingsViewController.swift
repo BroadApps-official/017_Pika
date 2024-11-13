@@ -132,7 +132,9 @@ class SettingsViewController: UIViewController {
     }
     
     @objc private func restorePur() {
-        purchaseManager.restorePurchase()
+        purchaseManager.restorePurchase(escaping: { result in
+            buyPublisher.send(1)
+        })
     }
     
     

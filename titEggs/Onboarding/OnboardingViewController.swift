@@ -25,7 +25,7 @@ class OnboardingViewController: UIViewController {
     
     private let arr: [OnbData] = [OnbData(image: "onboardingVideo1", topText: "Pick a photo &\nblow it up", botText: "Create unreal videos"),
     OnbData(image: "onboardingVideo2", topText: "Turn everything\nyou see", botText: "Quick and easy"),
-    OnbData(image: "onboardingVideo3", topText: "Take a photo &\nCake-ify it", botText: "Surprise your friends"),
+    OnbData(image: "onbVideo3", topText: "Take a photo &\nCake-ify it", botText: "Surprise your friends"),
     OnbData(image: "onboardingImage4", topText: "Rate our app in\nthe AppStore", botText: "Lots of satisfied users")]
     
     private lazy var pageControl: UIPageControl = {
@@ -132,7 +132,8 @@ extension OnboardingViewController: UICollectionViewDelegate, UICollectionViewDa
     
         let item = arr[indexPath.row]
         
-        if indexPath.row != 3 {
+        if indexPath.row == 0 || indexPath.row == 1 || indexPath.row == 2   {
+            print(indexPath.row, "56456645465")
             let player = AVPlayer(url: URL(fileURLWithPath: Bundle.main.path(forResource: item.image, ofType: "mp4")!))
             player.isMuted = true
             
@@ -167,6 +168,7 @@ extension OnboardingViewController: UICollectionViewDelegate, UICollectionViewDa
         }
         
         if indexPath.row == 3 {
+            print(indexPath.row, "1324654")
             let imageView = UIImageView(image: UIImage(named: item.image))
             imageView.contentMode = .scaleAspectFill
             cell.addSubview(imageView)

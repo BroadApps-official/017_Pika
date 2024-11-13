@@ -433,6 +433,8 @@ class MyVideosViewController: UIViewController {
         alertController.addAction(cancel)
         
         let ok = UIAlertAction(title: "Delete", style: .destructive) { [self] _ in
+            
+            
             model.arr.remove(at: selectIndex)
             model.saveArr()
             model.publisherVideo.send(1)
@@ -548,7 +550,7 @@ extension MyVideosViewController: UICollectionViewDelegate, UICollectionViewData
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        if model.arr[indexPath.row].video != nil {
+        if model.arr[indexPath.row].video != nil && model.arr[indexPath.row].status != "error" {
             self.navigationController?.pushViewController(OpenedViewController(model: model, index: indexPath.row), animated: true)
         }
     }
@@ -557,7 +559,7 @@ extension MyVideosViewController: UICollectionViewDelegate, UICollectionViewData
         
         self.selectIndex = indexPaths.first?.row ?? 0
         
-        if model.arr[selectIndex].video != nil {
+        if model.arr[selectIndex].video != nil && model.arr[selectIndex].status != "error"  {
             let imageSave = getImageForCurrentTheme(image: UIImage.saveGallery)
             let firstAction = UIAction(title: "Save to gallery", image: imageSave.resize(targetSize: CGSize(width: 20, height: 20))) { _ in
                 self.saveInGallery(index: indexPaths.first?.row ?? 0)
@@ -584,6 +586,24 @@ extension MyVideosViewController: UICollectionViewDelegate, UICollectionViewData
             return UIContextMenuConfiguration(identifier: nil, previewProvider: nil) { _ in
                 return menu
             }
+        } else if model.arr[selectIndex].status == "error"   {
+
+            let redTextAttributes: [NSAttributedString.Key: Any] = [
+                .foregroundColor: UIColor.red
+            ]
+            let imageTrash = UIImage.delete
+            let deleteTitle = NSAttributedString(string: "Delete", attributes: redTextAttributes)
+
+            let threeAction = UIAction(title: deleteTitle.string, image: imageTrash.resize(targetSize: CGSize(width: 20, height: 44))) { _ in
+                self.delete()
+            }
+            
+            let menu = UIMenu(title: "Video not load", children: [threeAction])
+            
+            return UIContextMenuConfiguration(identifier: nil, previewProvider: nil) { _ in
+                return menu
+            }
+            
         } else {
             let firstAction = UIAction(title: "") { _ in
             }
@@ -593,7 +613,6 @@ extension MyVideosViewController: UICollectionViewDelegate, UICollectionViewData
             return UIContextMenuConfiguration(identifier: nil, previewProvider: nil) { _ in
                 return menu
             }
-            
         }
         
         
