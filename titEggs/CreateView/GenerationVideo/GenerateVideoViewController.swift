@@ -72,6 +72,7 @@ class GenerateVideoViewController: UIViewController {
     }
     
     private func alertError(id: String) {
+        print("error laod generate page - ", "\(uuidVideo)")
         if id == uuidVideo {
             DispatchQueue.main.async {
                 self.openAlert()
@@ -103,16 +104,30 @@ class GenerateVideoViewController: UIViewController {
             
             var videoLoad = video
             
-            if video == nil {
+            if video?.id == nil {
                 videoLoad = Video(image: image, effectID: model.effectsArr[index].id, video: nil, generationID: nil, resultURL: nil, dataGenerate: self.getTodayFormattedData(), effectName: model.effectsArr[index].effect, status: nil)
+                model.arr.append(videoLoad!)
+                model.saveArr()
+                print("new video")
             } else {
                 videoLoad = video
+                print("old video")
+                var index = 0
+                
+                for _ in 0..<model.arr.count {
+                    if model.arr[index].id == videoLoad?.id {
+                        model.arr[index] = videoLoad!
+                        model.saveArr()
+                    } else {
+                        index += 1
+                    }
+                }
             }
             
-        
             uuidVideo = "\(videoLoad!.id)"
+            print(uuidVideo, "dsffdsfdsfdsfdssdfcx vcv")
             
-            model.createVideo(video: videoLoad!, escaping: { result in
+            model.createVideo(escaping: { result in
                 if result == false {
                     DispatchQueue.main.async {
                         self.openAlert()

@@ -211,7 +211,7 @@ class CreateViewController: UIViewController, UIImagePickerControllerDelegate, U
     }
     
     private func openGenerateVC(image: Data) {
-        let generateVC = GenerateVideoViewController(model: model, image: image, index: selectedIndex, publisher: publisher)
+        let generateVC = GenerateVideoViewController(model: model, image: image, index: selectedIndex, publisher: publisher, video: nil)
         print(image.count)
         generateVC.modalPresentationStyle = .fullScreen
         generateVC.modalTransitionStyle = .coverVertical

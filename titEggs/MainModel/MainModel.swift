@@ -55,14 +55,12 @@ class MainModel {
     }
 
     
-    func createVideo(video: Video, escaping: @escaping(Bool) -> Void) {
+    func createVideo( escaping: @escaping(Bool) -> Void) {
         
         checkConnect { isConnected in
             if isConnected == true {
                 
                 DispatchQueue.main.async {
-                    self.arr.append(video)
-                    self.saveArr()
                     self.checkStatus()
                     self.publisherVideo.send(1)
                     escaping(true)
@@ -94,7 +92,7 @@ class MainModel {
         let itemId = self.arr[index].generationID ?? "" // Используем id элемента для запроса
         print(itemId, "fgvxbnv")
         self.netWorking.getStatus(itemId: itemId) { status, resultUrl in
-            print(status, resultUrl, "fsfdsvfsdvccsv")
+            print(status, itemId, "fsfdsvfsdvccsv")
             if status != "fail" && resultUrl != "fail" && resultUrl != "" {
                 
                 print("Получены данные для индекса \(index): статус - \(status), URL - \(resultUrl), idGen - \(self.arr[index].generationID)")
@@ -117,8 +115,11 @@ class MainModel {
                 self.arr[index].status = "error"
                 self.saveArr()
                 self.errorPublisher.send((false,  "\(self.arr[index].id)"))
+                self.publisherVideo.send(1)
+                print("error load is - " , "\(self.arr[index].id)")
             } else if !(workItem?.isCancelled ?? true) {
                 print("Повторный запрос для индекса \(index) через 5 секунд...")
+                self.publisherVideo.send(1)
                 DispatchQueue.global().asyncAfter(deadline: .now() + 5, execute: workItem!)
             }
         }
@@ -127,7 +128,6 @@ class MainModel {
     func checkStatus() {
         workItems.forEach { $0.cancel() }
         workItems.removeAll()
-        
         // Поиск индексов для проверки
         var indices: [Int] = []
         for (index, element) in arr.enumerated() {
@@ -161,7 +161,7 @@ class MainModel {
                                 return
                             }
                             
-                            
+                            print(self.arr[index], "create genID")
                             self.arr[index].generationID = idVideo // Присваиваем полученный generationID
                             self.saveArr()
                             self.checkStatusForIndex(index: index, workItem: workItem)

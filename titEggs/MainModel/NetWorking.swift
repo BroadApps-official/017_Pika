@@ -48,7 +48,7 @@ class NetWorking {
             multipartFormData.append(Data(userID.utf8), withName: "userId")
         }, to: "https://vewapnew.online/api/generate", headers: headers)
         .responseData { response in
-            debugPrint(response)
+            debugPrint(response, "createOK")
             switch response.result {
             case .success(let data):
                 do {

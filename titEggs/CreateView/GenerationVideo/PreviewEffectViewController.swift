@@ -254,7 +254,7 @@ class PreviewEffectViewController: UIViewController, UIImagePickerControllerDele
     }
     
     private func openGenerateVC(image: Data) {
-        let generateVC = GenerateVideoViewController(model: model, image: image, index: index, publisher: publisher)
+        let generateVC = GenerateVideoViewController(model: model, image: image, index: index, publisher: publisher, video: nil)
         generateVC.modalPresentationStyle = .fullScreen
         generateVC.modalTransitionStyle = .coverVertical
         if #available(iOS 13.0, *) {

@@ -24,6 +24,8 @@ class MyVideosViewController: UIViewController {
     
     private lazy var noVideoView = createNoView()
     
+    private var publisher = PassthroughSubject<Bool, Never>()
+    
     private lazy var collection: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         let collection = UICollectionView(frame: .zero, collectionViewLayout: layout)
@@ -278,6 +280,60 @@ class MyVideosViewController: UIViewController {
         return viewLoad
     }
     
+    private func createErrorView() -> UIView {
+        let viewLoad = UIView()
+        viewLoad.layer.cornerRadius = 20
+        viewLoad.backgroundColor = .black.withAlphaComponent(0.4)
+        viewLoad.layer.borderColor = UIColor(red: 236/255, green: 13/255, blue: 42/255, alpha: 1).cgColor
+        viewLoad.layer.borderWidth = 0.55
+        
+        let grayView = UIView()
+        grayView.backgroundColor = UIColor(red: 37/255, green: 37/255, blue: 37/255, alpha: 0.55)
+        grayView.layer.cornerRadius = 8
+        
+        let blurEffect = UIBlurEffect(style: .systemThinMaterialDark) // или .dark, .extraLight и т.д.
+        let blurView = UIVisualEffectView(effect: blurEffect)
+        blurView.layer.cornerRadius = 8
+        blurView.clipsToBounds = true
+        blurView.alpha = 0.9
+        
+        grayView.addSubview(blurView)
+        blurView.snp.makeConstraints { make in
+            make.edges.equalToSuperview()
+        }
+        
+        viewLoad.addSubview(grayView)
+        grayView.snp.makeConstraints { make in
+            make.height.equalTo(72)
+            make.left.right.equalToSuperview().inset(15)
+            make.centerX.equalToSuperview()
+            make.centerY.equalToSuperview()
+        }
+        
+        let imageView = UIImageView(image: .errorVideo)
+        grayView.addSubview(imageView)
+        imageView.snp.makeConstraints { make in
+            make.height.width.equalTo(24)
+            make.centerX.equalToSuperview()
+            make.top.equalToSuperview().inset(10)
+        }
+        
+        let label = UILabel()
+        label.text = "Generation error, tap\nto learn more"
+        label.textAlignment = .center
+        label.numberOfLines = 2
+        label.font = .appFont(.Caption2Regular)
+        label.textColor = .white
+        
+        grayView.addSubview(label)
+        label.snp.makeConstraints { make in
+            make.left.right.equalToSuperview().inset(15)
+            make.bottom.equalToSuperview().inset(10)
+        }
+        
+        return viewLoad
+    }
+    
     private func getImageForCurrentTheme(image: UIImage) -> UIImage {
         let currentMode = traitCollection.userInterfaceStyle
         let image = image.withRenderingMode(.alwaysTemplate)
@@ -438,10 +494,57 @@ class MyVideosViewController: UIViewController {
             model.arr.remove(at: selectIndex)
             model.saveArr()
             model.publisherVideo.send(1)
+            
+            model.checkStatus()
+            
         }
         alertController.addAction(ok)
         
         self.present(alertController, animated: true)
+    }
+    
+    private func reloadVideo(index: Int) {
+        var item = model.arr[index]
+        
+        item.generationID = nil 
+        item.resultURL = nil
+        item.status = ""
+        
+        model.arr[index] = item
+        model.saveArr()
+        openGenerateVC(video: item)
+        
+    }
+    
+    private func openGenerateVC(video: Video) {
+        let generateVC = GenerateVideoViewController(model: self.model, image: video.image, index: video.effectID, publisher: publisher, video: video)
+        generateVC.modalPresentationStyle = .fullScreen
+        generateVC.modalTransitionStyle = .coverVertical
+        if #available(iOS 13.0, *) {
+            generateVC.isModalInPresentation = true
+        }
+        self.present(generateVC, animated: true)
+    }
+    
+    @objc private func openErrorVideo(index: Int) {
+        print(index)
+        selectIndex = index
+        let alert = UIAlertController(title: "Video generation error", message: "Something went wrong or the server is not responding. Try again or do it later.", preferredStyle: .alert)
+        
+        let tryAgain = UIAlertAction(title: "Try Again", style: .default) { _ in
+            self.reloadVideo(index: index)
+        }
+        alert.addAction(tryAgain)
+        
+        let delete = UIAlertAction(title: "Delete Video", style: .destructive) { _ in
+            self.delete()
+        }
+        alert.addAction(delete)
+        
+        let cancel = UIAlertAction(title: "Close", style: .cancel)
+        alert.addAction(cancel)
+        
+        self.present(alert, animated: true)
     }
     
 
@@ -519,10 +622,16 @@ extension MyVideosViewController: UICollectionViewDelegate, UICollectionViewData
             make.center.equalToSuperview()
         }
         
-        if item.video == nil {
+        if item.video == nil && item.status != "error" {
             let view = createGeneratingView()
             cell.addSubview(view)
             cell.isUserInteractionEnabled = false
+            view.snp.makeConstraints { make in
+                make.edges.equalToSuperview()
+            }
+        } else if item.status == "error" {
+            let view = createErrorView()
+            cell.addSubview(view)
             view.snp.makeConstraints { make in
                 make.edges.equalToSuperview()
             }
@@ -550,9 +659,16 @@ extension MyVideosViewController: UICollectionViewDelegate, UICollectionViewData
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        print(14)
+        self.selectIndex = indexPath.row
         if model.arr[indexPath.row].video != nil && model.arr[indexPath.row].status != "error" {
             self.navigationController?.pushViewController(OpenedViewController(model: model, index: indexPath.row), animated: true)
         }
+        if model.arr[indexPath.row].status == "error" {
+            self.openErrorVideo(index: indexPath.row)
+        }
+        
+        
     }
     
     func collectionView(_ collectionView: UICollectionView, contextMenuConfigurationForItemsAt indexPaths: [IndexPath], point: CGPoint) -> UIContextMenuConfiguration? {
@@ -588,35 +704,25 @@ extension MyVideosViewController: UICollectionViewDelegate, UICollectionViewData
             }
         } else if model.arr[selectIndex].status == "error"   {
 
-            let redTextAttributes: [NSAttributedString.Key: Any] = [
-                .foregroundColor: UIColor.red
-            ]
-            let imageTrash = UIImage.delete
-            let deleteTitle = NSAttributedString(string: "Delete", attributes: redTextAttributes)
-
-            let threeAction = UIAction(title: deleteTitle.string, image: imageTrash.resize(targetSize: CGSize(width: 20, height: 44))) { _ in
-                self.delete()
-            }
-            
-            let menu = UIMenu(title: "Video not load", children: [threeAction])
+            let menu = UIMenu(title: "Video not load", children: [])
             
             return UIContextMenuConfiguration(identifier: nil, previewProvider: nil) { _ in
                 return menu
             }
             
         } else {
-            let firstAction = UIAction(title: "") { _ in
-            }
-            
-            let menu = UIMenu(title: "Video is loading", children: [firstAction])
+           
+            let menu = UIMenu(title: "Video is loading", children: [])
             
             return UIContextMenuConfiguration(identifier: nil, previewProvider: nil) { _ in
                 return menu
             }
         }
-        
-        
     }
+
+    
+
+    
 }
 
 

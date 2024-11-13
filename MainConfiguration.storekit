@@ -5,7 +5,7 @@
   ],
   "products" : [
     {
-      "displayPrice" : "5.99",
+      "displayPrice" : "6.99",
       "familyShareable" : false,
       "internalID" : "11B7E841",
       "localizations" : [
@@ -15,7 +15,7 @@
           "locale" : "en_US"
         }
       ],
-      "productID" : "week_5.59_nottrial",
+      "productID" : "week_6.99_nottrial",
       "referenceName" : "Weekly",
       "type" : "Consumable"
     },

@@ -141,7 +141,7 @@ class PaywallViewController: UIViewController {
         videoContainerView.snp.makeConstraints { make in
             make.left.right.equalToSuperview()
             make.top.equalToSuperview()
-            make.height.equalTo(view.snp.width).multipliedBy(4.3 / 5.0)
+            make.height.equalTo(487)
         }
 
         // Создаем AVPlayerLayer и добавляем его в videoContainerView
@@ -151,7 +151,7 @@ class PaywallViewController: UIViewController {
 
         // Обновляем размер слоя после применения ограничений
         view.layoutIfNeeded()
-        playerLayer.frame = videoContainerView.frame
+        playerLayer.frame = videoContainerView.bounds
 
         // Добавляем зацикливание видео
         NotificationCenter.default.addObserver(forName: .AVPlayerItemDidPlayToEndTime, object: player.currentItem, queue: .main) { _ in
