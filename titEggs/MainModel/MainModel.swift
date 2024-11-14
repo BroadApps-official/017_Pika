@@ -9,11 +9,12 @@ import Foundation
 import Combine
 import Network
 
+
 class MainModel {
     
     private let netWorking = NetWorking()
     
-    lazy var arr: [Video] = loadVideoArrFromFile()  ?? []
+    lazy var arr: [Video] = loadVideoArrFromCache()  ?? []
     
     var effectsArr: [Effect] = []
     
@@ -74,15 +75,20 @@ class MainModel {
     }
     
     
-    
+    func loadPreviewVideo(idEffect: Int, escaping:  @escaping(Data, Bool) -> Void) {
+        netWorking.loadPreviewVideo(idEffect: idEffect) { data, isError in
+            escaping(data, isError)
+        }
+    }
 
     
     func saveArr() {
         do {
             let data = try JSONEncoder().encode(arr)
             try saveVideoArrToFile(data: data)
+            print("Массив видео успешно сохранен в кэш.")
         } catch {
-            print("Failed to encode or save athleteArr: \(error)")
+            print("Ошибка при кодировании или сохранении массива видео: \(error)")
         }
     }
     
@@ -93,7 +99,7 @@ class MainModel {
         print(itemId, "fgvxbnv")
         self.netWorking.getStatus(itemId: itemId) { status, resultUrl in
             print(status, itemId, "fsfdsvfsdvccsv")
-            if status != "fail" && resultUrl != "fail" && resultUrl != "" {
+            if status != "fail" && resultUrl != "fail" && resultUrl != "" && status != "error" {
                 
                 print("Получены данные для индекса \(index): статус - \(status), URL - \(resultUrl), idGen - \(self.arr[index].generationID)")
                 self.arr[index].resultURL = resultUrl
@@ -184,31 +190,34 @@ class MainModel {
 
     
     
-    private func loadVideoArrFromFile() -> [Video]? {
+    private func loadVideoArrFromCache() -> [Video]? {
         let fileManager = FileManager.default
-        guard let documentDirectory = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first else {
-            print("Unable to get document directory")
+        guard let cacheDirectory = fileManager.urls(for: .cachesDirectory, in: .userDomainMask).first else {
+            print("Unable to get cache directory")
             return nil
         }
-        let filePath = documentDirectory.appendingPathComponent("video.plist")
+        let filePath = cacheDirectory.appendingPathComponent("videoArrayCache.plist")
+        
         do {
             let data = try Data(contentsOf: filePath)
-            let athleteArr = try JSONDecoder().decode([Video].self, from: data)
-            return athleteArr
+            let videoArr = try JSONDecoder().decode([Video].self, from: data)
+            print("Видео успешно загружены из кэша.")
+            return videoArr
         } catch {
-            print("Failed to load or decode athleteArr: \(error)")
+            print("Ошибка при загрузке или декодировании массива видео: \(error)")
             return nil
         }
     }
+
     
     
     private func saveVideoArrToFile(data: Data) throws {
         let fileManager = FileManager.default
-        if let documentDirectory = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first {
-            let filePath = documentDirectory.appendingPathComponent("video.plist")
+        if let cacheDirectory = fileManager.urls(for: .cachesDirectory, in: .userDomainMask).first {
+            let filePath = cacheDirectory.appendingPathComponent("videoArrayCache.plist")
             try data.write(to: filePath)
         } else {
-            throw NSError(domain: "SaveError", code: 1, userInfo: [NSLocalizedDescriptionKey: "Unable to get document directory"])
+            throw NSError(domain: "SaveError", code: 1, userInfo: [NSLocalizedDescriptionKey: "Unable to get cache directory"])
         }
     }
 }

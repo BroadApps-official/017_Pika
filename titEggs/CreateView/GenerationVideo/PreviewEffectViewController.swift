@@ -14,29 +14,42 @@ class PreviewEffectViewController: UIViewController, UIImagePickerControllerDele
     let model: MainModel
     let index: Int
     let purchaseManager: PurchaseManager
-    let previewVideoName: String
+
     
     private var player: AVPlayer?
     private var playerLayer: AVPlayerLayer?
     private let videoContainerView = UIView() // Контейнер для видео
     private var playPauseButton: UIButton!
     private var hideButtonTimer: DispatchWorkItem?
+    private var tempFileURL: URL?
     private lazy var taps = 0
     
     private lazy var cancellable = [AnyCancellable]()
     var publisher: PassthroughSubject<Bool, Never>
     
-    init(model: MainModel, index: Int, purchaseManager: PurchaseManager, previewVideoName: String, publisher: PassthroughSubject<Bool, Never>) {
+    private lazy var activityIndicator: UIActivityIndicatorView = {
+        let view = UIActivityIndicatorView(style: .large)
+        view.color = .primary
+        view.backgroundColor = .black.withAlphaComponent(0.4)
+        view.layer.cornerRadius = 16
+        return view
+    }()
+    
+    init(model: MainModel, index: Int, purchaseManager: PurchaseManager, publisher: PassthroughSubject<Bool, Never>) {
         self.model = model
         self.index = index
         self.purchaseManager = purchaseManager
-        self.previewVideoName = previewVideoName
         self.publisher = publisher
         super.init(nibName: nil, bundle: nil)
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        player?.pause()
     }
     
     override func viewDidLoad() {
@@ -83,6 +96,12 @@ class PreviewEffectViewController: UIViewController, UIImagePickerControllerDele
     
 
     private func setupUI() {
+        
+        view.addSubview(activityIndicator)
+        activityIndicator.snp.makeConstraints { make in
+            make.height.width.equalTo(60)
+            make.center.equalToSuperview()
+        }
 
         let nextButton = UIButton(type: .system)
         nextButton.addTouchFeedback()
@@ -121,50 +140,93 @@ class PreviewEffectViewController: UIViewController, UIImagePickerControllerDele
         playPauseButton.alpha = 0
         
         
-        self.setupPlayer()
+        self.loadVideo()
         self.view.layoutIfNeeded()
     }
     
-    private func setupPlayer() {
-
-        guard let videoURL = Bundle.main.url(forResource: previewVideoName, withExtension: "mp4") else {
-            print("Video file not found")
-            return
+    private func loadVideo() {
+        
+        self.activityIndicator.startAnimating()
+        
+        model.loadPreviewVideo(idEffect: model.effectsArr[index].id) { dataVideo, isError in
+            
+            print(123000)
+            
+            if isError == true {
+                self.openAlert()
+            } else {
+                self.setupPlayer(data: dataVideo)
+            }
+            
+            self.activityIndicator.stopAnimating()
         }
-        
-        // Инициализируем AVPlayer с URL видеофайла
-        player = AVPlayer(url: videoURL)
-        
-        // Настраиваем слой для отображения видео
-        playerLayer = AVPlayerLayer(player: player)
-        playerLayer?.videoGravity = .resizeAspectFill
-        playerLayer?.cornerRadius = 20
-        
-        videoContainerView.layoutIfNeeded()
-        playerLayer?.frame = videoContainerView.bounds
-        videoContainerView.layer.addSublayer(playerLayer!)
-        playerLayer?.setNeedsDisplay()
-        
-        // Запускаем воспроизведение видео
-        player?.play()
-        player?.actionAtItemEnd = .none
-        
-        // Добавляем наблюдатель для окончания видео
-        NotificationCenter.default.addObserver(self, selector: #selector(videoDidFinish), name: .AVPlayerItemDidPlayToEndTime, object: player?.currentItem)
-        
-        // Настраиваем кнопку play/pause
-        videoContainerView.addSubview(playPauseButton)
-        playPauseButton.snp.makeConstraints { make in
-            make.height.width.equalTo(76)
-            make.center.equalToSuperview()
-        }
-        playPauseButton.alpha = 1
+    }
+    
+    private func setupPlayer(data: Data) {
+           // Устанавливаем путь к временному файлу
+           let tempDirectory = FileManager.default.temporaryDirectory
+           tempFileURL = tempDirectory.appendingPathComponent("tempVideo.mp4")
+           
+           // Пытаемся сохранить data как временный файл
+           guard let tempFileURL = tempFileURL else { return }
+           
+           do {
+               try data.write(to: tempFileURL)
+           } catch {
+               self.openAlert()
+               return
+           }
+           
+           // Инициализируем AVPlayer с URL видеофайла
+           player = AVPlayer(url: tempFileURL)
+           
+           // Настраиваем слой для отображения видео
+           playerLayer = AVPlayerLayer(player: player)
+           playerLayer?.videoGravity = .resizeAspectFill
+           playerLayer?.cornerRadius = 20
+           
+           videoContainerView.layoutIfNeeded()
+           playerLayer?.frame = videoContainerView.bounds
+           if let playerLayer = playerLayer {
+               videoContainerView.layer.addSublayer(playerLayer)
+           }
+           
+           // Запускаем воспроизведение видео
+           player?.play()
+           player?.actionAtItemEnd = .none
+           
+           // Добавляем наблюдатель для окончания видео
+           NotificationCenter.default.addObserver(self, selector: #selector(videoDidFinish), name: .AVPlayerItemDidPlayToEndTime, object: player?.currentItem)
+           
+           // Настраиваем кнопку play/pause
+           videoContainerView.addSubview(playPauseButton)
+           playPauseButton.snp.makeConstraints { make in
+               make.height.width.equalTo(76)
+               make.center.equalToSuperview()
+           }
+           playPauseButton.alpha = 0
+           playPauseTapped()
         playPauseTapped()
+       }
+    
+    private func openAlert() {
+        let alert = UIAlertController(title: "Video preview error", message: "Something went wrong or the server is not responding. Try again or do it later.", preferredStyle: .alert)
+        
+        let cancelButton = UIAlertAction(title: "Cancel", style: .cancel) { _ in
+            self.navigationController?.popViewController(animated: true)
+        }
+        alert.addAction(cancelButton)
+        
+        let repeatButton = UIAlertAction(title: "Try Again", style: .default) { _ in
+            self.activityIndicator.startAnimating()
+            self.loadVideo()
+        }
+        alert.addAction(repeatButton)
+        self.present(alert, animated: true)
     }
 
     
     @objc private func playPauseTapped() {
-        print(123)
         taps += 1
         if player?.rate == 0 {
             player?.play()
@@ -303,5 +365,26 @@ class PreviewEffectViewController: UIViewController, UIImagePickerControllerDele
     func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
         picker.dismiss(animated: true, completion: nil)
     }
+    
+    deinit {
+        print(5555)
+        NotificationCenter.default.removeObserver(self, name: .AVPlayerItemDidPlayToEndTime, object: player?.currentItem)
+        
+        // Останавливаем воспроизведение и очищаем player
+        player?.pause()
+        playPauseButton.setBackgroundImage(.bigPlay, for: .normal)
+        player = nil
+        
+        // Удаляем playerLayer из слоя videoContainerView
+        playerLayer?.removeFromSuperlayer()
+        playerLayer = nil
+        
+        if let tempFileURL = tempFileURL {
+            try? FileManager.default.removeItem(at: tempFileURL)
+        }
+    }
+    
+    
+
 
 }

@@ -89,6 +89,7 @@ class MyVideosViewController: UIViewController {
         
         model.publisherVideo
             .sink { _ in
+                self.checkManager()
                 self.sheckVideos()
             }
             .store(in: &cancellable)

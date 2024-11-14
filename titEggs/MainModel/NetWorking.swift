@@ -11,29 +11,48 @@ import Alamofire
 class NetWorking {
     
     func loadEffectsArr(escaping: @escaping(_ escaping: [Effect]) -> Void) {
-//        let token = "rE176kzVVqjtWeGToppo4lRcbz3HRLoBrZREEvgQ8fKdWuxySCw6tv52BdLKBkZTOHWda5ISwLUVTyRoZEF0A33Xpk63lF9wTCtDxOs8XK3YArAiqIXVb7ZS4IK61TYPQMu5WqzFWwXtZc1jo8w"
-//        
-//        let header: HTTPHeaders = [(.authorization(bearerToken: token))]
-//        
-//        AF.request("https://vewapnew.online/api/templates", method: .get, headers: header).responseData { response in
-//            switch response.result {
-//            case .success(let data):
-//                do {
-//                    let effects = try JSONDecoder().decode(DataEffect.self, from: data)
-//                    escaping(effects.data)
-//                } catch {
-//                    print("Ошибка декодирования JSON:", error.localizedDescription)
-//                    escaping([])
-//                }
-//                
-//            case  .failure(_):
-//                escaping([])
-//            }
-//        }
-        
         let arr =  [Effect(id: 1, effect: "Levitate"), Effect(id: 2, effect: "Decapitate"), Effect(id: 3, effect: "Eye-pop"), Effect(id: 4, effect: "Inflate"), Effect(id: 5, effect: "Melt"), Effect(id: 6, effect: "Explode"), Effect(id: 7, effect: "Squish"), Effect(id: 8, effect: "Crush"), Effect(id: 9, effect: "Cake-ify"), Effect(id: 10, effect: "Ta-da"), Effect(id: 11, effect: "Deflate"), Effect(id: 12, effect: "Crumble"), Effect(id: 13, effect: "Dissolve")]
         escaping(arr)
         
+    }
+    
+    func loadPreviewVideo(idEffect: Int, escaping: @escaping (Data, Bool) -> Void) {
+        let token = "rE176kzVVqjtWeGToppo4lRcbz3HRLoBrZREEvgQ8fKdWuxySCw6tv52BdLKBkZTOHWda5ISwLUVTyRoZEF0A33Xpk63lF9wTCtDxOs8XK3YArAiqIXVb7ZS4IK61TYPQMu5WqzFWwXtZc1jo8w"
+        let headers: HTTPHeaders = [(.authorization(bearerToken: token))]
+        
+        // Проверяем, есть ли видео в кэше
+        if let cachedData = loadCachedVideo(for: idEffect) {
+            // Если видео найдено в кэше, передаем его сразу
+            escaping(cachedData, false)
+            return
+        }
+        
+        // Выполняем сетевой запрос, если видео нет в кэше
+        AF.request("https://vewapnew.online/api/templates", method: .get, headers: headers).responseData { response in
+            debugPrint(response, "preview")
+            switch response.result {
+            case .success(let data):
+                do {
+                    let effects = try JSONDecoder().decode(DataEffect.self, from: data)
+                    let index = effects.data.firstIndex(where: { $0.id == idEffect }) ?? 1
+                    
+                    self.downloadVideo(from: effects.data[index].preview ?? "") { dataVideo, error in
+                        if let videoData = dataVideo, error == nil {
+                            self.cacheVideoData(videoData, for: idEffect)
+                            escaping(videoData, false)
+                        } else {
+                            escaping(Data(), true)
+                        }
+                    }
+                } catch {
+                    print("Ошибка декодирования JSON:", error.localizedDescription)
+                    escaping(Data(), true)
+                }
+                
+            case .failure(_):
+                escaping(Data(), true)
+            }
+        }
     }
     
     
@@ -98,6 +117,7 @@ class NetWorking {
     
 
     func downloadVideo(from url: String, completion: @escaping (Data?, Error?) -> Void) {
+        
         guard let videoURL = URL(string: url) else {
             completion(nil, NSError(domain: "Invalid URL", code: 400, userInfo: nil))
             return
@@ -113,7 +133,29 @@ class NetWorking {
             }
         }
     }
+    
+    
+    private func cacheVideoData(_ data: Data, for idEffect: Int) {
+        let cacheURL = getCacheURL(for: idEffect)
+        do {
+            try data.write(to: cacheURL)
+            print("Видео сохранено в кэш: \(cacheURL)")
+        } catch {
+            print("Ошибка сохранения видео в кэш: \(error)")
+        }
+    }
 
+    // Загрузка видео из кэша
+    private func loadCachedVideo(for idEffect: Int) -> Data? {
+        let cacheURL = getCacheURL(for: idEffect)
+        return try? Data(contentsOf: cacheURL)
+    }
+
+    // Получение пути для кэширования видео
+    private func getCacheURL(for idEffect: Int) -> URL {
+        let cacheDirectory = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask).first!
+        return cacheDirectory.appendingPathComponent("video_\(idEffect).mp4")
+    }
     
 }
 

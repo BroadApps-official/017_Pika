@@ -99,6 +99,15 @@ class OpenedViewController: UIViewController {
     }
     
     private func setupUI() {
+        
+        view.addSubview(shareButton)
+        shareButton.snp.makeConstraints { make in
+            make.height.equalTo(48)
+            make.left.right.equalToSuperview().inset(15)
+            make.bottom.equalTo(view.safeAreaLayoutGuide.snp.bottom).inset(10)
+        }
+        shareButton.addTarget(self, action: #selector(shareVideo), for: .touchUpInside)
+        
         // Добавляем контейнер для видео
         view.addSubview(videoContainerView)
         videoContainerView.layer.cornerRadius = 20
@@ -117,55 +126,49 @@ class OpenedViewController: UIViewController {
         playPauseButton.addTarget(self, action: #selector(playPauseTapped), for: .touchUpInside)
         playPauseButton.backgroundColor = .clear
         
-        playPauseButton.alpha = 0
+        playPauseButton.alpha = 0   //self.setupPlayer(with: videoData)
         
         // Добавляем тап жест для видео
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(videoTapped))
         videoContainerView.addGestureRecognizer(tapGesture)
         guard let videoData = model.arr[index].video else { return }
-        Task {
-            do {
-                let aspectRatio = try await getVideoAspectRatio(from: videoData)
-                DispatchQueue.main.async {
-                    if aspectRatio > 1 {
-                        self.videoContainerView.snp.remakeConstraints { make in
-                            make.left.equalToSuperview().offset(15)
-                            make.right.equalToSuperview().offset(-15)
-                            make.centerY.equalToSuperview()
-                            make.height.equalTo(self.videoContainerView.snp.width).multipliedBy(1.35)
-                        }
-                        self.view.layoutIfNeeded()
-                    } else {
-                        self.videoContainerView.snp.remakeConstraints { make in
-                            make.left.equalToSuperview().offset(15)
-                            make.right.equalToSuperview().offset(-15)
-                            make.centerY.equalToSuperview()
-                            make.height.equalTo(self.videoContainerView.snp.width).multipliedBy(0.7)
-                        }
-                        self.view.layoutIfNeeded()
-                    }
-                    self.setupPlayer(with: videoData)
-                }
-            } catch {
-                print("Ошибка получения соотношения сторон: \(error.localizedDescription)")
-            }
+        videoContainerView.snp.makeConstraints { make in
+            make.left.right.equalToSuperview().inset(15)
+            make.bottom.equalTo(shareButton.snp.top).inset(-30)
+            make.top.equalTo(view.safeAreaLayoutGuide.snp.top).inset(10)
         }
+        self.setupPlayer(with: videoData)
+        self.view.layoutIfNeeded()
     }
     
     private func setupPlayer(with videoData: Data) {
-        let tempURL = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent("tempVideo.mp4")
-        try? videoData.write(to: tempURL)
         
-        player = AVPlayer(url: tempURL)
+        let tempDirectory = FileManager.default.temporaryDirectory
+        tempURL = tempDirectory.appendingPathComponent("tempVideo.mp4")
         
+        // Пытаемся сохранить data как временный файл
+        guard let tempFileURL = tempURL else { return }
+        
+        do {
+            try videoData.write(to: tempFileURL)
+        } catch {
+            return
+        }
+        
+        // Инициализируем AVPlayer с URL видеофайла
+        player = AVPlayer(url: tempFileURL)
+        
+        // Настраиваем слой для отображения видео
         playerLayer = AVPlayerLayer(player: player)
-        playerLayer?.frame = videoContainerView.bounds
         playerLayer?.videoGravity = .resizeAspectFill
         playerLayer?.cornerRadius = 20
-        videoContainerView.layer.addSublayer(playerLayer!)
-        
-        player?.play()
         player?.actionAtItemEnd = .none
+        
+        videoContainerView.layoutIfNeeded()
+        playerLayer?.frame = videoContainerView.bounds
+        if let playerLayer = playerLayer {
+            videoContainerView.layer.addSublayer(playerLayer)
+        }
         
         // Следим за окончанием видео
         NotificationCenter.default.addObserver(self, selector: #selector(videoDidFinish), name: .AVPlayerItemDidPlayToEndTime, object: player?.currentItem)
@@ -175,17 +178,9 @@ class OpenedViewController: UIViewController {
             make.height.width.equalTo(76)
             make.center.equalToSuperview()
         }
-        playPauseButton.alpha = 1
+        playPauseButton.alpha = 0
         playPauseTapped()
-        
-        
-        view.addSubview(shareButton)
-        shareButton.snp.makeConstraints { make in
-            make.height.equalTo(48)
-            make.left.right.equalToSuperview().inset(15)
-            make.bottom.equalTo(view.safeAreaLayoutGuide.snp.bottom).inset(10)
-        }
-        shareButton.addTarget(self, action: #selector(shareVideo), for: .touchUpInside)
+
         
     }
     
@@ -290,30 +285,7 @@ class OpenedViewController: UIViewController {
         player?.play()
     }
     
-    func getVideoAspectRatio(from videoData: Data) async throws -> CGFloat {
-        if tempURL == nil {
-            tempURL = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent("tempVideo.mp4")
-            try videoData.write(to: tempURL!)
-        }
-        
-        guard let tempURL = tempURL else {
-            throw NSError(domain: "VideoProcessing", code: -1, userInfo: [NSLocalizedDescriptionKey: "Временный URL не найден"])
-        }
-        
-        let asset = AVAsset(url: tempURL)
-        let tracks = try await asset.load(.tracks)
-        guard let videoTrack = tracks.first(where: { $0.mediaType == .video }) else {
-            throw NSError(domain: "VideoProcessing", code: -1, userInfo: [NSLocalizedDescriptionKey: "Видео-дорожка не найдена"])
-        }
-        
-        let size = try await videoTrack.load(.naturalSize)
-        let transform = try await videoTrack.load(.preferredTransform)
-        
-        let dimensions = size.applying(transform)
-        let aspectRatio = abs(dimensions.width / dimensions.height)
-        
-        return aspectRatio
-    }
+   
     
     func removeTempFile() {
         guard let tempURL = tempURL else { return }

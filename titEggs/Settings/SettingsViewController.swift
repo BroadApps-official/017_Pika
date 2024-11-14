@@ -280,11 +280,19 @@ class SettingsViewController: UIViewController {
                     for fileURL in cacheFiles {
                         try fileManager.removeItem(at: fileURL)
                     }
+                    self.checkManager()
+                    self.model.arr.removeAll()
+                    self.model.saveArr()
+                    self.model.publisherVideo.send(1)
                     self.cacheLabel.text = self.getCache()
                 } catch {
                     self.cacheLabel.text = self.getCache()
+                    self.model.publisherVideo.send(1)
+                    self.checkManager()
                     print("Ошибка при очистке кэша: \(error.localizedDescription)")
                 }
+                
+               
             }
             alertController.addAction(clearButtpn)
             

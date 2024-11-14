@@ -226,7 +226,7 @@ class GenerateVideoViewController: UIViewController {
     private func setupTimer() {
         count = 0
         timer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { _ in
-            self.count += 0.0005 
+            self.count += 0.00035
             if self.count < 1 {
                 UIView.animate(withDuration: 0.1) {
                     self.progressView.setProgress(Float(self.count), animated: true)

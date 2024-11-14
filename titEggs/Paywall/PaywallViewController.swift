@@ -96,21 +96,20 @@ class PaywallViewController: UIViewController {
     
     
     private func loadProducts() async {
+        // Ожидаем, пока массив products будет содержать 2 элемента
+        while manager.productsApphud.count < 2 {
+            await Task.sleep(500_000_000) // Ждем 0.5 секунды перед повторной проверкой
+        }
+
+        // Когда продуктов достаточно, выполняем нужный код
         self.products = manager.productsApphud
         self.buttonsTopStackView.alpha = 1
         self.selectPlan(sender: self.annualButton)
         self.progressView.alpha = 0
-        
-//        do {
-//            self.products = manager.productsApphud
-//            self.buttonsTopStackView.alpha = 1
-//            self.selectPlan(sender: self.annualButton)
-//            self.progressView.alpha = 0
-//        } catch {
-//            print("Ошибка при загрузке продуктов: \(error)")
-//        }
+        self.continueButton.isEnabled = true
+
     }
-    
+
 
     
     private func setupTimer() {
@@ -191,6 +190,7 @@ class PaywallViewController: UIViewController {
         }
         
         view.addSubview(continueButton)
+        continueButton.isEnabled = false
         continueButton.snp.makeConstraints { make in
             make.left.right.equalToSuperview().inset(15)
             make.height.equalTo(48)
@@ -258,7 +258,7 @@ class PaywallViewController: UIViewController {
         
         view.addSubview(activity)
         activity.startAnimating()
-        activity.alpha = 0
+        activity.alpha = 0 
         activity.snp.makeConstraints { make in
             make.height.width.equalTo(60)
             make.center.equalToSuperview()
@@ -289,12 +289,6 @@ class PaywallViewController: UIViewController {
         }
     }
 
-
-
-    
-    private func createStackView() {
-        
-    }
     
     @objc private func close() {
         self.dismiss(animated: true)
