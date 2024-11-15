@@ -23,7 +23,8 @@ class OnboardingViewController: UIViewController {
         fatalError("init(coder:) has not been implemented")
     }
     
-    private let arr: [OnbData] = [OnbData(image: "onboardingVideo1", topText: "Pick a photo &\nblow it up", botText: "Create unreal videos"),
+    private let arr: [OnbData] = [
+    OnbData(image: "onboardingVideo1", topText: "Pick a photo &\nblow it up", botText: "Create unreal videos"),
     OnbData(image: "onboardingVideo2", topText: "Turn everything\nyou see", botText: "Quick and easy"),
     OnbData(image: "onbVideo3", topText: "Take a photo &\nCake-ify it", botText: "Surprise your friends"),
     OnbData(image: "onboardingImage4", topText: "Rate our app in\nthe AppStore", botText: "Lots of satisfied users")]
@@ -39,7 +40,7 @@ class OnboardingViewController: UIViewController {
     
     private lazy var nextButton = CreateElements.createPrimaryButton(title: "Continue")
     
-    private lazy var tap = 0
+    private var tap = 0
     
     private lazy var collection: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
@@ -64,6 +65,8 @@ class OnboardingViewController: UIViewController {
     
 
     private func setupUI() {
+        
+        
         view.addSubview(pageControl)
         pageControl.snp.makeConstraints { make in
             make.centerX.equalToSuperview()
@@ -71,6 +74,7 @@ class OnboardingViewController: UIViewController {
         }
         
         view.addSubview(nextButton)
+        nextButton.addTouchFeedback()
         nextButton.addTarget(self, action: #selector(goNext), for: .touchUpInside)
         nextButton.snp.makeConstraints { make in
             make.left.right.equalToSuperview().inset(15)
@@ -89,31 +93,38 @@ class OnboardingViewController: UIViewController {
     @objc private func goNext() {
         let nextIndex = min(pageControl.currentPage + 1, arr.count - 1)
         let indexPath = IndexPath(item: nextIndex, section: 0)
-        collection.scrollToItem(at: indexPath, at: .centeredHorizontally, animated: true)
+        print(indexPath, "tap index")
+        collection.scrollToItem(at: indexPath, at: .left, animated: true)
         pageControl.currentPage = nextIndex
         tap += 1
+        if indexPath.row != 3  {
+            collection.reloadItems(at: [indexPath])
+        }
         
         
         switch tap {
         case 4:
-            requestReview()
+            rateApp()
         case 5:
             self.navigationController?.setViewControllers([NotifyOnbViewController(paywall: paywall)], animated: true)
         default:
             return
         }
-        
-        
-        
+
     }
     
-    private func requestReview() {
-        if #available(iOS 14.0, *) {
-            if let windowScene = self.view.window?.windowScene {
-                SKStoreReviewController.requestReview(in: windowScene)
+    @objc private func rateApp() {
+        if #available(iOS 14, *) {
+            if let scene = UIApplication.shared.connectedScenes.first(where: { $0.activationState == .foregroundActive }) as? UIWindowScene {
+                DispatchQueue.main.async {
+                    SKStoreReviewController.requestReview(in: scene)
+                }
             }
         } else {
-            SKStoreReviewController.requestReview()
+            let appID = "ID"
+            if let url = URL(string: "itms-apps://itunes.apple.com/app/id\(6737900240)?action=write-review") {
+                UIApplication.shared.open(url, options: [:], completionHandler: nil)
+            }
         }
     }
 
@@ -131,11 +142,17 @@ extension OnboardingViewController: UICollectionViewDelegate, UICollectionViewDa
         cell.subviews.forEach { $0.removeFromSuperview() }
     
         let item = arr[indexPath.row]
+        print(indexPath.row , "- тут нет бага ")
         
-        if indexPath.row == 0 || indexPath.row == 1 || indexPath.row == 2   {
-            print(indexPath.row, "56456645465")
-            let player = AVPlayer(url: URL(fileURLWithPath: Bundle.main.path(forResource: item.image, ofType: "mp4")!))
+        
+        
+        if indexPath.row < 3   {
+            
+            
+            var player = AVPlayer(url: URL(fileURLWithPath: Bundle.main.path(forResource: item.image, ofType: "mp4")!))
             player.isMuted = true
+            
+           print(indexPath.row, item.image, "тут видосы")
             
             // Создаем UIView для отображения видео
             let videoContainerView = UIView()
@@ -164,11 +181,12 @@ extension OnboardingViewController: UICollectionViewDelegate, UICollectionViewDa
             
             // Запускаем воспроизведение
             player.play()
+            DispatchQueue.main.async {
+                playerLayer.frame = videoContainerView.bounds
+            }
             
-        }
-        
-        if indexPath.row == 3 {
-            print(indexPath.row, "1324654")
+        } else {
+            print(indexPath.row, "rew")
             let imageView = UIImageView(image: UIImage(named: item.image))
             imageView.contentMode = .scaleAspectFill
             cell.addSubview(imageView)
@@ -177,8 +195,9 @@ extension OnboardingViewController: UICollectionViewDelegate, UICollectionViewDa
                 make.top.equalToSuperview()
                 make.height.equalTo(imageView.snp.width).multipliedBy(3.0/2.0)
             }
-            
         }
+        
+       
         
         let shadowImageView = UIImageView(image: .onbShadow)
         shadowImageView.contentMode = .scaleAspectFill

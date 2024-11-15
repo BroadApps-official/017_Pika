@@ -266,40 +266,38 @@ class SettingsViewController: UIViewController {
     }
     
     @objc private func clearCache() {
-            
-            let alertController = UIAlertController(title: "Clear cache?", message: "The cached files of your videos will be deleted from your phone's memory. But your download history will be retained.", preferredStyle: .alert)
-            
-            let cancelButton = UIAlertAction(title: "Cancel", style: .cancel)
-            alertController.addAction(cancelButton)
-            
-            let clearButtpn = UIAlertAction(title: "Clear", style: .destructive) { _ in
-                let fileManager = FileManager.default
-                let cacheURL = fileManager.urls(for: .cachesDirectory, in: .userDomainMask).first!
-                do {
-                    let cacheFiles = try fileManager.contentsOfDirectory(at: cacheURL, includingPropertiesForKeys: nil)
-                    for fileURL in cacheFiles {
-                        try fileManager.removeItem(at: fileURL)
-                    }
-                    self.checkManager()
-                    self.model.arr.removeAll()
-                    self.model.saveArr()
-                    self.model.publisherVideo.send(1)
-                    self.cacheLabel.text = self.getCache()
-                } catch {
-                    self.cacheLabel.text = self.getCache()
-                    self.model.publisherVideo.send(1)
-                    self.checkManager()
-                    print("Ошибка при очистке кэша: \(error.localizedDescription)")
+        
+        let alertController = UIAlertController(title: "Clear cache?", message: "The cached files of your videos will be deleted from your phone's memory. But your download history will be retained.", preferredStyle: .alert)
+        
+        let cancelButton = UIAlertAction(title: "Cancel", style: .cancel)
+        alertController.addAction(cancelButton)
+        
+        let clearButtpn = UIAlertAction(title: "Clear", style: .destructive) { _ in
+            let fileManager = FileManager.default
+            let cacheURL = fileManager.urls(for: .cachesDirectory, in: .userDomainMask).first!
+            do {
+                let cacheFiles = try fileManager.contentsOfDirectory(at: cacheURL, includingPropertiesForKeys: nil)
+                for fileURL in cacheFiles {
+                    try fileManager.removeItem(at: fileURL)
                 }
-                
-               
+                self.checkManager()
+                self.model.arr.removeAll()
+                self.model.saveArr()
+                self.model.publisherVideo.send(1)
+                self.cacheLabel.text = self.getCache()
+            } catch {
+                self.cacheLabel.text = self.getCache()
+                self.model.publisherVideo.send(1)
+                self.checkManager()
+                print("Ошибка при очистке кэша: \(error.localizedDescription)")
             }
-            alertController.addAction(clearButtpn)
-            
-            self.present(alertController, animated: true)
         }
-
-
+        alertController.addAction(clearButtpn)
+        
+        self.present(alertController, animated: true)
+    }
+    
+    
     
     @objc private func contactUs() {
         let email = "example@example.com" // POST

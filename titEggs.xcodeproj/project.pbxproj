@@ -64,8 +64,8 @@
 		15E627792CE374DF00A2C10C /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 15E627782CE374DF00A2C10C /* GoogleService-Info.plist */; };
 		15E6277C2CE381DA00A2C10C /* FirebaseCrashlytics in Frameworks */ = {isa = PBXBuildFile; productRef = 15E6277B2CE381DA00A2C10C /* FirebaseCrashlytics */; };
 		15E627AE2CE3C61E00A2C10C /* Cake-ify_it1.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 15E627AD2CE3C61E00A2C10C /* Cake-ify_it1.mp4 */; };
-		15E627B22CE3D38C00A2C10C /* onbVideo3.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 15E627B12CE3D38C00A2C10C /* onbVideo3.mp4 */; };
 		15E9367D2CE4B4BA007B963B /* PreviewEffectViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15E9367C2CE4B4BA007B963B /* PreviewEffectViewController.swift */; };
+		15E9367F2CE762B5007B963B /* onbVideo3.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 15E9367E2CE762B5007B963B /* onbVideo3.mp4 */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -117,8 +117,8 @@
 		15D0BFCF2CD90AE90011227E /* CreateViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateViewController.swift; sourceTree = "<group>"; };
 		15E627782CE374DF00A2C10C /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		15E627AD2CE3C61E00A2C10C /* Cake-ify_it1.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Cake-ify_it1.mp4"; sourceTree = "<group>"; };
-		15E627B12CE3D38C00A2C10C /* onbVideo3.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = onbVideo3.mp4; sourceTree = "<group>"; };
 		15E9367C2CE4B4BA007B963B /* PreviewEffectViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreviewEffectViewController.swift; sourceTree = "<group>"; };
+		15E9367E2CE762B5007B963B /* onbVideo3.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = onbVideo3.mp4; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -245,7 +245,7 @@
 			isa = PBXGroup;
 			children = (
 				15542B6F2CDEBC7A0045598C /* onboardingVideo1.mp4 */,
-				15E627B12CE3D38C00A2C10C /* onbVideo3.mp4 */,
+				15E9367E2CE762B5007B963B /* onbVideo3.mp4 */,
 				15542B702CDEBC7B0045598C /* onboardingVideo2.mp4 */,
 				15542B712CDEBC7B0045598C /* Paywall.mp4 */,
 				15542B2D2CDE27900045598C /* Cells */,
@@ -451,8 +451,8 @@
 				15D0BFB82CD8F6CF0011227E /* Assets.xcassets in Resources */,
 				15542B742CDEBC7B0045598C /* onboardingVideo2.mp4 in Resources */,
 				15542B632CDEBC640045598C /* Deflate_it1.mp4 in Resources */,
-				15E627B22CE3D38C00A2C10C /* onbVideo3.mp4 in Resources */,
 				15542B622CDEBC640045598C /* decapitate_it1.mp4 in Resources */,
+				15E9367F2CE762B5007B963B /* onbVideo3.mp4 in Resources */,
 				152C78542CD9128F00A2A977 /* SF-Pro-Text-Medium.otf in Resources */,
 				15542B642CDEBC640045598C /* levitate_it1.mp4 in Resources */,
 				15542B732CDEBC7B0045598C /* onboardingVideo1.mp4 in Resources */,
@@ -677,7 +677,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = 6YA7577C98;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = titEggs/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Pika Art";
@@ -695,7 +695,7 @@
 				);
 				MARKETING_VERSION = 1.0;
 				OTHER_LDFLAGS = "-ObjC";
-				PRODUCT_BUNDLE_IDENTIFIER = com.agh.p1i1ka;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.agh.p1i1ka-";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -715,7 +715,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = 6YA7577C98;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = titEggs/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Pika Art";
@@ -733,7 +733,7 @@
 				);
 				MARKETING_VERSION = 1.0;
 				OTHER_LDFLAGS = "-ObjC";
-				PRODUCT_BUNDLE_IDENTIFIER = com.agh.p1i1ka;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.agh.p1i1ka-";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";

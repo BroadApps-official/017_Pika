@@ -76,6 +76,7 @@ class GenerateVideoViewController: UIViewController {
         if id == uuidVideo {
             DispatchQueue.main.async {
                 self.openAlert()
+                self.count = 0.0
             }
         }
     }

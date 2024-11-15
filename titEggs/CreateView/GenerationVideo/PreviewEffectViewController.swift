@@ -52,9 +52,13 @@ class PreviewEffectViewController: UIViewController, UIImagePickerControllerDele
         player?.pause()
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        setupNavController()
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-        setupNavController()
         view.backgroundColor = .bgPrimary
         setupUI()
         subscribe()
@@ -275,6 +279,8 @@ class PreviewEffectViewController: UIViewController, UIImagePickerControllerDele
         } else {
             let vc = CreateElements.openPaywall(manager: purchaseManager)
             self.present(vc, animated: true)
+            playPauseButton.setBackgroundImage(.bigPlay, for: .normal)
+            player?.pause()
         }
     }
     
@@ -322,6 +328,8 @@ class PreviewEffectViewController: UIViewController, UIImagePickerControllerDele
         if #available(iOS 13.0, *) {
             generateVC.isModalInPresentation = true
         }
+        playPauseButton.setBackgroundImage(.bigPlay, for: .normal)
+        player?.pause()
         self.present(generateVC, animated: true)
     }
     

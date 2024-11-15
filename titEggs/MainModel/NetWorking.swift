@@ -20,6 +20,8 @@ class NetWorking {
         let token = "rE176kzVVqjtWeGToppo4lRcbz3HRLoBrZREEvgQ8fKdWuxySCw6tv52BdLKBkZTOHWda5ISwLUVTyRoZEF0A33Xpk63lF9wTCtDxOs8XK3YArAiqIXVb7ZS4IK61TYPQMu5WqzFWwXtZc1jo8w"
         let headers: HTTPHeaders = [(.authorization(bearerToken: token))]
         
+        let parameter: Parameters = ["appId" : Bundle.main.bundleIdentifier ?? "pika"]
+        
         // Проверяем, есть ли видео в кэше
         if let cachedData = loadCachedVideo(for: idEffect) {
             // Если видео найдено в кэше, передаем его сразу
@@ -28,7 +30,7 @@ class NetWorking {
         }
         
         // Выполняем сетевой запрос, если видео нет в кэше
-        AF.request("https://vewapnew.online/api/templates", method: .get, headers: headers).responseData { response in
+        AF.request("https://vewapnew.online/api/templates", method: .get, parameters: parameter, headers: headers).responseData { response in
             debugPrint(response, "preview")
             switch response.result {
             case .success(let data):
@@ -59,12 +61,13 @@ class NetWorking {
     func createVideo(data: Data, idEffect: String, escaping: @escaping (String) -> Void) {
         let token = "rE176kzVVqjtWeGToppo4lRcbz3HRLoBrZREEvgQ8fKdWuxySCw6tv52BdLKBkZTOHWda5ISwLUVTyRoZEF0A33Xpk63lF9wTCtDxOs8XK3YArAiqIXVb7ZS4IK61TYPQMu5WqzFWwXtZc1jo8w"
         
-        let headers: HTTPHeaders = [.authorization(bearerToken: token)]
+        let headers: HTTPHeaders = [(.authorization(bearerToken: token))]
         
         AF.upload(multipartFormData: { multipartFormData in
             multipartFormData.append(Data(idEffect.utf8), withName: "templateId")
             multipartFormData.append(data, withName: "image", fileName: "image.jpg", mimeType: "image/jpeg")
             multipartFormData.append(Data(userID.utf8), withName: "userId")
+            multipartFormData.append(Data((Bundle.main.bundleIdentifier ?? "pika").utf8), withName: "appId")
         }, to: "https://vewapnew.online/api/generate", headers: headers)
         .responseData { response in
             debugPrint(response, "createOK")
@@ -91,10 +94,10 @@ class NetWorking {
         
         let token = "rE176kzVVqjtWeGToppo4lRcbz3HRLoBrZREEvgQ8fKdWuxySCw6tv52BdLKBkZTOHWda5ISwLUVTyRoZEF0A33Xpk63lF9wTCtDxOs8XK3YArAiqIXVb7ZS4IK61TYPQMu5WqzFWwXtZc1jo8w"
         
-        let header: HTTPHeaders = [(.authorization(bearerToken: token))]
-        let param: Parameters = ["generationId": itemId]
+        let header: HTTPHeaders = [(.authorization(bearerToken: token)),
+                                    HTTPHeader(name: "AppId", value: Bundle.main.bundleIdentifier ?? "pika")]
+        let param: Parameters = ["generationId": itemId, "appId" : Bundle.main.bundleIdentifier ?? "pika"]
 
-        
         
         AF.request("https://vewapnew.online/api/generationStatus", method: .get, parameters: param, headers: header).responseData { response in
             debugPrint(response, "statusGettttt")

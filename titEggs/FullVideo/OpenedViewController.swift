@@ -166,6 +166,7 @@ class OpenedViewController: UIViewController {
         
         videoContainerView.layoutIfNeeded()
         playerLayer?.frame = videoContainerView.bounds
+        
         if let playerLayer = playerLayer {
             videoContainerView.layer.addSublayer(playerLayer)
         }
