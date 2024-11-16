@@ -11,20 +11,15 @@ import Combine
 import ApphudSDK
 
 
+
 class PurchaseManager: NSObject {
     
-    let paywallID = "main"
-    
-    private var updates: Task<Void, Never>?
-    
-    private(set) var purchasedProductIDs = Set<String>()
-    private let productIds = ["pro_lifetime", "pro_weekly"]
-    var productsApphud: [ApphudProduct] = []
+    let paywallID = "main" //айди пэйволла
+    var productsApphud: [ApphudProduct] = [] //массив с продуктами
 
     
     override init() {
         super.init()
-
         
         Task {
             await self.loadPaywalls()
@@ -32,14 +27,13 @@ class PurchaseManager: NSObject {
         
     }
     
-    
+    //MARK: - Возврат true при наличии подписки
     var hasUnlockedPro: Bool {
         return Apphud.hasPremiumAccess()
     }
     
 
-    //оплата
-    
+    //MARK: - Начало оплаты
     @MainActor func startPurchase(produst: ApphudProduct, escaping: @escaping(Bool) -> Void) {
         let selectedProduct = produst
         Apphud.purchase(selectedProduct) { result in
@@ -49,7 +43,7 @@ class PurchaseManager: NSObject {
             }
             debugPrint(result)
             if let subscription = result.subscription, subscription.isActive() {
-                buyPublisher.send(1)
+                buyPublisher.send(1) //паблишер, который обновляет показ кнопки PRO на контроллерах. В его теле идет вызов hasUnlockedPro
                 escaping(true)
             } else if let purchase = result.nonRenewingPurchase, purchase.isActive() {
                 buyPublisher.send(1)
@@ -63,7 +57,7 @@ class PurchaseManager: NSObject {
         }
     }
     
-    //vосстановление покупок
+    //MARK: - vосстановление покупок
     @MainActor func restorePurchase(escaping: @escaping(Bool) -> Void) {
         print("restore")
         Apphud.restorePurchases {  subscriptions, _, error in
@@ -84,12 +78,9 @@ class PurchaseManager: NSObject {
             }
         }
     }
-    
-    deinit {
-        updates?.cancel()
-    }
-    
 
+    
+//MARK: - загрузка продуктов с эппхад
     @MainActor
     func loadPaywalls() {
         Apphud.paywallsDidLoadCallback { paywalls, arg in
@@ -98,19 +89,17 @@ class PurchaseManager: NSObject {
                 
                 let products = paywall.products
                 self.productsApphud = products
+                
                 for i in products {
                     print(i.skProduct?.productIdentifier, "ProdID")
                     print(i.skProduct?.price.stringValue, "cena")
                 }
- 
             }
         }
     }
-
     
     
-    
-    
+  
 }
 
 

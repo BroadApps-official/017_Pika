@@ -62,7 +62,7 @@ class CreateViewController: UIViewController, UIImagePickerControllerDelegate, U
         super.viewWillAppear(animated)
         setupNavController()
         checkManager()
-        
+        collection.reloadData()
     }
     
     private func checkManager() {

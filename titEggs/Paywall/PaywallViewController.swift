@@ -357,7 +357,11 @@ class PaywallViewController: UIViewController {
         button.layer.borderWidth = selected ? 1 : 0
         
         let typeLabel = UILabel()
-        typeLabel.text = type ? products.first?.skProduct?.localizedTitle : products.last?.skProduct?.localizedTitle
+        typeLabel.text = type
+            ? (products.first != nil ? returnName(product: products.first!) : "Annual")
+            : (products.last != nil ? returnName(product: products.last!) : "Weekly")
+
+
         typeLabel.textColor = .white
         typeLabel.font = .appFont(.BodyRegular)
         button.addSubview(typeLabel)
@@ -440,6 +444,8 @@ class PaywallViewController: UIViewController {
         return button
     }
     
+    
+    
     @objc private func selectPlan(sender: UIButton) {
         buttonsTopStackView.arrangedSubviews.forEach { $0.removeFromSuperview() }
         if sender.tag == 1 {
@@ -455,6 +461,31 @@ class PaywallViewController: UIViewController {
         buttonsTopStackView.addArrangedSubview(annualButton)
         buttonsTopStackView.addArrangedSubview(weeklyButton)
     }
+    
+    private func returnName(product: ApphudProduct) -> String {
+        guard let subscriptionPeriod = product.skProduct?.subscriptionPeriod else {
+            return " "
+        }
+        
+        let unitCount = subscriptionPeriod.numberOfUnits
+        let unit: String
+        
+        switch subscriptionPeriod.unit {
+        case .day:
+            unit = "Daily"
+        case .week:
+            unit = "Weekly"
+        case .month:
+            unit = "Monthly"
+        case .year:
+            unit = "Annual"
+        @unknown default:
+            unit = "unknown"
+        }
+        
+        return unit
+    }
+
     
     @objc private func buttonTouchDown(_ sender: UIButton) {
         sender.alpha = 0.7

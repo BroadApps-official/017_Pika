@@ -64,7 +64,8 @@ class SettingsViewController: UIViewController {
         super.viewWillAppear(animated)
         cacheLabel.text = getCache()
         checkManager()
-        print( UserDefaults.standard.object(forKey: "isNotificaion") as? Bool ?? false)
+        setupNavController()
+        self.title = "Settings"
     }
     
     override func viewDidLoad() {
@@ -95,8 +96,8 @@ class SettingsViewController: UIViewController {
     }
     
     private func setupNavController() {
-        self.title = "Settings"
-        navigationController?.navigationBar.prefersLargeTitles = true
+        tabBarController?.title = "Settings"
+        tabBarController?.navigationController?.navigationBar.prefersLargeTitles = true
         let appearance = UINavigationBarAppearance()
         appearance.configureWithOpaqueBackground()
         appearance.backgroundColor = .clear
@@ -108,15 +109,15 @@ class SettingsViewController: UIViewController {
             .foregroundColor: UIColor.white,
             .font: UIFont.appFont(.LargeTitleEmphasized)
         ]
-        navigationController?.navigationBar.standardAppearance = appearance
-        navigationController?.navigationBar.scrollEdgeAppearance = appearance
+        tabBarController?.navigationController?.navigationBar.standardAppearance = appearance
+        tabBarController?.navigationController?.navigationBar.scrollEdgeAppearance = appearance
         
         if purchaseManager.hasUnlockedPro == false {
             rightButton.addTarget(self, action: #selector(paywallButtonTapped), for: .touchUpInside)
             
             let barButtonItem = UIBarButtonItem(customView: rightButton)
             
-            navigationItem.rightBarButtonItem = barButtonItem
+            tabBarController?.navigationItem.rightBarButtonItem = barButtonItem
             rightButton.snp.makeConstraints { make in
                 make.width.equalTo(80)
                 make.height.equalTo(32)
