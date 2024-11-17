@@ -1,5 +1,5 @@
 {
-  "identifier" : "46B38283",
+  "identifier" : "0968CCFF",
   "nonRenewingSubscriptions" : [
 
   ],
@@ -7,27 +7,15 @@
 
   ],
   "settings" : {
-    "_askToBuyEnabled" : false,
-    "_billingGracePeriodEnabled" : false,
-    "_billingIssuesEnabled" : false,
     "_failTransactionsEnabled" : false,
-    "_locale" : "en_US",
-    "_renewalBillingIssuesEnabled" : false,
-    "_storefront" : "USA",
     "_storeKitErrors" : [
       {
-        "current" : {
-          "index" : 2,
-          "type" : "generic"
-        },
+        "current" : null,
         "enabled" : false,
         "name" : "Load Products"
       },
       {
-        "current" : {
-          "index" : 1,
-          "type" : "purchase"
-        },
+        "current" : null,
         "enabled" : false,
         "name" : "Purchase"
       },
@@ -37,10 +25,7 @@
         "name" : "Verification"
       },
       {
-        "current" : {
-          "index" : 2,
-          "type" : "generic"
-        },
+        "current" : null,
         "enabled" : false,
         "name" : "App Store Sync"
       },
@@ -60,10 +45,7 @@
         "name" : "Manage Subscriptions Sheet"
       },
       {
-        "current" : {
-          "index" : 0,
-          "type" : "refund request"
-        },
+        "current" : null,
         "enabled" : false,
         "name" : "Refund Request Sheet"
       },
@@ -72,16 +54,15 @@
         "enabled" : false,
         "name" : "Offer Code Redeem Sheet"
       }
-    ],
-    "_timeRate" : 0
+    ]
   },
   "subscriptionGroups" : [
     {
-      "id" : "6E7FF403",
+      "id" : "351BB5AF",
       "localizations" : [
 
       ],
-      "name" : "WeekSub",
+      "name" : "Test",
       "subscriptions" : [
         {
           "adHocOffers" : [
@@ -93,19 +74,19 @@
           "displayPrice" : "6.99",
           "familyShareable" : false,
           "groupNumber" : 1,
-          "internalID" : "5245463D",
+          "internalID" : "F139782D",
           "introductoryOffer" : null,
           "localizations" : [
             {
               "description" : "",
-              "displayName" : "Weekly",
+              "displayName" : "PikaWeek",
               "locale" : "en_US"
             }
           ],
-          "productID" : "week_6.99_nottrail",
+          "productID" : "week_6.99_nottrial",
           "recurringSubscriptionPeriod" : "P1W",
           "referenceName" : "Weekly",
-          "subscriptionGroupID" : "6E7FF403",
+          "subscriptionGroupID" : "351BB5AF",
           "type" : "RecurringSubscription"
         },
         {
@@ -113,37 +94,49 @@
 
           ],
           "codeOffers" : [
-            {
-              "displayPrice" : "50",
-              "eligibility" : [
-                "expired",
-                "existing",
-                "new"
-              ],
-              "internalID" : "0F132113",
-              "isStackable" : true,
-              "numberOfPeriods" : 1,
-              "paymentMode" : "payAsYouGo",
-              "referenceName" : "Yearly",
-              "subscriptionPeriod" : "P1Y"
-            }
+
           ],
-          "displayPrice" : "5",
+          "displayPrice" : "49.99",
           "familyShareable" : false,
           "groupNumber" : 1,
-          "internalID" : "0D5A08E9",
+          "internalID" : "97E5CC94",
           "introductoryOffer" : null,
           "localizations" : [
             {
               "description" : "",
-              "displayName" : "Yearly",
+              "displayName" : "PikaPro",
               "locale" : "en_US"
             }
           ],
-          "productID" : "week_50_nottrail",
+          "productID" : "year_50_nottrial",
           "recurringSubscriptionPeriod" : "P1Y",
-          "referenceName" : "Annual",
-          "subscriptionGroupID" : "6E7FF403",
+          "referenceName" : "Yearly",
+          "subscriptionGroupID" : "351BB5AF",
+          "type" : "RecurringSubscription"
+        },
+        {
+          "adHocOffers" : [
+
+          ],
+          "codeOffers" : [
+
+          ],
+          "displayPrice" : "1",
+          "familyShareable" : false,
+          "groupNumber" : 1,
+          "internalID" : "BF484BF7",
+          "introductoryOffer" : null,
+          "localizations" : [
+            {
+              "description" : "",
+              "displayName" : "Pikaaaa",
+              "locale" : "en_US"
+            }
+          ],
+          "productID" : "week_5.99_nottrail",
+          "recurringSubscriptionPeriod" : "P2M",
+          "referenceName" : "WeekTwo",
+          "subscriptionGroupID" : "351BB5AF",
           "type" : "RecurringSubscription"
         }
       ]

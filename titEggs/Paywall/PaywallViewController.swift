@@ -464,27 +464,18 @@ class PaywallViewController: UIViewController {
     
     private func returnName(product: ApphudProduct) -> String {
         guard let subscriptionPeriod = product.skProduct?.subscriptionPeriod else {
-            return " "
+            return ""
         }
-        
-        let unitCount = subscriptionPeriod.numberOfUnits
-        let unit: String
-        
+
         switch subscriptionPeriod.unit {
-        case .day:
-            unit = "Daily"
-        case .week:
-            unit = "Weekly"
-        case .month:
-            unit = "Monthly"
-        case .year:
-            unit = "Annual"
-        @unknown default:
-            unit = "unknown"
+        case .day: return "Weekly"
+        case .week: return "Weekly"
+        case .month: return "Monthly"
+        case .year: return "Yearly"
+        @unknown default: return "Unknown"
         }
-        
-        return unit
     }
+
 
     
     @objc private func buttonTouchDown(_ sender: UIButton) {

@@ -46,6 +46,9 @@
 		15542B732CDEBC7B0045598C /* onboardingVideo1.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 15542B6F2CDEBC7A0045598C /* onboardingVideo1.mp4 */; };
 		15542B742CDEBC7B0045598C /* onboardingVideo2.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 15542B702CDEBC7B0045598C /* onboardingVideo2.mp4 */; };
 		15542B752CDEBC7B0045598C /* Paywall.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 15542B712CDEBC7B0045598C /* Paywall.mp4 */; };
+		159C01CE2CEA302A009DEEE8 /* MainConfiguration.storekit in Resources */ = {isa = PBXBuildFile; fileRef = 159C01CD2CEA302A009DEEE8 /* MainConfiguration.storekit */; };
+		159C01D12CEA3106009DEEE8 /* TestSub.storekit in Resources */ = {isa = PBXBuildFile; fileRef = 159C01D02CEA3106009DEEE8 /* TestSub.storekit */; };
+		159C01D32CEA3644009DEEE8 /* Pika Art - Ai video generator.storekit in Resources */ = {isa = PBXBuildFile; fileRef = 159C01D22CEA3644009DEEE8 /* Pika Art - Ai video generator.storekit */; };
 		15D0BFAF2CD8F6CD0011227E /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15D0BFAE2CD8F6CD0011227E /* AppDelegate.swift */; };
 		15D0BFB12CD8F6CD0011227E /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15D0BFB02CD8F6CD0011227E /* SceneDelegate.swift */; };
 		15D0BFB62CD8F6CD0011227E /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 15D0BFB42CD8F6CD0011227E /* Main.storyboard */; };
@@ -81,7 +84,6 @@
 		152C786A2CDA365100A2A977 /* PaywallButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaywallButton.swift; sourceTree = "<group>"; };
 		152C786C2CDA3A8000A2A977 /* CustomLikeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomLikeViewController.swift; sourceTree = "<group>"; };
 		152C786F2CDA43D100A2A977 /* SettingsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewController.swift; sourceTree = "<group>"; };
-		152C78712CDA6D5000A2A977 /* MainConfiguration.storekit */ = {isa = PBXFileReference; lastKnownFileType = text; path = MainConfiguration.storekit; sourceTree = "<group>"; };
 		152C78732CDB7D7C00A2A977 /* MyVideosViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyVideosViewController.swift; sourceTree = "<group>"; };
 		152C78772CDB887E00A2A977 /* MainModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainModel.swift; sourceTree = "<group>"; };
 		152C78802CDCCAFD00A2A977 /* NetWorking.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetWorking.swift; sourceTree = "<group>"; };
@@ -105,6 +107,9 @@
 		15542B6F2CDEBC7A0045598C /* onboardingVideo1.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = onboardingVideo1.mp4; sourceTree = "<group>"; };
 		15542B702CDEBC7B0045598C /* onboardingVideo2.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = onboardingVideo2.mp4; sourceTree = "<group>"; };
 		15542B712CDEBC7B0045598C /* Paywall.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = Paywall.mp4; sourceTree = "<group>"; };
+		159C01CD2CEA302A009DEEE8 /* MainConfiguration.storekit */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = MainConfiguration.storekit; path = ../../Downloads/MainConfiguration.storekit; sourceTree = "<group>"; };
+		159C01D02CEA3106009DEEE8 /* TestSub.storekit */ = {isa = PBXFileReference; lastKnownFileType = text; path = TestSub.storekit; sourceTree = "<group>"; };
+		159C01D22CEA3644009DEEE8 /* Pika Art - Ai video generator.storekit */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "Pika Art - Ai video generator.storekit"; sourceTree = "<group>"; };
 		15D0BFAB2CD8F6CD0011227E /* titEggs.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = titEggs.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		15D0BFAE2CD8F6CD0011227E /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		15D0BFB02CD8F6CD0011227E /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -276,7 +281,9 @@
 		15D0BFA22CD8F6CD0011227E = {
 			isa = PBXGroup;
 			children = (
-				152C78712CDA6D5000A2A977 /* MainConfiguration.storekit */,
+				159C01D02CEA3106009DEEE8 /* TestSub.storekit */,
+				159C01D22CEA3644009DEEE8 /* Pika Art - Ai video generator.storekit */,
+				159C01CD2CEA302A009DEEE8 /* MainConfiguration.storekit */,
 				15D0BFAD2CD8F6CD0011227E /* titEggs */,
 				15D0BFAC2CD8F6CD0011227E /* Products */,
 				15E6277A2CE381DA00A2C10C /* Frameworks */,
@@ -442,6 +449,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				159C01D12CEA3106009DEEE8 /* TestSub.storekit in Resources */,
 				15542B612CDEBC640045598C /* crumble_it1.mp4 in Resources */,
 				15542B692CDEBC640045598C /* Squish_it1.mp4 in Resources */,
 				15E627792CE374DF00A2C10C /* GoogleService-Info.plist in Resources */,
@@ -459,6 +467,7 @@
 				15542B6A2CDEBC640045598C /* Inflate_it1.mp4 in Resources */,
 				15542B752CDEBC7B0045598C /* Paywall.mp4 in Resources */,
 				15542B672CDEBC640045598C /* explode_it1.mp4 in Resources */,
+				159C01D32CEA3644009DEEE8 /* Pika Art - Ai video generator.storekit in Resources */,
 				152C78532CD9128F00A2A977 /* SF-Pro-Text-Semibold.otf in Resources */,
 				15542B222CDCFB390045598C /* Generate.json in Resources */,
 				15542B662CDEBC640045598C /* Melt_it1.mp4 in Resources */,
@@ -466,6 +475,7 @@
 				15542B6B2CDEBC640045598C /* eye-pop_it1.mp4 in Resources */,
 				15542B652CDEBC640045598C /* Crush_it1.mp4 in Resources */,
 				15542B682CDEBC640045598C /* Ta-da_it1.mp4 in Resources */,
+				159C01CE2CEA302A009DEEE8 /* MainConfiguration.storekit in Resources */,
 				15D0BFB62CD8F6CD0011227E /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -693,7 +703,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.2;
+				MARKETING_VERSION = 1.4;
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_BUNDLE_IDENTIFIER = com.agh.p1i1ka;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -731,7 +741,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.2;
+				MARKETING_VERSION = 1.4;
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_BUNDLE_IDENTIFIER = com.agh.p1i1ka;
 				PRODUCT_NAME = "$(TARGET_NAME)";

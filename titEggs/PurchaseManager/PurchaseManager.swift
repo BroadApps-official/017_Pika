@@ -89,10 +89,8 @@ class PurchaseManager: NSObject {
                 
                 let products = paywall.products
                 self.productsApphud = products
-                
                 for i in products {
-                    print(i.skProduct?.productIdentifier, "ProdID")
-                    print(i.skProduct?.price.stringValue, "cena")
+                    print(i.skProduct?.subscriptionPeriod?.unit.rawValue, "Proddd")
                 }
             }
         }
