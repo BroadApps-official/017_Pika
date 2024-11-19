@@ -49,6 +49,12 @@
 		159C01CE2CEA302A009DEEE8 /* MainConfiguration.storekit in Resources */ = {isa = PBXBuildFile; fileRef = 159C01CD2CEA302A009DEEE8 /* MainConfiguration.storekit */; };
 		159C01D12CEA3106009DEEE8 /* TestSub.storekit in Resources */ = {isa = PBXBuildFile; fileRef = 159C01D02CEA3106009DEEE8 /* TestSub.storekit */; };
 		159C01D32CEA3644009DEEE8 /* Pika Art - Ai video generator.storekit in Resources */ = {isa = PBXBuildFile; fileRef = 159C01D22CEA3644009DEEE8 /* Pika Art - Ai video generator.storekit */; };
+		159C01F12CECA3BE009DEEE8 /* FacebookAEM in Frameworks */ = {isa = PBXBuildFile; productRef = 159C01F02CECA3BE009DEEE8 /* FacebookAEM */; };
+		159C01F32CECA3BE009DEEE8 /* FacebookBasics in Frameworks */ = {isa = PBXBuildFile; productRef = 159C01F22CECA3BE009DEEE8 /* FacebookBasics */; };
+		159C01F52CECA3BE009DEEE8 /* FacebookCore in Frameworks */ = {isa = PBXBuildFile; productRef = 159C01F42CECA3BE009DEEE8 /* FacebookCore */; };
+		159C01F72CECA3BE009DEEE8 /* FacebookGamingServices in Frameworks */ = {isa = PBXBuildFile; productRef = 159C01F62CECA3BE009DEEE8 /* FacebookGamingServices */; };
+		159C01F92CECA3BE009DEEE8 /* FacebookLogin in Frameworks */ = {isa = PBXBuildFile; productRef = 159C01F82CECA3BE009DEEE8 /* FacebookLogin */; };
+		159C01FB2CECAA26009DEEE8 /* FacebookShare in Frameworks */ = {isa = PBXBuildFile; productRef = 159C01FA2CECAA26009DEEE8 /* FacebookShare */; };
 		15D0BFAF2CD8F6CD0011227E /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15D0BFAE2CD8F6CD0011227E /* AppDelegate.swift */; };
 		15D0BFB12CD8F6CD0011227E /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15D0BFB02CD8F6CD0011227E /* SceneDelegate.swift */; };
 		15D0BFB62CD8F6CD0011227E /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 15D0BFB42CD8F6CD0011227E /* Main.storyboard */; };
@@ -132,11 +138,17 @@
 			buildActionMask = 2147483647;
 			files = (
 				15E6276E2CE3713300A2C10C /* FirebaseAnalytics in Frameworks */,
+				159C01F92CECA3BE009DEEE8 /* FacebookLogin in Frameworks */,
+				159C01FB2CECAA26009DEEE8 /* FacebookShare in Frameworks */,
+				159C01F52CECA3BE009DEEE8 /* FacebookCore in Frameworks */,
+				159C01F12CECA3BE009DEEE8 /* FacebookAEM in Frameworks */,
 				152C78842CDCCB1400A2A977 /* Alamofire in Frameworks */,
 				15D0BFCD2CD909390011227E /* SnapKit in Frameworks */,
 				15542B252CDE19D70045598C /* ApphudSDK in Frameworks */,
 				15E627692CE29A4500A2C10C /* AlamofireNetworkActivityLogger in Frameworks */,
+				159C01F72CECA3BE009DEEE8 /* FacebookGamingServices in Frameworks */,
 				152C78662CDA309700A2A977 /* SwiftyStoreKit in Frameworks */,
+				159C01F32CECA3BE009DEEE8 /* FacebookBasics in Frameworks */,
 				15542B1C2CDCF3D20045598C /* Lottie in Frameworks */,
 				15E627722CE3713300A2C10C /* FirebaseAnalyticsWithoutAdIdSupport in Frameworks */,
 				15E627742CE3713300A2C10C /* FirebaseAppCheck in Frameworks */,
@@ -397,6 +409,12 @@
 				15E627732CE3713300A2C10C /* FirebaseAppCheck */,
 				15E627752CE3713300A2C10C /* FirebaseAppDistribution-Beta */,
 				15E6277B2CE381DA00A2C10C /* FirebaseCrashlytics */,
+				159C01F02CECA3BE009DEEE8 /* FacebookAEM */,
+				159C01F22CECA3BE009DEEE8 /* FacebookBasics */,
+				159C01F42CECA3BE009DEEE8 /* FacebookCore */,
+				159C01F62CECA3BE009DEEE8 /* FacebookGamingServices */,
+				159C01F82CECA3BE009DEEE8 /* FacebookLogin */,
+				159C01FA2CECAA26009DEEE8 /* FacebookShare */,
 			);
 			productName = titEggs;
 			productReference = 15D0BFAB2CD8F6CD0011227E /* titEggs.app */;
@@ -434,6 +452,7 @@
 				15542B232CDE19D70045598C /* XCRemoteSwiftPackageReference "ApphudSDK" */,
 				15E627672CE29A4500A2C10C /* XCRemoteSwiftPackageReference "AlamofireNetworkActivityLogger" */,
 				15E6276C2CE3713300A2C10C /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
+				159C01EF2CECA3BE009DEEE8 /* XCRemoteSwiftPackageReference "facebook-ios-sdk" */,
 			);
 			productRefGroup = 15D0BFAC2CD8F6CD0011227E /* Products */;
 			projectDirPath = "";
@@ -811,6 +830,14 @@
 				minimumVersion = 3.5.5;
 			};
 		};
+		159C01EF2CECA3BE009DEEE8 /* XCRemoteSwiftPackageReference "facebook-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/facebook/facebook-ios-sdk";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 14.1.0;
+			};
+		};
 		15D0BFCB2CD909390011227E /* XCRemoteSwiftPackageReference "SnapKit" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/SnapKit/SnapKit";
@@ -857,6 +884,36 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 15542B232CDE19D70045598C /* XCRemoteSwiftPackageReference "ApphudSDK" */;
 			productName = ApphudSDK;
+		};
+		159C01F02CECA3BE009DEEE8 /* FacebookAEM */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 159C01EF2CECA3BE009DEEE8 /* XCRemoteSwiftPackageReference "facebook-ios-sdk" */;
+			productName = FacebookAEM;
+		};
+		159C01F22CECA3BE009DEEE8 /* FacebookBasics */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 159C01EF2CECA3BE009DEEE8 /* XCRemoteSwiftPackageReference "facebook-ios-sdk" */;
+			productName = FacebookBasics;
+		};
+		159C01F42CECA3BE009DEEE8 /* FacebookCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 159C01EF2CECA3BE009DEEE8 /* XCRemoteSwiftPackageReference "facebook-ios-sdk" */;
+			productName = FacebookCore;
+		};
+		159C01F62CECA3BE009DEEE8 /* FacebookGamingServices */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 159C01EF2CECA3BE009DEEE8 /* XCRemoteSwiftPackageReference "facebook-ios-sdk" */;
+			productName = FacebookGamingServices;
+		};
+		159C01F82CECA3BE009DEEE8 /* FacebookLogin */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 159C01EF2CECA3BE009DEEE8 /* XCRemoteSwiftPackageReference "facebook-ios-sdk" */;
+			productName = FacebookLogin;
+		};
+		159C01FA2CECAA26009DEEE8 /* FacebookShare */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 159C01EF2CECA3BE009DEEE8 /* XCRemoteSwiftPackageReference "facebook-ios-sdk" */;
+			productName = FacebookShare;
 		};
 		15D0BFCC2CD909390011227E /* SnapKit */ = {
 			isa = XCSwiftPackageProductDependency;

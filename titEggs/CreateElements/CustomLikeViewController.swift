@@ -99,7 +99,7 @@ class CustomLikeViewController: UIViewController {
     }
     
     @objc private func write() {
-        guard let url = URL(string: "itms-apps://itunes.apple.com/app/id6737510164?action=write-review") else { //как пример - 6737510164
+        guard let url = URL(string: "itms-apps://itunes.apple.com/app/id6737900240?action=write-review") else { //как пример - 6737510164
             return
         }
         

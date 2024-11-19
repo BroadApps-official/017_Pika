@@ -8,6 +8,8 @@
   ],
   "settings" : {
     "_failTransactionsEnabled" : false,
+    "_locale" : "en_US",
+    "_storefront" : "USA",
     "_storeKitErrors" : [
       {
         "current" : null,
@@ -111,31 +113,6 @@
           "productID" : "year_50_nottrial",
           "recurringSubscriptionPeriod" : "P1Y",
           "referenceName" : "Yearly",
-          "subscriptionGroupID" : "351BB5AF",
-          "type" : "RecurringSubscription"
-        },
-        {
-          "adHocOffers" : [
-
-          ],
-          "codeOffers" : [
-
-          ],
-          "displayPrice" : "1",
-          "familyShareable" : false,
-          "groupNumber" : 1,
-          "internalID" : "BF484BF7",
-          "introductoryOffer" : null,
-          "localizations" : [
-            {
-              "description" : "",
-              "displayName" : "Pikaaaa",
-              "locale" : "en_US"
-            }
-          ],
-          "productID" : "week_5.99_nottrail",
-          "recurringSubscriptionPeriod" : "P2M",
-          "referenceName" : "WeekTwo",
           "subscriptionGroupID" : "351BB5AF",
           "type" : "RecurringSubscription"
         }

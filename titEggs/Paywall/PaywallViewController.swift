@@ -11,6 +11,7 @@ import WebKit
 import ApphudSDK
 import AVFoundation
 import AVKit
+import FacebookCore
 
 class PaywallViewController: UIViewController {
     
@@ -275,6 +276,7 @@ class PaywallViewController: UIViewController {
                 guard let product = productToPurchase else { return }
                 manager.startPurchase(produst: product) { result in
                     if result == true {
+                        AppEvents.shared.logPurchase(amount: productToPurchase?.skProduct?.price.doubleValue ?? 0.0, currency: productToPurchase?.skProduct?.priceLocale.currencySymbol ?? "error")
                         self.dismiss(animated: true)
                     }
                     

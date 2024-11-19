@@ -9,7 +9,7 @@ import Foundation
 import StoreKit
 import Combine
 import ApphudSDK
-
+import FacebookCore
 
 
 class PurchaseManager: NSObject {
