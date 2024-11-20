@@ -115,6 +115,81 @@
           "referenceName" : "Yearly",
           "subscriptionGroupID" : "351BB5AF",
           "type" : "RecurringSubscription"
+        },
+        {
+          "adHocOffers" : [
+
+          ],
+          "codeOffers" : [
+
+          ],
+          "displayPrice" : "15",
+          "familyShareable" : false,
+          "groupNumber" : 1,
+          "internalID" : "96FCFFCE",
+          "introductoryOffer" : null,
+          "localizations" : [
+            {
+              "description" : "",
+              "displayName" : "monthly_15_notrial",
+              "locale" : "en_US"
+            }
+          ],
+          "productID" : "monthly_15_notrial",
+          "recurringSubscriptionPeriod" : "P1M",
+          "referenceName" : "monthly_15_notrial",
+          "subscriptionGroupID" : "351BB5AF",
+          "type" : "RecurringSubscription"
+        },
+        {
+          "adHocOffers" : [
+
+          ],
+          "codeOffers" : [
+
+          ],
+          "displayPrice" : "39.99",
+          "familyShareable" : false,
+          "groupNumber" : 1,
+          "internalID" : "57F3FA7A",
+          "introductoryOffer" : null,
+          "localizations" : [
+            {
+              "description" : "",
+              "displayName" : "yearly_39.99_nottrial",
+              "locale" : "en_US"
+            }
+          ],
+          "productID" : "yearly_39.99_nottrial",
+          "recurringSubscriptionPeriod" : "P1Y",
+          "referenceName" : "yearly_39.99_nottrial",
+          "subscriptionGroupID" : "351BB5AF",
+          "type" : "RecurringSubscription"
+        },
+        {
+          "adHocOffers" : [
+
+          ],
+          "codeOffers" : [
+
+          ],
+          "displayPrice" : "5.99",
+          "familyShareable" : false,
+          "groupNumber" : 1,
+          "internalID" : "0701A2E4",
+          "introductoryOffer" : null,
+          "localizations" : [
+            {
+              "description" : "",
+              "displayName" : "week_5.59_nottrial",
+              "locale" : "en_US"
+            }
+          ],
+          "productID" : "week_5.59_nottrial",
+          "recurringSubscriptionPeriod" : "P1W",
+          "referenceName" : "week_5.59_nottrial",
+          "subscriptionGroupID" : "351BB5AF",
+          "type" : "RecurringSubscription"
         }
       ]
     }

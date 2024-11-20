@@ -35,10 +35,21 @@ class PaywallViewController: UIViewController {
     private lazy var continueButton = CreateElements.createPrimaryButton(title: "Continue")
     private lazy var cancelAnytimeButton = createMiniButtons(title: "Cancel Anytime", color: .white.withAlphaComponent(0.4), font: .appFont(.Caption1Regular), isACancelAnytime: true)
     
-    private lazy var annualButton = createSubscribeButtons(type: true, selected: true)
-    private lazy var weeklyButton = createSubscribeButtons(type: false, selected: false)
-    private lazy var selectedSubscribe = true  // тру -1 кнопка ; фолс - вторая
-    private lazy var buttonsTopStackView = UIStackView(arrangedSubviews: [annualButton, weeklyButton])
+//    private lazy var annualButton = createSubscribeButtons(type: true, selected: true)
+//    private lazy var weeklyButton = createSubscribeButtons(type: false, selected: false)
+    private lazy var selectedSubscribe = 0
+    
+    private lazy var collection: UICollectionView = {
+        let layout = UICollectionViewFlowLayout()
+        let collection = UICollectionView(frame: .zero, collectionViewLayout: layout)
+        collection.register(UICollectionViewCell.self, forCellWithReuseIdentifier: "1")
+        layout.scrollDirection = .vertical
+        collection.backgroundColor = .clear
+        collection.delegate = self
+        collection.dataSource = self
+        layout.minimumLineSpacing = 4
+        return collection
+    }()
     
     private lazy var progressView: UIActivityIndicatorView = {
         let view = UIActivityIndicatorView(style: .medium)
@@ -61,6 +72,7 @@ class PaywallViewController: UIViewController {
         view.layer.cornerRadius = 16
         return view
     }()
+    private lazy var shadowImageView = UIImageView(image: .shadowPaywall)
     
     //MARK: -Store
     private let manager:PurchaseManager
@@ -98,17 +110,34 @@ class PaywallViewController: UIViewController {
     
     private func loadProducts() async {
         // Ожидаем, пока массив products будет содержать 2 элемента
-        while manager.productsApphud.count < 2 {
+        while manager.productsApphud.count < 1 {
             await Task.sleep(500_000_000) // Ждем 0.5 секунды перед повторной проверкой
         }
 
         // Когда продуктов достаточно, выполняем нужный код
         self.products = manager.productsApphud
-        self.buttonsTopStackView.alpha = 1
-        self.selectPlan(sender: self.annualButton)
+        self.collection.reloadData()
+        self.selectPlan(index: 0)
         self.progressView.alpha = 0
         self.continueButton.isEnabled = true
-
+        collection.snp.remakeConstraints { make in
+            make.left.right.equalToSuperview().inset(15)
+            make.bottom.equalTo(cancelAnytimeButton.snp.top).inset(-20)
+            make.height.equalTo(products.count * 60)
+        }
+        shadowImageView.snp.remakeConstraints { make in
+            make.left.bottom.right.equalToSuperview()
+            if products.count == 2 {
+                make.height.equalTo(view.snp.height).multipliedBy(3.8 / 5.0)
+            } else {
+                make.height.equalTo(view.snp.height).multipliedBy(4.3 / 5.0)
+            }
+            make.height.lessThanOrEqualTo(600)
+        }
+        
+        UIView.animate(withDuration: 0.3) {
+            self.view.layoutIfNeeded()
+        }
     }
 
 
@@ -163,7 +192,7 @@ class PaywallViewController: UIViewController {
         player.play()
 
         // Создаем изображение тени и добавляем поверх видео
-        let shadowImageView = UIImageView(image: .shadowPaywall)
+        
         shadowImageView.clipsToBounds = false
         view.addSubview(shadowImageView)
         view.bringSubviewToFront(shadowImageView) // Убедитесь, что тень на переднем плане
@@ -213,20 +242,18 @@ class PaywallViewController: UIViewController {
             make.height.equalTo(120)
             make.left.right.equalToSuperview().inset(15)
             make.bottom.equalTo(cancelAnytimeButton.snp.top).inset(-20)
+           
         }
         
         
-        
-        buttonsTopStackView.alpha = 0
-        buttonsTopStackView.axis = .vertical
-        buttonsTopStackView.distribution = .fillEqually
-        buttonsTopStackView.spacing = 8
-        view.addSubview(buttonsTopStackView)
-        buttonsTopStackView.snp.makeConstraints { make in
-            make.height.equalTo(120)
+        view.addSubview(collection)
+        collection.snp.makeConstraints { make in
             make.left.right.equalToSuperview().inset(15)
             make.bottom.equalTo(cancelAnytimeButton.snp.top).inset(-20)
+            make.height.equalTo(products.count == 0 ? 120 : products.count * 60)
         }
+        
+        
         
         let topStackView = UIStackView(arrangedSubviews: [createTextGalc(text: "Full Access"), createTextGalc(text: "Share unique videos"), createTextGalc(text: "Quick generation")])
         topStackView.backgroundColor = .clear
@@ -237,7 +264,7 @@ class PaywallViewController: UIViewController {
         view.addSubview(topStackView)
         topStackView.snp.makeConstraints { make in
             make.centerX.equalToSuperview()
-            make.bottom.equalTo(progressView.snp.top).inset(-20)
+            make.bottom.equalTo(collection.snp.top).inset(-20)
             make.height.equalTo(100)
             make.width.equalTo(174)
         }
@@ -272,11 +299,10 @@ class PaywallViewController: UIViewController {
         }
         Task {
             do {
-                let productToPurchase = selectedSubscribe ? products.first : products.last
-                guard let product = productToPurchase else { return }
-                manager.startPurchase(produst: product) { result in
+                let productToPurchase = products[selectedSubscribe]
+                manager.startPurchase(produst: productToPurchase) { result in
                     if result == true {
-                        AppEvents.shared.logPurchase(amount: productToPurchase?.skProduct?.price.doubleValue ?? 0.0, currency: productToPurchase?.skProduct?.priceLocale.currencySymbol ?? "error")
+                        AppEvents.shared.logPurchase(amount: productToPurchase.skProduct?.price.doubleValue ?? 0.0, currency: productToPurchase.skProduct?.priceLocale.currencySymbol ?? "error")
                         self.dismiss(animated: true)
                     }
                     
@@ -285,8 +311,6 @@ class PaywallViewController: UIViewController {
                     }
                     
                 }
-            } catch {
-                print("Ошибка при покупке: \(error)")
             }
         }
     }
@@ -340,128 +364,117 @@ class PaywallViewController: UIViewController {
         return button
     }
     
-    private func createSubscribeButtons(type: Bool, selected: Bool) -> UIButton {
-        let button = UIButton(type: .system)
-        button.backgroundColor = .white.withAlphaComponent(0.08)
-        button.layer.cornerRadius = 10
-        button.tag = type ? 1 : 0
-        
-        let dotImageView = UIImageView(image: selected ? .selectedSub.withRenderingMode(.alwaysTemplate) : .unselectedSub.withRenderingMode(.alwaysTemplate))
-        dotImageView.tintColor = selected ? .primary : .white.withAlphaComponent(0.28)
-        button.addSubview(dotImageView)
-        dotImageView.snp.makeConstraints { make in
-            make.left.equalToSuperview().inset(15)
-            make.centerY.equalToSuperview()
-            make.height.width.equalTo(32)
-        }
-        
-        button.layer.borderColor = selected ? UIColor.primary.cgColor : UIColor.clear.cgColor
-        button.layer.borderWidth = selected ? 1 : 0
-        
-        let typeLabel = UILabel()
-        typeLabel.text = type
-            ? (products.first != nil ? returnName(product: products.first!) : "Annual")
-            : (products.last != nil ? returnName(product: products.last!) : "Weekly")
-
-
-        typeLabel.textColor = .white
-        typeLabel.font = .appFont(.BodyRegular)
-        button.addSubview(typeLabel)
-        typeLabel.snp.makeConstraints { make in
-            make.left.equalTo(dotImageView.snp.right).inset(-5)
-            if type {
-                make.top.equalToSuperview().inset(10)
-            } else {
-                make.centerY.equalToSuperview()
-            }
-        }
-        
-        let saleLabel = UILabel()
-        saleLabel.font = .appFont(.Caption1Regular)
-        saleLabel.textColor = .white.withAlphaComponent(0.4)
-        saleLabel.text = "$0.87 per week"
-        
-        if type {
-            button.addSubview(saleLabel)
-            saleLabel.snp.makeConstraints { make in
-                make.bottom.equalToSuperview().inset(10)
-                make.left.equalTo(dotImageView.snp.right).inset(-5)
-            }
-        }
-        
-        let countlabel = UILabel()
-        countlabel.font = .appFont(.BodyEmphasized)
-        countlabel.textColor = .white
-        
-        
-       
-        if type {
-            let znak = products.first?.skProduct?.priceLocale.currencySymbol
-            if let price = products.first?.skProduct?.price.stringValue {
-                countlabel.text = (znak ?? "$") + price
-            } else {
-                countlabel.text = ""
-            }
-        } else {
-            let znak = products.last?.skProduct?.priceLocale.currencySymbol
-            if let price = products.last?.skProduct?.price.stringValue {
-                countlabel.text = (znak ?? "$") + price // Устанавливаем цену в UILabel
-            } else {
-                countlabel.text = ""
-            }
-        }
-
-        
-        button.addSubview(countlabel)
-        countlabel.snp.makeConstraints { make in
-            make.right.equalToSuperview().inset(15)
-            make.top.equalToSuperview().inset(10)
-        }
-        
-        let textLabel = UILabel()
-        textLabel.textColor = .white.withAlphaComponent(0.6)
-        textLabel.font = .appFont(.Caption1Regular)
-        textLabel.text = type ? "per year" : "per week"
-        button.addSubview(textLabel)
-        textLabel.snp.makeConstraints { make in
-            make.right.equalToSuperview().inset(15)
-            make.bottom.equalToSuperview().inset(10)
-        }
-        
-        if type {
-            let view = createSaleView()
-            button.addSubview(view)
-            view.snp.makeConstraints { make in
-                make.centerY.equalTo(countlabel)
-                make.height.equalTo(21)
-                make.width.equalTo(66)
-                make.right.equalTo(countlabel.snp.left).inset(-5)
-            }
-        }
-        
-        
-        button.addTarget(self, action: #selector(selectPlan(sender:)), for: .touchUpInside)
-        button.addTarget(self, action: #selector(buttonTouchDown), for: .touchDown)
-        button.addTarget(self, action: #selector(buttonTouchUp), for: [.touchUpInside, .touchUpOutside])
-        return button
-    }
+//    private func createSubscribeButtons(type: Bool, selected: Bool) -> UIButton {
+//        let button = UIButton(type: .system)
+//        button.backgroundColor = .white.withAlphaComponent(0.08)
+//        button.layer.cornerRadius = 10
+//        button.tag = type ? 1 : 0
+//        
+//        let dotImageView = UIImageView(image: selected ? .selectedSub.withRenderingMode(.alwaysTemplate) : .unselectedSub.withRenderingMode(.alwaysTemplate))
+//        dotImageView.tintColor = selected ? .primary : .white.withAlphaComponent(0.28)
+//        button.addSubview(dotImageView)
+//        dotImageView.snp.makeConstraints { make in
+//            make.left.equalToSuperview().inset(15)
+//            make.centerY.equalToSuperview()
+//            make.height.width.equalTo(32)
+//        }
+//        
+//        button.layer.borderColor = selected ? UIColor.primary.cgColor : UIColor.clear.cgColor
+//        button.layer.borderWidth = selected ? 1 : 0
+//        
+//        let typeLabel = UILabel()
+//        typeLabel.text = type
+//            ? (products.first != nil ? returnName(product: products.first!) : "Annual")
+//            : (products.last != nil ? returnName(product: products.last!) : "Weekly")
+//
+//
+//        typeLabel.textColor = .white
+//        typeLabel.font = .appFont(.BodyRegular)
+//        button.addSubview(typeLabel)
+//        typeLabel.snp.makeConstraints { make in
+//            make.left.equalTo(dotImageView.snp.right).inset(-5)
+//            if type {
+//                make.top.equalToSuperview().inset(10)
+//            } else {
+//                make.centerY.equalToSuperview()
+//            }
+//        }
+//        
+//        let saleLabel = UILabel()
+//        saleLabel.font = .appFont(.Caption1Regular)
+//        saleLabel.textColor = .white.withAlphaComponent(0.4)
+//        saleLabel.text = "$0.87 per week"
+//        
+//        if type {
+//            button.addSubview(saleLabel)
+//            saleLabel.snp.makeConstraints { make in
+//                make.bottom.equalToSuperview().inset(10)
+//                make.left.equalTo(dotImageView.snp.right).inset(-5)
+//            }
+//        }
+//        
+//        let countlabel = UILabel()
+//        countlabel.font = .appFont(.BodyEmphasized)
+//        countlabel.textColor = .white
+//        
+//        
+//       
+//        if type {
+//            let znak = products.first?.skProduct?.priceLocale.currencySymbol
+//            if let price = products.first?.skProduct?.price.stringValue {
+//                countlabel.text = (znak ?? "$") + price
+//            } else {
+//                countlabel.text = ""
+//            }
+//        } else {
+//            let znak = products.last?.skProduct?.priceLocale.currencySymbol
+//            if let price = products.last?.skProduct?.price.stringValue {
+//                countlabel.text = (znak ?? "$") + price // Устанавливаем цену в UILabel
+//            } else {
+//                countlabel.text = ""
+//            }
+//        }
+//
+//        
+//        button.addSubview(countlabel)
+//        countlabel.snp.makeConstraints { make in
+//            make.right.equalToSuperview().inset(15)
+//            make.top.equalToSuperview().inset(10)
+//        }
+//        
+//        let textLabel = UILabel()
+//        textLabel.textColor = .white.withAlphaComponent(0.6)
+//        textLabel.font = .appFont(.Caption1Regular)
+//        textLabel.text = type ? "per year" : "per week"
+//        button.addSubview(textLabel)
+//        textLabel.snp.makeConstraints { make in
+//            make.right.equalToSuperview().inset(15)
+//            make.bottom.equalToSuperview().inset(10)
+//        }
+//        
+//        if type {
+//            let view = createSaleView()
+//            button.addSubview(view)
+//            view.snp.makeConstraints { make in
+//                make.centerY.equalTo(countlabel)
+//                make.height.equalTo(21)
+//                make.width.equalTo(66)
+//                make.right.equalTo(countlabel.snp.left).inset(-5)
+//            }
+//        }
+//        
+//        
+//       
+//        button.addTarget(self, action: #selector(buttonTouchDown), for: .touchDown)
+//        button.addTarget(self, action: #selector(buttonTouchUp), for: [.touchUpInside, .touchUpOutside])
+//        return button
+//    }
     
     
     
-    @objc private func selectPlan(sender: UIButton) {
-        buttonsTopStackView.arrangedSubviews.forEach { $0.removeFromSuperview() }
-        if sender.tag == 1 {
-            selectedSubscribe = true
-            annualButton = createSubscribeButtons(type: true, selected: true)
-            weeklyButton = createSubscribeButtons(type: false, selected: false)
-        } else {
-            selectedSubscribe = false
-            weeklyButton = createSubscribeButtons(type: false, selected: true)
-            annualButton = createSubscribeButtons(type: true, selected: false)
-        }
-        
-        buttonsTopStackView.addArrangedSubview(annualButton)
-        buttonsTopStackView.addArrangedSubview(weeklyButton)
+    @objc private func selectPlan(index: Int) {
+       selectedSubscribe = index
+        collection.reloadData()
     }
     
     private func returnName(product: ApphudProduct) -> String {
@@ -474,6 +487,20 @@ class PaywallViewController: UIViewController {
         case .week: return "Weekly"
         case .month: return "Monthly"
         case .year: return "Yearly"
+        @unknown default: return "Unknown"
+        }
+    }
+    
+    private func returnType(product: ApphudProduct) -> String {
+        guard let subscriptionPeriod = product.skProduct?.subscriptionPeriod else {
+            return ""
+        }
+
+        switch subscriptionPeriod.unit {
+        case .day: return "per week"
+        case .week: return "per week"
+        case .month: return "per month"
+        case .year: return "per year"
         @unknown default: return "Unknown"
         }
     }
@@ -529,3 +556,114 @@ class PaywallViewController: UIViewController {
     
 }
 
+extension PaywallViewController: UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        return products.count
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "1", for: indexPath)
+        cell.subviews.forEach { $0.removeFromSuperview() }
+        
+        cell.backgroundColor = .white.withAlphaComponent(0.08)
+        cell.layer.cornerRadius = 10
+        
+        cell.layer.borderColor = indexPath.row == selectedSubscribe ? UIColor.primary.cgColor : UIColor.clear.cgColor
+        cell.layer.borderWidth = 1
+        
+        let dotImageView = UIImageView(image: indexPath.row == selectedSubscribe ? .selectedSub.withRenderingMode(.alwaysTemplate) : .unselectedSub.withRenderingMode(.alwaysTemplate))
+        dotImageView.tintColor = indexPath.row == selectedSubscribe ? .primary : .white.withAlphaComponent(0.28)
+        cell.addSubview(dotImageView)
+        dotImageView.snp.makeConstraints { make in
+            make.left.equalToSuperview().inset(15)
+            make.centerY.equalToSuperview()
+            make.height.width.equalTo(32)
+        }
+        
+        let typeLabel = UILabel()
+        typeLabel.text = returnName(product: products[indexPath.row])
+
+        
+        typeLabel.textColor = .white
+        typeLabel.font = .appFont(.BodyRegular)
+        cell.addSubview(typeLabel)
+        
+        typeLabel.snp.makeConstraints { make in
+            make.left.equalTo(dotImageView.snp.right).inset(-5)
+            if indexPath.row == 0 {
+                make.top.equalToSuperview().inset(10)
+            } else {
+                make.centerY.equalToSuperview()
+            }
+        }
+        
+        let saleLabel = UILabel()
+        saleLabel.font = .appFont(.Caption1Regular)
+        saleLabel.textColor = .white.withAlphaComponent(0.4)
+        saleLabel.text = "$0.87 per week"
+        
+        if indexPath.row == 0 {
+            cell.addSubview(saleLabel)
+            saleLabel.snp.makeConstraints { make in
+                make.bottom.equalToSuperview().inset(10)
+                make.left.equalTo(dotImageView.snp.right).inset(-5)
+            }
+        }
+        
+        let countlabel = UILabel()
+        countlabel.font = .appFont(.BodyEmphasized)
+        countlabel.textColor = .white
+        
+        
+        
+        let znak = products[indexPath.row].skProduct?.priceLocale.currencySymbol
+        if let price = products[indexPath.row].skProduct?.price.stringValue {
+            countlabel.text = (znak ?? "$") + price
+        } else {
+            countlabel.text = ""
+        }
+        
+        
+        cell.addSubview(countlabel)
+        countlabel.snp.makeConstraints { make in
+            make.right.equalToSuperview().inset(15)
+            make.top.equalToSuperview().inset(10)
+        }
+        
+        let textLabel = UILabel()
+        textLabel.textColor = .white.withAlphaComponent(0.6)
+        textLabel.font = .appFont(.Caption1Regular)
+        textLabel.text = returnType(product: products[indexPath.row])
+        cell.addSubview(textLabel)
+        textLabel.snp.makeConstraints { make in
+            make.right.equalToSuperview().inset(15)
+            make.bottom.equalToSuperview().inset(10)
+        }
+        
+        if indexPath.row == 0 {
+            let view = createSaleView()
+            cell.addSubview(view)
+            view.snp.makeConstraints { make in
+                make.centerY.equalTo(countlabel)
+                make.height.equalTo(21)
+                make.width.equalTo(66)
+                make.right.equalTo(countlabel.snp.left).inset(-5)
+            }
+        }
+        
+        
+        
+        return cell
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        return CGSize(width: collectionView.frame.width, height: 56)
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        selectedSubscribe = indexPath.row
+        collectionView.reloadData()
+    }
+    
+    
+}

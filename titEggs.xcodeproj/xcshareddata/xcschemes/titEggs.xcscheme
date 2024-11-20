@@ -56,7 +56,7 @@
          </CommandLineArgument>
       </CommandLineArguments>
       <StoreKitConfigurationFileReference
-         identifier = "../../Pika Art - Ai video generator.storekit">
+         identifier = "../../TestSub.storekit">
       </StoreKitConfigurationFileReference>
    </LaunchAction>
    <ProfileAction

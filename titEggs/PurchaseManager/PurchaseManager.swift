@@ -14,7 +14,8 @@ import FacebookCore
 
 class PurchaseManager: NSObject {
     
-    let paywallID = "main" //айди пэйволла
+    let experementName = "wekly_and_motly_test"
+    let paywallID = "main" //айди пэйволла //ПОМЕНЯТЬ НА main
     var productsApphud: [ApphudProduct] = [] //массив с продуктами
 
     
@@ -83,17 +84,25 @@ class PurchaseManager: NSObject {
 //MARK: - загрузка продуктов с эппхад
     @MainActor
     func loadPaywalls() {
+
         Apphud.paywallsDidLoadCallback { paywalls, arg in
-            if let paywall = paywalls.first(where: { $0.identifier == self.paywallID }) {
+           
+            if let paywall = paywalls.first(where: { $0.identifier == self.paywallID}) {
                 Apphud.paywallShown(paywall)
+                
+                paywall.experimentName
                 
                 let products = paywall.products
                 self.productsApphud = products
+                
                 for i in products {
-                    print(i.skProduct?.subscriptionPeriod?.unit.rawValue, "Proddd")
+                    print(i.skProduct?.localizedDescription, "Proddd")
                 }
+                
             }
         }
+        
+       
     }
     
     
