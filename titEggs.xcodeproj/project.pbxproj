@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 60;
+	objectVersion = 56;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -54,7 +54,6 @@
 		159C01F72CECA3BE009DEEE8 /* FacebookGamingServices in Frameworks */ = {isa = PBXBuildFile; productRef = 159C01F62CECA3BE009DEEE8 /* FacebookGamingServices */; };
 		159C01F92CECA3BE009DEEE8 /* FacebookLogin in Frameworks */ = {isa = PBXBuildFile; productRef = 159C01F82CECA3BE009DEEE8 /* FacebookLogin */; };
 		159C01FB2CECAA26009DEEE8 /* FacebookShare in Frameworks */ = {isa = PBXBuildFile; productRef = 159C01FA2CECAA26009DEEE8 /* FacebookShare */; };
-		15CD92CE2CEF53B3000F4797 /* FBAudienceNetwork.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 15CD92CC2CEF51B7000F4797 /* FBAudienceNetwork.xcframework */; };
 		15D0BFAF2CD8F6CD0011227E /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15D0BFAE2CD8F6CD0011227E /* AppDelegate.swift */; };
 		15D0BFB12CD8F6CD0011227E /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15D0BFB02CD8F6CD0011227E /* SceneDelegate.swift */; };
 		15D0BFB62CD8F6CD0011227E /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 15D0BFB42CD8F6CD0011227E /* Main.storyboard */; };
@@ -115,7 +114,6 @@
 		15542B712CDEBC7B0045598C /* Paywall.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = Paywall.mp4; sourceTree = "<group>"; };
 		159C01CD2CEA302A009DEEE8 /* MainConfiguration.storekit */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = MainConfiguration.storekit; path = ../../Downloads/MainConfiguration.storekit; sourceTree = "<group>"; };
 		159C01D02CEA3106009DEEE8 /* TestSub.storekit */ = {isa = PBXFileReference; lastKnownFileType = text; path = TestSub.storekit; sourceTree = "<group>"; };
-		15CD92CC2CEF51B7000F4797 /* FBAudienceNetwork.xcframework */ = {isa = PBXFileReference; expectedSignature = "AppleDeveloperProgram:V9WTTPBFK9:Meta Platforms, Inc."; lastKnownFileType = wrapper.xcframework; path = FBAudienceNetwork.xcframework; sourceTree = "<group>"; };
 		15D0BFAB2CD8F6CD0011227E /* titEggs.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = titEggs.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		15D0BFAE2CD8F6CD0011227E /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		15D0BFB02CD8F6CD0011227E /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -153,7 +151,6 @@
 				15E627722CE3713300A2C10C /* FirebaseAnalyticsWithoutAdIdSupport in Frameworks */,
 				15E627742CE3713300A2C10C /* FirebaseAppCheck in Frameworks */,
 				15E6277C2CE381DA00A2C10C /* FirebaseCrashlytics in Frameworks */,
-				15CD92CE2CEF53B3000F4797 /* FBAudienceNetwork.xcframework in Frameworks */,
 				15E627762CE3713300A2C10C /* FirebaseAppDistribution-Beta in Frameworks */,
 				15E627702CE3713300A2C10C /* FirebaseAnalyticsOnDeviceConversion in Frameworks */,
 			);
@@ -327,7 +324,6 @@
 				15D0BFC32CD8F77B0011227E /* TabBar */,
 				15D0BFC22CD8F76B0011227E /* Other */,
 				15D0BFBC2CD8F6CF0011227E /* Info.plist */,
-				15CD92CC2CEF51B7000F4797 /* FBAudienceNetwork.xcframework */,
 			);
 			path = titEggs;
 			sourceTree = "<group>";
@@ -705,7 +701,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 4;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = "";
 				GENERATE_INFOPLIST_FILE = YES;
@@ -744,7 +740,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 4;
 				DEVELOPMENT_TEAM = "";
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = titEggs/Info.plist;
