@@ -263,6 +263,7 @@ class MyVideosViewController: UIViewController {
             make.centerX.equalToSuperview()
             make.top.equalToSuperview().inset(10)
         }
+        progressView.center = grayView.center
         progressView.startAnimating()
         
         let label = UILabel()
@@ -576,6 +577,7 @@ extension MyVideosViewController: UICollectionViewDelegate, UICollectionViewData
         let imageView = UIImageView(image: UIImage(data: item.image))
         imageView.clipsToBounds = true
         imageView.layer.cornerRadius = 10
+        imageView.contentMode = .scaleAspectFill
         
         mainView.addSubview(imageView)
         imageView.snp.makeConstraints { make in

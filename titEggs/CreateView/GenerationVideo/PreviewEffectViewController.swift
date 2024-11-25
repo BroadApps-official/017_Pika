@@ -64,6 +64,13 @@ class PreviewEffectViewController: UIViewController, UIImagePickerControllerDele
         subscribe()
     }
     
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        activityIndicator.center = self.view.center
+    }
+    
+   
+    
     private func subscribe() {
         publisher
             .sink { result in
@@ -106,6 +113,7 @@ class PreviewEffectViewController: UIViewController, UIImagePickerControllerDele
             make.height.width.equalTo(60)
             make.center.equalToSuperview()
         }
+        
 
         let nextButton = UIButton(type: .system)
         nextButton.addTouchFeedback()

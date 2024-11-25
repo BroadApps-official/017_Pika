@@ -291,6 +291,7 @@ class PaywallViewController: UIViewController {
             make.height.width.equalTo(60)
             make.center.equalToSuperview()
         }
+        activity.center = view.center
     }
     
     @objc private func createPurchase() {

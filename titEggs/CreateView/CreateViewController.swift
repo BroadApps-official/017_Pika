@@ -62,7 +62,6 @@ class CreateViewController: UIViewController, UIImagePickerControllerDelegate, U
         super.viewWillAppear(animated)
         setupNavController()
         checkManager()
-        collection.reloadData()
     }
     
     private func checkManager() {
@@ -93,6 +92,7 @@ class CreateViewController: UIViewController, UIImagePickerControllerDelegate, U
             make.center.equalToSuperview()
             make.height.width.equalTo(64)
         }
+        activity.center = view.center
         activity.startAnimating()
         collection.alpha = 0
         model.loadEffectArr {

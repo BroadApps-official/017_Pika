@@ -16,6 +16,7 @@ import Firebase
 import FacebookCore
 import FBSDKCoreKit.FBSDKSettings
 import FBSDKCoreKit
+import OneSignalFramework
 
 
 let buyPublisher = PassthroughSubject<Any, Never>()
@@ -29,6 +30,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         Apphud.start(apiKey: "app_Ya3A7cxvYehiiDp7nq6MARXH8adoTQ")
         Apphud.setDeviceIdentifiers(idfa: nil, idfv: UIDevice.current.identifierForVendor?.uuidString)
         fetchIDFA()
+        
+        OneSignal.initialize("8fa8b5e3-4f20-4d75-aad5-5ad1b46f8d80", withLaunchOptions:  launchOptions)
+        OneSignal.login(Apphud.userID())
+        
+        
         
         FirebaseApp.configure()
         

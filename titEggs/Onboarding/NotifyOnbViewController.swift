@@ -7,6 +7,7 @@
 
 import UIKit
 import UserNotifications
+import OneSignalFramework
 
 class NotifyOnbViewController: UIViewController {
     
@@ -127,12 +128,10 @@ class NotifyOnbViewController: UIViewController {
     }
     
     private func requestNotificationAuthorization(completion: @escaping () -> Void) {
-        let center = UNUserNotificationCenter.current()
-        center.requestAuthorization(options: [.alert, .sound, .badge]) { _, _ in
-            DispatchQueue.main.async {
-                completion()
-            }
-        }
+        OneSignal.Notifications.requestPermission({ accepted in
+          print("User accepted notifications: \(accepted)")
+            completion()
+        }, fallbackToSettings: true)
     }
     
 }
