@@ -56,6 +56,8 @@ struct Generate: Codable {
 
 struct DataGenerate: Codable {
     let generationId: String
+    let totalWeekGenerations: Int
+    let maxGenerations: Int
 }
 
 //check stat
@@ -71,4 +73,6 @@ struct StatusData: Codable {
     let error: String?
     let resultUrl: String?
     let progress: Int?
+    let totalWeekGenerations: Int
+    let maxGenerations: Int
 }

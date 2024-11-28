@@ -282,14 +282,32 @@ class PreviewEffectViewController: UIViewController, UIImagePickerControllerDele
     
     @objc private func nextTapped() {
         
+        
+        
         if purchaseManager.hasUnlockedPro == true {
-            self.cellTapped(index: index)
+            if dynamicAppHud?.segment == "v2" {
+                let amount = UserDefaults.standard.object(forKey: "amountTokens") as? String ?? "0"
+                if amount == "0" {
+                    openAmountAlert()
+                } else {
+                    self.cellTapped(index: index)
+                }
+            } else {
+                self.cellTapped(index: index)
+            }
         } else {
             let vc = CreateElements.openPaywall(manager: purchaseManager)
             self.present(vc, animated: true)
             playPauseButton.setBackgroundImage(.bigPlay, for: .normal)
             player?.pause()
         }
+    }
+    
+    private func openAmountAlert() {
+        let alert = UIAlertController(title: "Attention", message: "You ran out of generations this week, they are updated every week on Monday", preferredStyle: .alert)
+        let okAction = UIAlertAction(title: "OK", style: .cancel)
+        alert.addAction(okAction)
+        self.present(alert, animated: true)
     }
     
     private func cellTapped(index: Int) {

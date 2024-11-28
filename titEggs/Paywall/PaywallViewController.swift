@@ -13,6 +13,7 @@ import AVFoundation
 import AVKit
 import FacebookCore
 
+
 class PaywallViewController: UIViewController {
     
     private var timer: Timer?
@@ -35,9 +36,11 @@ class PaywallViewController: UIViewController {
     private lazy var continueButton = CreateElements.createPrimaryButton(title: "Continue")
     private lazy var cancelAnytimeButton = createMiniButtons(title: "Cancel Anytime", color: .white.withAlphaComponent(0.4), font: .appFont(.Caption1Regular), isACancelAnytime: true)
     
+    
 //    private lazy var annualButton = createSubscribeButtons(type: true, selected: true)
 //    private lazy var weeklyButton = createSubscribeButtons(type: false, selected: false)
     private lazy var selectedSubscribe = 0
+    var topStackView: UIStackView?
     
     private lazy var collection: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
@@ -73,6 +76,16 @@ class PaywallViewController: UIViewController {
         return view
     }()
     private lazy var shadowImageView = UIImageView(image: .shadowPaywall)
+    private lazy var numberGenButton: UIButton = {
+        let button = UIButton()
+        button.layer.cornerRadius = 8
+        button.backgroundColor = .white.withAlphaComponent(0.08)
+        button.titleLabel?.font = .appFont(.Caption1Emphasized)
+        button.setTitleColor(.white, for: .normal)
+        button.contentEdgeInsets = UIEdgeInsets(top: 0, left: 10, bottom: 0, right: 10)
+        button.setTitle("520", for: .normal)
+        return button
+    }()
     
     //MARK: -Store
     private let manager:PurchaseManager
@@ -91,10 +104,10 @@ class PaywallViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        someMethod()
         view.backgroundColor = .bgPrimary
         setupUI()
         setupTimer()
+        someMethod()
     }
     
     private func someMethod() {
@@ -111,7 +124,7 @@ class PaywallViewController: UIViewController {
     private func loadProducts() async {
         // Ожидаем, пока массив products будет содержать 2 элемента
         while manager.productsApphud.count < 1 {
-            await Task.sleep(500_000_000) // Ждем 0.5 секунды перед повторной проверкой
+            await Task.sleep(500_000_000) 
         }
 
         // Когда продуктов достаточно, выполняем нужный код
@@ -128,14 +141,37 @@ class PaywallViewController: UIViewController {
         shadowImageView.snp.remakeConstraints { make in
             make.left.bottom.right.equalToSuperview()
             if products.count == 2 {
-                make.height.equalTo(view.snp.height).multipliedBy(3.8 / 5.0)
+                if dynamicAppHud?.segment == "v2" {
+                    make.height.equalTo(view.snp.height).multipliedBy(4 / 5.0)
+                } else {
+                    make.height.equalTo(view.snp.height).multipliedBy(3.8 / 5.0)
+                }
             } else {
-                make.height.equalTo(view.snp.height).multipliedBy(4.3 / 5.0)
+                if dynamicAppHud?.segment == "v2" {
+                    make.height.equalTo(view.snp.height).multipliedBy(4.5 / 5.0)
+                } else {
+                    make.height.equalTo(view.snp.height).multipliedBy(4.2 / 5.0)
+                }
             }
             make.height.lessThanOrEqualTo(600)
         }
         
         UIView.animate(withDuration: 0.3) {
+            let time = self.returnType(product: self.products[0])
+            
+            if dynamicAppHud?.segment == "v2" {
+                switch time {
+                case "per week":
+                    self.numberGenButton.setTitle("10", for: .normal)
+                case "per year":
+                    self.numberGenButton.setTitle("520", for: .normal)
+                case "per month":
+                    self.numberGenButton.setTitle("40", for: .normal)
+                default:
+                    self.numberGenButton.setTitle("0", for: .normal)
+                }
+                self.topStackView?.addArrangedSubview(self.createTextGalc(text: "Number of generations:"))
+            }
             self.view.layoutIfNeeded()
         }
     }
@@ -254,25 +290,29 @@ class PaywallViewController: UIViewController {
         }
         
         
+        topStackView = UIStackView(arrangedSubviews: [createTextGalc(text: "Full Access"), createTextGalc(text: "Share unique videos"), createTextGalc(text: "Quick generation")])
         
-        let topStackView = UIStackView(arrangedSubviews: [createTextGalc(text: "Full Access"), createTextGalc(text: "Share unique videos"), createTextGalc(text: "Quick generation")])
-        topStackView.backgroundColor = .clear
-        topStackView.axis = .vertical
-        topStackView.distribution = .fillEqually
-        topStackView.alignment = .leading
-        topStackView.spacing = 1
-        view.addSubview(topStackView)
-        topStackView.snp.makeConstraints { make in
-            make.centerX.equalToSuperview()
+        topStackView?.backgroundColor = .clear
+        topStackView?.axis = .vertical
+        topStackView?.distribution = .fillEqually
+        topStackView?.alignment = .leading
+        topStackView?.spacing = 1
+        view.addSubview(topStackView!)
+        topStackView?.snp.makeConstraints { make in
+            make.centerX.equalToSuperview().offset(-40)
             make.bottom.equalTo(collection.snp.top).inset(-20)
-            make.height.equalTo(100)
+            if dynamicAppHud?.segment == "v2" {
+                make.height.equalTo(134)
+            } else {
+                make.height.equalTo(100)
+            }
             make.width.equalTo(174)
         }
         
         view.addSubview(topLabel)
         topLabel.snp.makeConstraints { make in
             make.centerX.equalToSuperview()
-            make.bottom.equalTo(topStackView.snp.top).inset(-10)
+            make.bottom.equalTo(topStackView!.snp.top).inset(-10)
         }
         
         view.addSubview(closePaywall)
@@ -303,7 +343,17 @@ class PaywallViewController: UIViewController {
                 let productToPurchase = products[selectedSubscribe]
                 manager.startPurchase(produst: productToPurchase) { result in
                     if result == true {
-                        AppEvents.shared.logPurchase(amount: productToPurchase.skProduct?.price.doubleValue ?? 0.0, currency: productToPurchase.skProduct?.priceLocale.currencySymbol ?? "error")
+                        
+                        let parameters: [AppEvents.ParameterName: Any] = [
+                            .init("product_id"): productToPurchase.skProduct?.productIdentifier ?? "no id", // Уникальный ID продукта
+                            .init("price"): productToPurchase.skProduct?.price.doubleValue ?? 0.0, // Цена продукта
+                            .init("currency"): productToPurchase.skProduct?.priceLocale.currencySymbol ?? "$" // Валюта
+                        ]
+                        AppEvents.shared.logEvent(AppEvents.Name("subscriptionPurchase_completed"), parameters: parameters)
+                        if dynamicAppHud?.segment == "v2" {
+                            UserDefaults.standard.setValue(self.numberGenButton.titleLabel!.text, forKey: "alltokens")
+                            UserDefaults.standard.setValue("100", forKey: "amountTokens")
+                        }
                         self.dismiss(animated: true)
                     }
                     
@@ -365,116 +415,11 @@ class PaywallViewController: UIViewController {
         return button
     }
     
-//    private func createSubscribeButtons(type: Bool, selected: Bool) -> UIButton {
-//        let button = UIButton(type: .system)
-//        button.backgroundColor = .white.withAlphaComponent(0.08)
-//        button.layer.cornerRadius = 10
-//        button.tag = type ? 1 : 0
-//        
-//        let dotImageView = UIImageView(image: selected ? .selectedSub.withRenderingMode(.alwaysTemplate) : .unselectedSub.withRenderingMode(.alwaysTemplate))
-//        dotImageView.tintColor = selected ? .primary : .white.withAlphaComponent(0.28)
-//        button.addSubview(dotImageView)
-//        dotImageView.snp.makeConstraints { make in
-//            make.left.equalToSuperview().inset(15)
-//            make.centerY.equalToSuperview()
-//            make.height.width.equalTo(32)
-//        }
-//        
-//        button.layer.borderColor = selected ? UIColor.primary.cgColor : UIColor.clear.cgColor
-//        button.layer.borderWidth = selected ? 1 : 0
-//        
-//        let typeLabel = UILabel()
-//        typeLabel.text = type
-//            ? (products.first != nil ? returnName(product: products.first!) : "Annual")
-//            : (products.last != nil ? returnName(product: products.last!) : "Weekly")
-//
-//
-//        typeLabel.textColor = .white
-//        typeLabel.font = .appFont(.BodyRegular)
-//        button.addSubview(typeLabel)
-//        typeLabel.snp.makeConstraints { make in
-//            make.left.equalTo(dotImageView.snp.right).inset(-5)
-//            if type {
-//                make.top.equalToSuperview().inset(10)
-//            } else {
-//                make.centerY.equalToSuperview()
-//            }
-//        }
-//        
-//        let saleLabel = UILabel()
-//        saleLabel.font = .appFont(.Caption1Regular)
-//        saleLabel.textColor = .white.withAlphaComponent(0.4)
-//        saleLabel.text = "$0.87 per week"
-//        
-//        if type {
-//            button.addSubview(saleLabel)
-//            saleLabel.snp.makeConstraints { make in
-//                make.bottom.equalToSuperview().inset(10)
-//                make.left.equalTo(dotImageView.snp.right).inset(-5)
-//            }
-//        }
-//        
-//        let countlabel = UILabel()
-//        countlabel.font = .appFont(.BodyEmphasized)
-//        countlabel.textColor = .white
-//        
-//        
-//       
-//        if type {
-//            let znak = products.first?.skProduct?.priceLocale.currencySymbol
-//            if let price = products.first?.skProduct?.price.stringValue {
-//                countlabel.text = (znak ?? "$") + price
-//            } else {
-//                countlabel.text = ""
-//            }
-//        } else {
-//            let znak = products.last?.skProduct?.priceLocale.currencySymbol
-//            if let price = products.last?.skProduct?.price.stringValue {
-//                countlabel.text = (znak ?? "$") + price // Устанавливаем цену в UILabel
-//            } else {
-//                countlabel.text = ""
-//            }
-//        }
-//
-//        
-//        button.addSubview(countlabel)
-//        countlabel.snp.makeConstraints { make in
-//            make.right.equalToSuperview().inset(15)
-//            make.top.equalToSuperview().inset(10)
-//        }
-//        
-//        let textLabel = UILabel()
-//        textLabel.textColor = .white.withAlphaComponent(0.6)
-//        textLabel.font = .appFont(.Caption1Regular)
-//        textLabel.text = type ? "per year" : "per week"
-//        button.addSubview(textLabel)
-//        textLabel.snp.makeConstraints { make in
-//            make.right.equalToSuperview().inset(15)
-//            make.bottom.equalToSuperview().inset(10)
-//        }
-//        
-//        if type {
-//            let view = createSaleView()
-//            button.addSubview(view)
-//            view.snp.makeConstraints { make in
-//                make.centerY.equalTo(countlabel)
-//                make.height.equalTo(21)
-//                make.width.equalTo(66)
-//                make.right.equalTo(countlabel.snp.left).inset(-5)
-//            }
-//        }
-//        
-//        
-//       
-//        button.addTarget(self, action: #selector(buttonTouchDown), for: .touchDown)
-//        button.addTarget(self, action: #selector(buttonTouchUp), for: [.touchUpInside, .touchUpOutside])
-//        return button
-//    }
-    
-    
+
     
     @objc private func selectPlan(index: Int) {
        selectedSubscribe = index
+        
         collection.reloadData()
     }
     
@@ -552,6 +497,15 @@ class PaywallViewController: UIViewController {
             make.centerY.equalTo(imageView)
         }
         
+        if text == "Number of generations:" {
+            view.addSubview(numberGenButton)
+            numberGenButton.snp.makeConstraints { make in
+                make.height.equalTo(24)
+                make.centerY.equalTo(label)
+                make.left.equalTo(label.snp.right).inset(-10)
+            }
+        }
+        
         return view
     }
     
@@ -583,7 +537,8 @@ extension PaywallViewController: UICollectionViewDelegate, UICollectionViewDataS
         
         let typeLabel = UILabel()
         typeLabel.text = returnName(product: products[indexPath.row])
-
+        
+       
         
         typeLabel.textColor = .white
         typeLabel.font = .appFont(.BodyRegular)
@@ -591,19 +546,19 @@ extension PaywallViewController: UICollectionViewDelegate, UICollectionViewDataS
         
         typeLabel.snp.makeConstraints { make in
             make.left.equalTo(dotImageView.snp.right).inset(-5)
-            if indexPath.row == 0 {
+            if typeLabel.text == "Yearly" {
                 make.top.equalToSuperview().inset(10)
             } else {
                 make.centerY.equalToSuperview()
             }
         }
-        
+    
         let saleLabel = UILabel()
         saleLabel.font = .appFont(.Caption1Regular)
         saleLabel.textColor = .white.withAlphaComponent(0.4)
         saleLabel.text = "$0.87 per week"
         
-        if indexPath.row == 0 {
+        if typeLabel.text == "Yearly" {
             cell.addSubview(saleLabel)
             saleLabel.snp.makeConstraints { make in
                 make.bottom.equalToSuperview().inset(10)
@@ -641,7 +596,7 @@ extension PaywallViewController: UICollectionViewDelegate, UICollectionViewDataS
             make.bottom.equalToSuperview().inset(10)
         }
         
-        if indexPath.row == 0 {
+        if typeLabel.text == "Yearly" {
             let view = createSaleView()
             cell.addSubview(view)
             view.snp.makeConstraints { make in
@@ -664,7 +619,24 @@ extension PaywallViewController: UICollectionViewDelegate, UICollectionViewDataS
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         selectedSubscribe = indexPath.row
         collectionView.reloadData()
+        
+        let time = returnType(product: products[indexPath.row])
+        
+        UIView.animate(withDuration: 0.3) {
+            if dynamicAppHud?.segment == "v2" {
+                switch time {
+                case "per week":
+                    self.numberGenButton.setTitle("10", for: .normal)
+                case "per year":
+                    self.numberGenButton.setTitle("520", for: .normal)
+                case "per month":
+                    self.numberGenButton.setTitle("40", for: .normal)
+                default:
+                    self.numberGenButton.setTitle("0", for: .normal)
+                }
+            }
+        }
+        
+        
     }
-    
-    
 }

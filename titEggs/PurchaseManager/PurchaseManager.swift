@@ -95,8 +95,9 @@ class PurchaseManager: NSObject {
                 let products = paywall.products
                 self.productsApphud = products
                 
+                print(products, "Proddd")
                 for i in products {
-                    print(i.skProduct?.localizedDescription, "Proddd")
+                    print(i.productId, "ID")
                 }
                 
             }

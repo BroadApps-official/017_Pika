@@ -11,7 +11,7 @@ import Combine
 import ApphudSDK
 import AppTrackingTransparency
 import AdSupport
-import AlamofireNetworkActivityLogger
+import Alamofire
 import Firebase
 import FacebookCore
 import FBSDKCoreKit.FBSDKSettings
@@ -21,6 +21,7 @@ import OneSignalFramework
 
 let buyPublisher = PassthroughSubject<Any, Never>()
 var userID = ""
+var dynamicAppHud: DynamicSegment?
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -30,30 +31,52 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         Apphud.start(apiKey: "app_Ya3A7cxvYehiiDp7nq6MARXH8adoTQ")
         Apphud.setDeviceIdentifiers(idfa: nil, idfv: UIDevice.current.identifierForVendor?.uuidString)
         fetchIDFA()
-        
-        OneSignal.initialize("8fa8b5e3-4f20-4d75-aad5-5ad1b46f8d80", withLaunchOptions:  launchOptions)
+        getCampaign(apphudUserID: Apphud.userID())
+        OneSignal.initialize("48593fbd-dce5-4723-9261-b1d0b23a4666", withLaunchOptions:  launchOptions)
         OneSignal.login(Apphud.userID())
         
-        
-        
         FirebaseApp.configure()
-        
         
         var open = UserDefaults.standard.integer(forKey: "count")
         open += 1
         UserDefaults.standard.setValue(open, forKey: "count")
         
-        if let deviceID = UIDevice.current.identifierForVendor?.uuidString {
-            userID = deviceID
-        }
+        userID = Apphud.userID()
         
         ApplicationDelegate.shared.application(
             application,
             didFinishLaunchingWithOptions: launchOptions
         )
-        
-        
+
         return true
+    }
+    
+    //MARK: - при сегменте V2 - у нас появляются ограничения на генерации.  code - id эксперемента, нужен для вывода количества продуктов
+    
+    func getCampaign(apphudUserID: String) {
+        
+        let param = ["appHudUserId" : apphudUserID]
+        
+        AF.request("https://testerapps.site/api/campaign/c2f8IRxxdiiSKt7", method: .post, parameters: param).responseData{ response in
+            debugPrint(response, "авторизация ок")
+            switch response.result {
+            case .success(let data):
+                do {
+                    let items = try JSONDecoder().decode([DynamicSegment].self, from: data)
+                    
+                    for i in items {
+                        if i.code == "pika_onboarding1" {
+                            dynamicAppHud = i
+                        }
+                    }
+                } catch {
+                    print("Ошибка декодирования JSON:", error.localizedDescription)
+                }
+                
+            case  .failure(_):
+                print("fail")
+            }
+        }
     }
     
     func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey : Any] = [:]) -> Bool {
@@ -115,3 +138,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 }
 
 
+struct DynamicSegment: Decodable {
+    var code: String
+    var segment: String
+    var forceSegment: String?
+}

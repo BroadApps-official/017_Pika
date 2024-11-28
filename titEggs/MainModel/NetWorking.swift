@@ -58,10 +58,39 @@ class NetWorking {
     }
     
     
+    
     func createVideo(data: Data, idEffect: String, escaping: @escaping (String) -> Void) {
         let token = "rE176kzVVqjtWeGToppo4lRcbz3HRLoBrZREEvgQ8fKdWuxySCw6tv52BdLKBkZTOHWda5ISwLUVTyRoZEF0A33Xpk63lF9wTCtDxOs8XK3YArAiqIXVb7ZS4IK61TYPQMu5WqzFWwXtZc1jo8w"
         
         let headers: HTTPHeaders = [(.authorization(bearerToken: token))]
+        
+        let param: Parameters = ["templateId": idEffect, "image" : data, "userId": userID, "appId": Bundle.main.bundleIdentifier ?? "pika"]
+        
+//        AF.request("https://vewapnew.online/api/generate", method: .post, parameters: param, headers: headers).responseData { response in
+//            debugPrint(response, "createOK")
+//            switch response.result {
+//            case .success(let data):
+//                do {
+//                    let effects = try JSONDecoder().decode(Generate.self, from: data)
+//                    let amount = 100 - effects.data.totalWeekGenerations * 10
+//                    if dynamicAppHud?.segment == "v2" {
+//                        UserDefaults.standard.setValue("\(effects.data.maxGenerations)", forKey: "maxGenWeek")
+//                        UserDefaults.standard.setValue("\(amount)", forKey: "amountTokens")
+//                        UserDefaults.standard.synchronize()
+//                    }
+//                    escaping(effects.data.generationId)
+//                } catch {
+//                    print("Ошибка декодирования JSON:", error.localizedDescription)
+//                    escaping("error")
+//                }
+//                
+//            case .failure(let error):
+//                print("Ошибка запроса:", error.localizedDescription)
+//                escaping("error")
+//            }
+//        }
+//        
+        
         
         AF.upload(multipartFormData: { multipartFormData in
             multipartFormData.append(Data(idEffect.utf8), withName: "templateId")
@@ -75,6 +104,12 @@ class NetWorking {
             case .success(let data):
                 do {
                     let effects = try JSONDecoder().decode(Generate.self, from: data)
+                    let amount = 100 - effects.data.totalWeekGenerations * 10
+                    if dynamicAppHud?.segment == "v2" {
+                        UserDefaults.standard.setValue("\(effects.data.maxGenerations)", forKey: "maxGenWeek")
+                        UserDefaults.standard.setValue("\(amount)", forKey: "amountTokens")
+                        UserDefaults.standard.synchronize()
+                    }
                     escaping(effects.data.generationId)
                 } catch {
                     print("Ошибка декодирования JSON:", error.localizedDescription)
@@ -105,6 +140,12 @@ class NetWorking {
             case .success(let data):
                 do {
                     let item = try JSONDecoder().decode(Status.self, from: data)
+                    let amount = 100 - item.data.totalWeekGenerations * 10
+                    if dynamicAppHud?.segment == "v2" {
+                        UserDefaults.standard.setValue("\(item.data.maxGenerations)", forKey: "maxGenWeek")
+                        UserDefaults.standard.setValue("\(amount)", forKey: "amountTokens")
+                        UserDefaults.standard.synchronize()
+                    }
                     escaping(item.data.status, item.data.resultUrl ?? "")
                 } catch {
                     print("Ошибка декодирования JSON:", error.localizedDescription)

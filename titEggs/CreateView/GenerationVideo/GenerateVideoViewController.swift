@@ -126,7 +126,6 @@ class GenerateVideoViewController: UIViewController {
             }
             
             uuidVideo = "\(videoLoad!.id)"
-            print(uuidVideo, "dsffdsfdsfdsfdssdfcx vcv")
             
             model.createVideo(escaping: { result in
                 if result == false {

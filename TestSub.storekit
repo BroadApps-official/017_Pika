@@ -190,6 +190,31 @@
           "referenceName" : "week_5.59_nottrial",
           "subscriptionGroupID" : "351BB5AF",
           "type" : "RecurringSubscription"
+        },
+        {
+          "adHocOffers" : [
+
+          ],
+          "codeOffers" : [
+
+          ],
+          "displayPrice" : "19.99",
+          "familyShareable" : false,
+          "groupNumber" : 1,
+          "internalID" : "C9D78834",
+          "introductoryOffer" : null,
+          "localizations" : [
+            {
+              "description" : "",
+              "displayName" : "monthly_19.99_notrial ",
+              "locale" : "en_US"
+            }
+          ],
+          "productID" : "monthly_19.99_notrial",
+          "recurringSubscriptionPeriod" : "P1M",
+          "referenceName" : "monthly_19.99",
+          "subscriptionGroupID" : "351BB5AF",
+          "type" : "RecurringSubscription"
         }
       ]
     }

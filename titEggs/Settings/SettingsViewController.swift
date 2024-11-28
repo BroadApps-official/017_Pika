@@ -67,6 +67,7 @@ class SettingsViewController: UIViewController {
         checkManager()
         setupNavController()
         self.title = "Settings"
+        colelction.reloadData()
     }
     
     override func viewDidLoad() {
@@ -75,6 +76,7 @@ class SettingsViewController: UIViewController {
         setupNavController()
         setupUI()
         subscribe()
+        colelction.reloadData()
     }
     
     private func subscribe() {
@@ -88,6 +90,7 @@ class SettingsViewController: UIViewController {
     private func checkManager() {
         
         print(purchaseManager.hasUnlockedPro, "- есть или нет покупок")
+        colelction.reloadData()
         
         if purchaseManager.hasUnlockedPro {
             rightButton.alpha = 0
@@ -511,7 +514,7 @@ class SettingsViewController: UIViewController {
 extension SettingsViewController: UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return 4
+        return 5
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
@@ -519,43 +522,100 @@ extension SettingsViewController: UICollectionViewDelegate, UICollectionViewData
         cell.subviews.forEach { $0.removeFromSuperview() }
         cell.backgroundColor = .bgPrimary
         
-        let topLabel = createTopLabel(text: arrGeaders[indexPath.row])
-        cell.addSubview(topLabel)
-        topLabel.snp.makeConstraints { make in
-            make.left.top.equalToSuperview()
-        }
         
-        let viewCell = createCellViews(cell: indexPath.row)
-        cell.addSubview(viewCell)
-        viewCell.snp.makeConstraints { make in
-            make.left.right.equalToSuperview()
-            make.top.equalTo(topLabel.snp.bottom).inset(-5)
-            make.height.equalTo(indexPath.row == 3 ? 132 : 88)
-        }
-        //cell.backgroundColor = .red
         
-        if indexPath.row == 3 {
-            let versionlabel = UILabel()
-            versionlabel.textColor = .white.withAlphaComponent(0.6)
-            versionlabel.font = .appFont(.FootnoteRegular)
-            if let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String {
-                versionlabel.text = "App Version: \(version)"
-            } else {
-                versionlabel.text = "App Version: Unknown"
+        if (indexPath.row != 0)  {
+            let topLabel = createTopLabel(text: arrGeaders[indexPath.row - 1])
+            cell.addSubview(topLabel)
+            topLabel.snp.makeConstraints { make in
+                make.left.top.equalToSuperview()
             }
             
-            cell.addSubview(versionlabel)
-            versionlabel.snp.makeConstraints { make in
-                make.centerX.equalToSuperview()
-                make.bottom.equalToSuperview().inset(20)
+            let viewCell = createCellViews(cell: indexPath.row - 1)
+            cell.addSubview(viewCell)
+            viewCell.snp.makeConstraints { make in
+                make.left.right.equalToSuperview()
+                make.top.equalTo(topLabel.snp.bottom).inset(-5)
+                make.height.equalTo(indexPath.row == 4 ? 132 : 88)
+               
+            }
+            //cell.backgroundColor = .red
+            
+            if (indexPath.row == 4)  {
+                let versionlabel = UILabel()
+                versionlabel.textColor = .white.withAlphaComponent(0.6)
+                versionlabel.font = .appFont(.FootnoteRegular)
+                if let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String {
+                    versionlabel.text = "App Version: \(version)"
+                } else {
+                    versionlabel.text = "App Version: Unknown"
+                }
+                
+                cell.addSubview(versionlabel)
+                versionlabel.snp.makeConstraints { make in
+                    make.centerX.equalToSuperview()
+                    make.bottom.equalToSuperview().inset(20)
+                }
             }
         }
+        
+        if indexPath.row == 0 && UserDefaults.standard.object(forKey: "alltokens") != nil {
+            let view = UIView()
+            view.backgroundColor = .bgTeriary
+            view.layer.cornerRadius = 10
+            cell.addSubview(view)
+            view.snp.makeConstraints { make in
+                make.left.right.equalToSuperview()
+                make.centerY.equalToSuperview().offset(-10)
+                make.height.equalTo(42)
+            }
+            
+            let label = UILabel()
+            label.text = "Tokens to generate:"
+            label.textColor = .white
+            label.font = .appFont(.CalloutEmphasized)
+            view.addSubview(label)
+            label.snp.makeConstraints { make in
+                make.left.equalToSuperview().inset(15)
+                make.centerY.equalToSuperview()
+            }
+            
+            let numberTokens: String = UserDefaults.standard.object(forKey: "alltokens") as? String ?? "100"
+            
+            let labelAllToken = UILabel()
+            labelAllToken.font = .appFont(.BodyEmphasized)
+            labelAllToken.textColor = .white
+            labelAllToken.text = " / " + (purchaseManager.hasUnlockedPro ? "100" : "0")
+            view.addSubview(labelAllToken)
+            labelAllToken.snp.makeConstraints { make in
+                make.centerY.equalToSuperview()
+                make.right.equalToSuperview().inset(15)
+            }
+            
+            let amountTokens: String = UserDefaults.standard.object(forKey: "amountTokens") as? String ?? "0"
+            
+            let amountLabel = UILabel()
+            amountLabel.textColor = .white.withAlphaComponent(0.4)
+            amountLabel.font = .appFont(.CalloutRegular)
+            amountLabel.text = amountTokens
+            view.addSubview(amountLabel)
+            amountLabel.snp.makeConstraints { make in
+                make.centerY.equalToSuperview()
+                make.right.equalTo(labelAllToken.snp.left)
+            } 
+        }
+        
         
         return cell
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        return CGSize(width: collectionView.bounds.width, height: indexPath.row != 3 ? 112 : 206)
+        if indexPath.row == 0  {
+            return CGSize(width: collectionView.bounds.width, height: UserDefaults.standard.object(forKey: "alltokens") != nil ? 60 : 0)
+        } else {
+            return CGSize(width: collectionView.bounds.width, height: indexPath.row == 4 ? 206 : 112)
+        }
+        
     }
 }
 
