@@ -95,6 +95,10 @@ class MainModel {
     
     func checkStatusForIndex(index: Int, workItem: DispatchWorkItem?) {
         
+        guard index < self.arr.count else {
+            return
+        }
+        
         let itemId = self.arr[index].generationID ?? "" // Используем id элемента для запроса
         print(itemId, "fgvxbnv")
         self.netWorking.getStatus(itemId: itemId) { status, resultUrl in
