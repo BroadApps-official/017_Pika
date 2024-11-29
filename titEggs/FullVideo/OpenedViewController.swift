@@ -222,7 +222,7 @@ class OpenedViewController: UIViewController {
         if #available(iOS 14, *) {
             if let scene = UIApplication.shared.connectedScenes.first(where: { $0.activationState == .foregroundActive }) as? UIWindowScene {
                 DispatchQueue.main.async {
-                    SKStoreReviewController.requestReview(in: scene)
+                    AppStore.requestReview(in: scene)
                 }
             }
         } else {

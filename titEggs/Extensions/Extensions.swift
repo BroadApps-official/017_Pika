@@ -138,6 +138,11 @@ extension UIButton {
 
     @objc private func didTouchDown() {
         self.alpha = 0.7
+        let feedbackGenerator = UIImpactFeedbackGenerator(style: .medium)
+        
+        feedbackGenerator.prepare()
+        
+        feedbackGenerator.impactOccurred()
     }
 
     @objc private func didTouchUp() {

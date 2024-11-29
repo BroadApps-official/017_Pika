@@ -305,7 +305,7 @@ class SettingsViewController: UIViewController {
     
     
     @objc private func contactUs() {
-        let email = "example@example.com" // POST
+        let email = "mcbayroxane@gmail.com"
         let emailURL = "mailto:\(email)"
         if let url = URL(string: emailURL.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!) {
             if UIApplication.shared.canOpenURL(url) {
@@ -414,7 +414,7 @@ class SettingsViewController: UIViewController {
         if #available(iOS 14, *) {
             if let scene = UIApplication.shared.connectedScenes.first(where: { $0.activationState == .foregroundActive }) as? UIWindowScene {
                 DispatchQueue.main.async {
-                    SKStoreReviewController.requestReview(in: scene)
+                    AppStore.requestReview(in: scene)
                 }
             }
         } else {

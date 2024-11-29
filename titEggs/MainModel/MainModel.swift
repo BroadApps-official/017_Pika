@@ -126,7 +126,7 @@ class MainModel {
             } else if !(workItem?.isCancelled ?? true) {
                 print("Повторный запрос для индекса \(index) через 5 секунд...")
                 self.publisherVideo.send(1)
-                DispatchQueue.global().asyncAfter(deadline: .now() + 5, execute: workItem!)
+                DispatchQueue.global().asyncAfter(deadline: .now() + 20, execute: workItem!)
             }
         }
     }
