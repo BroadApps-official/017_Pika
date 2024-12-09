@@ -76,3 +76,14 @@ struct StatusData: Codable {
     let totalWeekGenerations: Int
     let maxGenerations: Int
 }
+
+//fetch user
+struct UserInfoResponse: Decodable {
+    let error: Bool
+    let messages: [String]
+    let data: UserData
+}
+
+struct UserData: Decodable {
+    let availableGenerations: Int
+}

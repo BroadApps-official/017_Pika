@@ -94,7 +94,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                     let idfa = ASIdentifierManager.shared().advertisingIdentifier.uuidString
                     Apphud.setDeviceIdentifiers(idfa: idfa, idfv: UIDevice.current.identifierForVendor?.uuidString)
                     Settings.shared.isAdvertiserTrackingEnabled = true
-                   
                 case .denied:
                     print("Tracking authorization denied by the user.")
                     Settings.shared.isAdvertiserTrackingEnabled = false
@@ -102,17 +101,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 case .restricted:
                     print("Tracking is restricted (e.g., parental controls).")
                     Settings.shared.isAdvertiserTrackingEnabled = false
-                   
                 case .notDetermined:
                     print("Tracking authorization has not been determined.")
                     Settings.shared.isAdvertiserTrackingEnabled = false
-                    
                 @unknown default:
                     print("Unexpected tracking status.")
                     Settings.shared.isAdvertiserTrackingEnabled = true
-                 
-                    
-                    
                 }
             }
         }

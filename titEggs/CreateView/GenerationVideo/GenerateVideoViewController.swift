@@ -101,6 +101,7 @@ class GenerateVideoViewController: UIViewController {
             DispatchQueue.main.async {
                 self.limitAlert()
             }
+            return
         } else {
             
             var videoLoad = video
@@ -246,6 +247,10 @@ class GenerateVideoViewController: UIViewController {
             if like % 3 == 0 {
                 self.openCustomLike()
             }
+            if like == 1 {
+                self.openCustomLike()
+            }
+                
             UserDefaults.standard.setValue(like, forKey: "likes")
             print(like, "like")
         }

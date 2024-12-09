@@ -27,7 +27,6 @@ class MainModel {
     
     init() {
         checkStatus()
-        print(arr)
     }
     
     
@@ -49,7 +48,7 @@ class MainModel {
             } else {
                 completion(false)
             }
-            monitor.cancel() // Остановим мониторинг, чтобы избежать утечек памяти
+            monitor.cancel()
         }
         
         monitor.start(queue: queue)
@@ -96,6 +95,7 @@ class MainModel {
     func checkStatusForIndex(index: Int, workItem: DispatchWorkItem?) {
         
         guard index < self.arr.count else {
+            print("Index \(index) out of range in completion")
             return
         }
         
@@ -222,6 +222,17 @@ class MainModel {
             try data.write(to: filePath)
         } else {
             throw NSError(domain: "SaveError", code: 1, userInfo: [NSLocalizedDescriptionKey: "Unable to get cache directory"])
+        }
+    }
+    
+    func fetchUserInfo(escaping: @escaping(Bool) -> Void) {
+        netWorking.fetchUserInfo { isError, weekgen  in
+            UserDefaults.standard.setValue("\(weekgen)", forKey: "amountTokens")
+            if weekgen == 0 {
+                escaping(false)
+            } else {
+                escaping(true)
+            }
         }
     }
 }

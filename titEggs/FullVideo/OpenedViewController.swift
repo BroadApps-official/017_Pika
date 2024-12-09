@@ -333,13 +333,21 @@ class OpenedViewController: UIViewController {
             showErrorAlertFiles()
             return
         }
-
+        
+        // Проверяем, что файл существует
+        if !FileManager.default.fileExists(atPath: tempURL.path) {
+            print("Файл не найден по пути: \(tempURL.path)")
+            showErrorAlertFiles()
+            return
+        }
+        
         // Создаем Document Picker для экспорта файла
         let documentPicker = UIDocumentPickerViewController(forExporting: [tempURL])
         documentPicker.delegate = self
         documentPicker.allowsMultipleSelection = false
         present(documentPicker, animated: true, completion: nil)
     }
+
 
     
     private func showErrorAlertFiles() {

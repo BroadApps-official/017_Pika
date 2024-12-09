@@ -281,17 +281,18 @@ class PreviewEffectViewController: UIViewController, UIImagePickerControllerDele
     }
     
     @objc private func nextTapped() {
-        
-        
-        
+
         if purchaseManager.hasUnlockedPro == true {
             if dynamicAppHud?.segment == "v2" {
-                let amount = UserDefaults.standard.object(forKey: "amountTokens") as? String ?? "0"
-                if amount == "0" {
-                    openAmountAlert()
-                } else {
-                    self.cellTapped(index: index)
+                model.fetchUserInfo { isError in
+                   
+                    if isError == false {
+                        self.openAmountAlert()
+                    } else {
+                        self.cellTapped(index: self.index)
+                    }
                 }
+               
             } else {
                 self.cellTapped(index: index)
             }

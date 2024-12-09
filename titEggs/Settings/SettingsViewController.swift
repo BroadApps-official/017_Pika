@@ -585,7 +585,7 @@ extension SettingsViewController: UICollectionViewDelegate, UICollectionViewData
             let labelAllToken = UILabel()
             labelAllToken.font = .appFont(.BodyEmphasized)
             labelAllToken.textColor = .white
-            labelAllToken.text = " / " + (purchaseManager.hasUnlockedPro ? "100" : "0")
+            labelAllToken.text = " / " + (purchaseManager.hasUnlockedPro ? numberTokens : "0")
             view.addSubview(labelAllToken)
             labelAllToken.snp.makeConstraints { make in
                 make.centerY.equalToSuperview()

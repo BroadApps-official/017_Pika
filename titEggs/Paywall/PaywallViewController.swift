@@ -83,7 +83,7 @@ class PaywallViewController: UIViewController {
         button.titleLabel?.font = .appFont(.Caption1Emphasized)
         button.setTitleColor(.white, for: .normal)
         button.contentEdgeInsets = UIEdgeInsets(top: 0, left: 10, bottom: 0, right: 10)
-        button.setTitle("520", for: .normal)
+        button.setTitle("100", for: .normal)
         return button
     }()
     
@@ -164,7 +164,7 @@ class PaywallViewController: UIViewController {
                 case "per week":
                     self.numberGenButton.setTitle("10", for: .normal)
                 case "per year":
-                    self.numberGenButton.setTitle("520", for: .normal)
+                    self.numberGenButton.setTitle("100", for: .normal)
                 case "per month":
                     self.numberGenButton.setTitle("40", for: .normal)
                 default:
@@ -350,9 +350,17 @@ class PaywallViewController: UIViewController {
                             .init("currency"): productToPurchase.skProduct?.priceLocale.currencySymbol ?? "$" // Валюта
                         ]
                         AppEvents.shared.logEvent(AppEvents.Name("subscriptionPurchase_completed"), parameters: parameters)
+                        
                         if dynamicAppHud?.segment == "v2" {
-                            UserDefaults.standard.setValue(self.numberGenButton.titleLabel!.text, forKey: "alltokens")
-                            UserDefaults.standard.setValue("100", forKey: "amountTokens")
+                            
+                            
+                            if self.numberGenButton.titleLabel?.text == "10" {
+                                UserDefaults.standard.setValue("10", forKey: "amountTokens")
+                                UserDefaults.standard.setValue("10", forKey: "alltokens")
+                            } else {
+                                UserDefaults.standard.setValue("100", forKey: "amountTokens")
+                                UserDefaults.standard.setValue("100", forKey: "alltokens")
+                            }
                         }
                         self.dismiss(animated: true)
                     }
@@ -628,9 +636,9 @@ extension PaywallViewController: UICollectionViewDelegate, UICollectionViewDataS
                 case "per week":
                     self.numberGenButton.setTitle("10", for: .normal)
                 case "per year":
-                    self.numberGenButton.setTitle("520", for: .normal)
+                    self.numberGenButton.setTitle("100", for: .normal)
                 case "per month":
-                    self.numberGenButton.setTitle("40", for: .normal)
+                    self.numberGenButton.setTitle("10", for: .normal)
                 default:
                     self.numberGenButton.setTitle("0", for: .normal)
                 }
