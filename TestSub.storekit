@@ -4,7 +4,66 @@
 
   ],
   "products" : [
-
+    {
+      "displayPrice" : "39.99",
+      "familyShareable" : false,
+      "internalID" : "5CACF666",
+      "localizations" : [
+        {
+          "description" : "",
+          "displayName" : "1000",
+          "locale" : "en_US"
+        }
+      ],
+      "productID" : "1000_Tokens_59.99",
+      "referenceName" : "1000",
+      "type" : "Consumable"
+    },
+    {
+      "displayPrice" : "19.99",
+      "familyShareable" : false,
+      "internalID" : "8B4F5B79",
+      "localizations" : [
+        {
+          "description" : "",
+          "displayName" : "100",
+          "locale" : "en_US"
+        }
+      ],
+      "productID" : "100_Tokens",
+      "referenceName" : "100",
+      "type" : "Consumable"
+    },
+    {
+      "displayPrice" : "29.99",
+      "familyShareable" : false,
+      "internalID" : "3FD4B759",
+      "localizations" : [
+        {
+          "description" : "",
+          "displayName" : "500",
+          "locale" : "en_US"
+        }
+      ],
+      "productID" : "500_Tokens_34.99",
+      "referenceName" : "500",
+      "type" : "Consumable"
+    },
+    {
+      "displayPrice" : "49.99",
+      "familyShareable" : false,
+      "internalID" : "C135160B",
+      "localizations" : [
+        {
+          "description" : "",
+          "displayName" : "2000",
+          "locale" : "en_US"
+        }
+      ],
+      "productID" : "2000_Tokens_99.99",
+      "referenceName" : "2000",
+      "type" : "Consumable"
+    }
   ],
   "settings" : {
     "_failTransactionsEnabled" : false,

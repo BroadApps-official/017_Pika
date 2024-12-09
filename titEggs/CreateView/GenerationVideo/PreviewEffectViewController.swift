@@ -306,9 +306,24 @@ class PreviewEffectViewController: UIViewController, UIImagePickerControllerDele
     
     private func openAmountAlert() {
         let alert = UIAlertController(title: "Attention", message: "You ran out of generations this week, they are updated every week on Monday", preferredStyle: .alert)
-        let okAction = UIAlertAction(title: "OK", style: .cancel)
+        let okAction = UIAlertAction(title: "Close", style: .cancel)
         alert.addAction(okAction)
+        
+        let buyAction = UIAlertAction(title: "Show more", style: .default) { _ in
+            self.openPaywallToken()
+        }
+        alert.addAction(buyAction)
         self.present(alert, animated: true)
+    }
+    
+    func openPaywallToken() {
+        let paywallViewController = TokenPaywallViewController(model: model)
+        paywallViewController.modalPresentationStyle = .fullScreen
+        paywallViewController.modalTransitionStyle = .coverVertical
+        if #available(iOS 13.0, *) {
+            paywallViewController.isModalInPresentation = true
+        }
+        self.present(paywallViewController, animated: true)
     }
     
     private func cellTapped(index: Int) {

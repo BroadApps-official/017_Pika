@@ -22,6 +22,8 @@ class MainModel {
     
     var publisherVideo = PassthroughSubject<Any, Never>()
     
+    lazy var tokenPurchaseManager = TokenManager()
+    
     var errorPublisher = PassthroughSubject<(Bool, String), Never>()
     var videoDownloadedPublisher = PassthroughSubject<String, Never>()
     
@@ -227,7 +229,7 @@ class MainModel {
     
     func fetchUserInfo(escaping: @escaping(Bool) -> Void) {
         netWorking.fetchUserInfo { isError, weekgen  in
-            UserDefaults.standard.setValue("\(weekgen)", forKey: "amountTokens")
+            UserDefaults.standard.setValue("\(weekgen * 10)", forKey: "amountTokens")
             if weekgen == 0 {
                 escaping(false)
             } else {

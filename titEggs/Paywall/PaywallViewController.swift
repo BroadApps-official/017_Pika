@@ -166,7 +166,7 @@ class PaywallViewController: UIViewController {
                 case "per year":
                     self.numberGenButton.setTitle("100", for: .normal)
                 case "per month":
-                    self.numberGenButton.setTitle("40", for: .normal)
+                    self.numberGenButton.setTitle("10", for: .normal)
                 default:
                     self.numberGenButton.setTitle("0", for: .normal)
                 }
@@ -354,12 +354,13 @@ class PaywallViewController: UIViewController {
                         if dynamicAppHud?.segment == "v2" {
                             
                             
+                            
                             if self.numberGenButton.titleLabel?.text == "10" {
-                                UserDefaults.standard.setValue("10", forKey: "amountTokens")
-                                UserDefaults.standard.setValue("10", forKey: "alltokens")
-                            } else {
                                 UserDefaults.standard.setValue("100", forKey: "amountTokens")
                                 UserDefaults.standard.setValue("100", forKey: "alltokens")
+                            } else {
+                                UserDefaults.standard.setValue("1000", forKey: "amountTokens")
+                                UserDefaults.standard.setValue("1000", forKey: "alltokens")
                             }
                         }
                         self.dismiss(animated: true)

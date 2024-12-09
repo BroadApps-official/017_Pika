@@ -78,7 +78,7 @@ class SettingsViewController: UIViewController {
         subscribe()
         colelction.reloadData()
     }
-    
+
     private func subscribe() {
         buyPublisher
             .sink { _ in
@@ -305,9 +305,25 @@ class SettingsViewController: UIViewController {
     
     
     @objc private func contactUs() {
+        
+        var versionText = ""
+        
+        if let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String {
+            versionText = "App Version: \(version)"
+        } else {
+            versionText = "App Version: Unknown"
+        }
+        
         let email = "mcbayroxane@gmail.com"
-        let emailURL = "mailto:\(email)"
-        if let url = URL(string: emailURL.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!) {
+        let subject = "Support Request" // Тема письма
+        let body = "App ver: \(versionText), User id - \(userID)" // Текст письма
+
+        // Создаем URL с добавлением темы и тела письма
+        let emailURL = "mailto:\(email)?subject=\(subject)&body=\(body)"
+        
+        // Кодируем URL
+        if let encodedURL = emailURL.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed),
+           let url = URL(string: encodedURL) {
             if UIApplication.shared.canOpenURL(url) {
                 UIApplication.shared.open(url, options: [:], completionHandler: nil)
             } else {
@@ -582,6 +598,7 @@ extension SettingsViewController: UICollectionViewDelegate, UICollectionViewData
             
             let numberTokens: String = UserDefaults.standard.object(forKey: "alltokens") as? String ?? "100"
             
+            
             let labelAllToken = UILabel()
             labelAllToken.font = .appFont(.BodyEmphasized)
             labelAllToken.textColor = .white
@@ -593,6 +610,7 @@ extension SettingsViewController: UICollectionViewDelegate, UICollectionViewData
             }
             
             let amountTokens: String = UserDefaults.standard.object(forKey: "amountTokens") as? String ?? "0"
+            
             
             let amountLabel = UILabel()
             amountLabel.textColor = .white.withAlphaComponent(0.4)

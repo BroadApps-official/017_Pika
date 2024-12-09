@@ -54,6 +54,8 @@
 		159C01F72CECA3BE009DEEE8 /* FacebookGamingServices in Frameworks */ = {isa = PBXBuildFile; productRef = 159C01F62CECA3BE009DEEE8 /* FacebookGamingServices */; };
 		159C01F92CECA3BE009DEEE8 /* FacebookLogin in Frameworks */ = {isa = PBXBuildFile; productRef = 159C01F82CECA3BE009DEEE8 /* FacebookLogin */; };
 		159C01FB2CECAA26009DEEE8 /* FacebookShare in Frameworks */ = {isa = PBXBuildFile; productRef = 159C01FA2CECAA26009DEEE8 /* FacebookShare */; };
+		15AEF2842D0765E300156891 /* TokenPaywallViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15AEF2832D0765E300156891 /* TokenPaywallViewController.swift */; };
+		15AEF2862D076B5700156891 /* TokenManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15AEF2852D076B5700156891 /* TokenManager.swift */; };
 		15D0BFAF2CD8F6CD0011227E /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15D0BFAE2CD8F6CD0011227E /* AppDelegate.swift */; };
 		15D0BFB12CD8F6CD0011227E /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15D0BFB02CD8F6CD0011227E /* SceneDelegate.swift */; };
 		15D0BFB62CD8F6CD0011227E /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 15D0BFB42CD8F6CD0011227E /* Main.storyboard */; };
@@ -131,6 +133,8 @@
 		15542B712CDEBC7B0045598C /* Paywall.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = Paywall.mp4; sourceTree = "<group>"; };
 		159C01CD2CEA302A009DEEE8 /* MainConfiguration.storekit */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = MainConfiguration.storekit; path = ../../Downloads/MainConfiguration.storekit; sourceTree = "<group>"; };
 		159C01D02CEA3106009DEEE8 /* TestSub.storekit */ = {isa = PBXFileReference; lastKnownFileType = text; path = TestSub.storekit; sourceTree = "<group>"; };
+		15AEF2832D0765E300156891 /* TokenPaywallViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TokenPaywallViewController.swift; sourceTree = "<group>"; };
+		15AEF2852D076B5700156891 /* TokenManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TokenManager.swift; sourceTree = "<group>"; };
 		15D0BFAB2CD8F6CD0011227E /* titEggs.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = titEggs.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		15D0BFAE2CD8F6CD0011227E /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		15D0BFB02CD8F6CD0011227E /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -312,6 +316,15 @@
 			path = Cells;
 			sourceTree = "<group>";
 		};
+		15AEF2822D0765B500156891 /* TokenPaywall */ = {
+			isa = PBXGroup;
+			children = (
+				15AEF2832D0765E300156891 /* TokenPaywallViewController.swift */,
+				15AEF2852D076B5700156891 /* TokenManager.swift */,
+			);
+			path = TokenPaywall;
+			sourceTree = "<group>";
+		};
 		15D0BFA22CD8F6CD0011227E = {
 			isa = PBXGroup;
 			children = (
@@ -335,6 +348,7 @@
 		15D0BFAD2CD8F6CD0011227E /* titEggs */ = {
 			isa = PBXGroup;
 			children = (
+				15AEF2822D0765B500156891 /* TokenPaywall */,
 				15D2857E2CF4C3A900998395 /* titEggs.entitlements */,
 				15E627782CE374DF00A2C10C /* GoogleService-Info.plist */,
 				15542B1D2CDCF4B30045598C /* FullVideo */,
@@ -570,6 +584,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				15542B492CDE2AC40045598C /* VideoCollectionViewCell.swift in Sources */,
+				15AEF2862D076B5700156891 /* TokenManager.swift in Sources */,
+				15AEF2842D0765E300156891 /* TokenPaywallViewController.swift in Sources */,
 				152C786D2CDA3A8000A2A977 /* CustomLikeViewController.swift in Sources */,
 				152C785E2CD949A900A2A977 /* ModelDataOnb.swift in Sources */,
 				152C785C2CD9469800A2A977 /* CreateElements.swift in Sources */,
@@ -762,7 +778,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.9;
+				MARKETING_VERSION = 1.10;
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_BUNDLE_IDENTIFIER = com.agh.p1i1ka;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -802,7 +818,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.9;
+				MARKETING_VERSION = 1.10;
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_BUNDLE_IDENTIFIER = com.agh.p1i1ka;
 				PRODUCT_NAME = "$(TARGET_NAME)";
