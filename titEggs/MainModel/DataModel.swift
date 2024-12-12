@@ -18,6 +18,7 @@ struct Effect: Codable {
     var id: Int
     var effect: String
     var preview: String? 
+    var previewSmall: String?
 }
 
 

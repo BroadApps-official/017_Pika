@@ -8,6 +8,7 @@
 import UIKit
 import AVFoundation
 import Combine
+import GSPlayer
 
 class PreviewEffectViewController: UIViewController, UIImagePickerControllerDelegate, UINavigationControllerDelegate  {
     
@@ -16,12 +17,9 @@ class PreviewEffectViewController: UIViewController, UIImagePickerControllerDele
     let purchaseManager: PurchaseManager
 
     
-    private var player: AVPlayer?
-    private var playerLayer: AVPlayerLayer?
-    private let videoContainerView = UIView() // Контейнер для видео
+    private let playerView = VideoPlayerView()
     private var playPauseButton: UIButton!
     private var hideButtonTimer: DispatchWorkItem?
-    private var tempFileURL: URL?
     private lazy var taps = 0
     
     private lazy var cancellable = [AnyCancellable]()
@@ -49,7 +47,7 @@ class PreviewEffectViewController: UIViewController, UIImagePickerControllerDele
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
-        player?.pause()
+        playerView.pause(reason: .userInteraction)
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -131,17 +129,18 @@ class PreviewEffectViewController: UIViewController, UIImagePickerControllerDele
         nextButton.addTarget(self, action: #selector(nextTapped), for: .touchUpInside)
         
         
-        view.addSubview(videoContainerView)
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(videoTapped))
-        videoContainerView.addGestureRecognizer(tapGesture)
-        videoContainerView.layer.cornerRadius = 20
-        videoContainerView.clipsToBounds = true
-        videoContainerView.snp.makeConstraints { make in
+        playerView.addGestureRecognizer(tapGesture)
+        view.addSubview(playerView)
+        playerView.layer.cornerRadius = 20
+        playerView.clipsToBounds = true
+        playerView.replay(resetCount: true)
+        playerView.playerLayer.videoGravity = .resizeAspectFill
+        playerView.snp.makeConstraints { make in
             make.left.right.equalToSuperview().inset(15)
             make.bottom.equalTo(nextButton.snp.top).inset(-30)
             make.top.equalTo(view.safeAreaLayoutGuide.snp.top).inset(10)
         }
-        videoContainerView.backgroundColor = .clear
         
         // Настраиваем кнопку play/pause
         playPauseButton = UIButton(type: .custom)
@@ -150,68 +149,34 @@ class PreviewEffectViewController: UIViewController, UIImagePickerControllerDele
         playPauseButton.backgroundColor = .clear
         
         playPauseButton.alpha = 0
+        activityIndicator.startAnimating()
+        
+        playerView.stateDidChanged = { state in
+            switch state {
+            case .none:
+                print("none")
+            case .error(let error):
+                print("error - \(error.localizedDescription)")
+            case .loading:
+                print("loading")
+            case .paused(let playing, let buffering):
+                print("paused - progress \(Int(playing * 100))% buffering \(Int(buffering * 100))%")
+            case .playing:
+                self.activityIndicator.stopAnimating()
+            }
+        }
         
         
-        self.loadVideo()
+        self.setupPlayer()
         self.view.layoutIfNeeded()
     }
     
-    private func loadVideo() {
-        
-        self.activityIndicator.startAnimating()
-        
-        model.loadPreviewVideo(idEffect: model.effectsArr[index].id) { dataVideo, isError in
-            
-            print(123000)
-            
-            if isError == true {
-                self.openAlert()
-            } else {
-                self.setupPlayer(data: dataVideo)
-            }
-            
-            self.activityIndicator.stopAnimating()
-        }
-    }
+   
     
-    private func setupPlayer(data: Data) {
-           // Устанавливаем путь к временному файлу
-           let tempDirectory = FileManager.default.temporaryDirectory
-           tempFileURL = tempDirectory.appendingPathComponent("tempVideo.mp4")
-           
-           // Пытаемся сохранить data как временный файл
-           guard let tempFileURL = tempFileURL else { return }
-           
-           do {
-               try data.write(to: tempFileURL)
-           } catch {
-               self.openAlert()
-               return
-           }
-           
-           // Инициализируем AVPlayer с URL видеофайла
-           player = AVPlayer(url: tempFileURL)
-           
-           // Настраиваем слой для отображения видео
-           playerLayer = AVPlayerLayer(player: player)
-           playerLayer?.videoGravity = .resizeAspectFill
-           playerLayer?.cornerRadius = 20
-           
-           videoContainerView.layoutIfNeeded()
-           playerLayer?.frame = videoContainerView.bounds
-           if let playerLayer = playerLayer {
-               videoContainerView.layer.addSublayer(playerLayer)
-           }
-           
-           // Запускаем воспроизведение видео
-           player?.play()
-           player?.actionAtItemEnd = .none
-           
-           // Добавляем наблюдатель для окончания видео
-           NotificationCenter.default.addObserver(self, selector: #selector(videoDidFinish), name: .AVPlayerItemDidPlayToEndTime, object: player?.currentItem)
-           
-           // Настраиваем кнопку play/pause
-           videoContainerView.addSubview(playPauseButton)
+    private func setupPlayer() {
+        playerView.play(for: URL(string: model.effectsArr[index].preview!)!)
+       
+        view.addSubview(playPauseButton)
            playPauseButton.snp.makeConstraints { make in
                make.height.width.equalTo(76)
                make.center.equalToSuperview()
@@ -231,7 +196,6 @@ class PreviewEffectViewController: UIViewController, UIImagePickerControllerDele
         
         let repeatButton = UIAlertAction(title: "Try Again", style: .default) { _ in
             self.activityIndicator.startAnimating()
-            self.loadVideo()
         }
         alert.addAction(repeatButton)
         self.present(alert, animated: true)
@@ -240,12 +204,12 @@ class PreviewEffectViewController: UIViewController, UIImagePickerControllerDele
     
     @objc private func playPauseTapped() {
         taps += 1
-        if player?.rate == 0 {
-            player?.play()
-            playPauseButton.setBackgroundImage(.bigPause, for: .normal)
-        } else {
-            player?.pause()
+        if playerView.state == .playing {
+            playerView.pause(reason: .userInteraction)
             playPauseButton.setBackgroundImage(.bigPlay, for: .normal)
+        } else {
+            playerView.resume()
+            playPauseButton.setBackgroundImage(.bigPause, for: .normal)
         }
         
         hideButtonTimer?.cancel()
@@ -263,7 +227,7 @@ class PreviewEffectViewController: UIViewController, UIImagePickerControllerDele
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
             self.playPauseButton.alpha = 1
         }
-        playPauseButton.isSelected = player?.rate != 0
+        //playPauseButton.isSelected = player?.rate != 0
         
         hideButtonTimer?.cancel()
         
@@ -275,10 +239,6 @@ class PreviewEffectViewController: UIViewController, UIImagePickerControllerDele
         DispatchQueue.main.asyncAfter(deadline: .now() + 3, execute: hideButtonTimer!)
     }
     
-    @objc private func videoDidFinish() {
-        player?.seek(to: .zero)
-        player?.play()
-    }
     
     @objc private func nextTapped() {
 
@@ -300,7 +260,7 @@ class PreviewEffectViewController: UIViewController, UIImagePickerControllerDele
             let vc = CreateElements.openPaywall(manager: purchaseManager)
             self.present(vc, animated: true)
             playPauseButton.setBackgroundImage(.bigPlay, for: .normal)
-            player?.pause()
+            playerView.pause(reason: .userInteraction)
         }
     }
     
@@ -371,7 +331,7 @@ class PreviewEffectViewController: UIViewController, UIImagePickerControllerDele
             generateVC.isModalInPresentation = true
         }
         playPauseButton.setBackgroundImage(.bigPlay, for: .normal)
-        player?.pause()
+        playerView.pause(reason: .userInteraction)
         self.present(generateVC, animated: true)
     }
     
@@ -417,21 +377,9 @@ class PreviewEffectViewController: UIViewController, UIImagePickerControllerDele
     }
     
     deinit {
-        print(5555)
-        NotificationCenter.default.removeObserver(self, name: .AVPlayerItemDidPlayToEndTime, object: player?.currentItem)
-        
-        // Останавливаем воспроизведение и очищаем player
-        player?.pause()
+        playerView.pause(reason: .userInteraction)
         playPauseButton.setBackgroundImage(.bigPlay, for: .normal)
-        player = nil
         
-        // Удаляем playerLayer из слоя videoContainerView
-        playerLayer?.removeFromSuperlayer()
-        playerLayer = nil
-        
-        if let tempFileURL = tempFileURL {
-            try? FileManager.default.removeItem(at: tempFileURL)
-        }
     }
     
     

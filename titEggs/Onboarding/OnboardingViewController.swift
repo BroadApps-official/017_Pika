@@ -9,10 +9,12 @@ import UIKit
 import StoreKit
 import AVFoundation
 import AVKit
+import GSPlayer
 
 class OnboardingViewController: UIViewController {
     
     var paywall: PurchaseManager
+    let network = NetWorking()
     
     init(paywall: PurchaseManager) {
         self.paywall = paywall
@@ -22,6 +24,7 @@ class OnboardingViewController: UIViewController {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+    
     
     private let arr: [OnbData] = [
     OnbData(image: "onboardingVideo1", topText: "Pick a photo &\nblow it up", botText: "Create unreal videos"),
@@ -37,6 +40,7 @@ class OnboardingViewController: UIViewController {
         control.isUserInteractionEnabled = false
         return control
     }()
+    
     
     private lazy var nextButton = CreateElements.createPrimaryButton(title: "Continue")
     
@@ -56,11 +60,29 @@ class OnboardingViewController: UIViewController {
         collection.dataSource = self
         return collection
     }()
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        loadEffects()
+    }
 
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .bgPrimary
         setupUI()
+        
+    }
+    
+    private func loadEffects() {
+        network.loadEffectsArr { escaping in
+            var arr: [URL] = []
+            for i in escaping {
+                if i.previewSmall != nil {
+                    arr.append(URL(string: i.previewSmall ?? "")!)
+                }
+            }
+            VideoPreloadManager.shared.set(waiting: arr)
+        }
     }
     
 

@@ -34,7 +34,15 @@ class MainModel {
     
     func loadEffectArr(escaping: @escaping() -> Void) {
         netWorking.loadEffectsArr { effect in
-            self.effectsArr = effect
+            var arr: [Effect] = []
+            
+            for i in effect {
+                if i.preview != nil && i.previewSmall != nil {
+                    arr.append(i)
+                }
+            }
+            
+            self.effectsArr = arr
             escaping()
         }
     }
@@ -76,11 +84,11 @@ class MainModel {
     }
     
     
-    func loadPreviewVideo(idEffect: Int, escaping:  @escaping(Data, Bool) -> Void) {
-        netWorking.loadPreviewVideo(idEffect: idEffect) { data, isError in
-            escaping(data, isError)
-        }
-    }
+//    func loadPreviewVideo(idEffect: Int, escaping:  @escaping(Data, Bool) -> Void) {
+//        netWorking.loadPreviewVideo(idEffect: idEffect) { data, isError in
+//            escaping(data, isError)
+//        }
+//    }
 
     
     func saveArr() {

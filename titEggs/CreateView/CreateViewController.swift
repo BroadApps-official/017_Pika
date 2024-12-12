@@ -9,6 +9,7 @@ import UIKit
 import Combine
 import AVFoundation
 import AVKit
+import GSPlayer
 
 class CreateViewController: UIViewController, UIImagePickerControllerDelegate, UINavigationControllerDelegate  {
     
@@ -36,7 +37,7 @@ class CreateViewController: UIViewController, UIImagePickerControllerDelegate, U
         collection.backgroundColor = .bgPrimary
         collection.showsVerticalScrollIndicator = false
         layout.scrollDirection = .vertical
-        collection.register(VideoCollectionViewCell.self, forCellWithReuseIdentifier: "VideoCollectionViewCell")
+        collection.register(UICollectionViewCell.self, forCellWithReuseIdentifier: "VideoCollectionViewCell")
 
         collection.alpha = 0
         collection.delegate = self
@@ -87,20 +88,16 @@ class CreateViewController: UIViewController, UIImagePickerControllerDelegate, U
     
     
     private func loadArr() {
-        view.addSubview(activity)
-        activity.snp.makeConstraints { make in
-            make.center.equalToSuperview()
-            make.height.width.equalTo(64)
-        }
-        activity.center = view.center
-        activity.startAnimating()
+      
         collection.alpha = 0
         model.loadEffectArr {
             if self.model.effectsArr.count > 0 {
                 UIView.animate(withDuration: 0.3) {
                     self.collection.alpha = 1
-                    self.activity.removeFromSuperview()
+                    self.view.layoutIfNeeded()
                 }
+                self.activity.removeFromSuperview()
+                self.setupNavController()
                 self.collection.reloadData()
             }
         }
@@ -170,6 +167,14 @@ class CreateViewController: UIViewController, UIImagePickerControllerDelegate, U
             make.top.equalTo(view.safeAreaLayoutGuide.snp.top)
         }
         collection.reloadData()
+        
+        view.addSubview(activity)
+        activity.snp.makeConstraints { make in
+            make.center.equalToSuperview()
+            make.height.width.equalTo(64)
+        }
+        activity.center = view.center
+        activity.startAnimating()
     }
     
     private func cellTapped(index: Int) {
@@ -272,39 +277,54 @@ extension CreateViewController: UICollectionViewDelegate, UICollectionViewDataSo
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "VideoCollectionViewCell", for: indexPath) as? VideoCollectionViewCell else {
-            return UICollectionViewCell()
-        }
-        
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "VideoCollectionViewCell", for: indexPath)
+        cell.subviews.forEach { $0.removeFromSuperview() }
         cell.layer.cornerRadius = 20
         cell.backgroundColor = .white.withAlphaComponent(0.08)
         
-        let videoName: String
-        switch indexPath.row {
-        case 0: videoName = "levitate_it1"
-        case 1: videoName = "decapitate_it1"
-        case 2: videoName = "eye-pop_it1"
-        case 3: videoName = "Inflate_it1"
-        case 4: videoName = "Melt_it1"
-        case 5: videoName = "explode_it1"
-        case 6: videoName = "Squish_it1"
-        case 7: videoName = "Crush_it1"
-        case 8: videoName = "Cake-ify_it1"
-        case 9: videoName = "Ta-da_it1"
-        case 10: videoName = "Deflate_it1"
-        case 11: videoName = "crumble_it1"
-        case 12: videoName = "dissolve_it1"
-        default: videoName = "dissolve_it1"
+        let item = model.effectsArr[indexPath.row]
+        let url: URL = URL(string: item.previewSmall ?? "") ??  Bundle.main.url(forResource: "Melt_it1", withExtension: "mp4")!
+        
+        
+        let label = UILabel()
+        label.text = item.effect
+        label.textColor = .white
+        label.font = .appFont(.BodyRegular)
+        cell.addSubview(label)
+        label.snp.makeConstraints { make in
+            make.centerX.equalToSuperview()
+            make.bottom.equalToSuperview().inset(15)
         }
         
-        // Проверяем наличие URL для видео
-        if let urlVideo = Bundle.main.url(forResource: videoName, withExtension: "mp4") {
-            let title = model.effectsArr[indexPath.row].effect
-            cell.configure(with: urlVideo, title: title)
+        var videoView: VideoPlayerView
+        if let existingVideoView = cell.viewWithTag(100) as? VideoPlayerView {
+            videoView = existingVideoView
+        } else {
+            videoView = VideoPlayerView()
+            videoView.layer.cornerRadius = 10
+            videoView.clipsToBounds = true
+            videoView.contentMode = .center
+            videoView.playerLayer.videoGravity = .resizeAspectFill
+            videoView.tag = 100
+            videoView.isMuted = true
+            videoView.replay(resetCount: true)
+            cell.addSubview(videoView)
+            videoView.snp.makeConstraints { make in
+                make.left.right.top.equalToSuperview().inset(10)
+                make.bottom.equalTo(label.snp.top).inset(-15)
+            }
         }
+
+        DispatchQueue.main.async {
+            videoView.play(for: url)
+            videoView.isMuted = true
+        }
+       
         
         return cell
     }
+    
+   
 
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {

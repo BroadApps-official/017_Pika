@@ -309,7 +309,7 @@ class TokenPaywallViewController: UIViewController {
                         print(tokens)
                         
                         if dynamicAppHud?.segment == "v2" {
-                            self.model.tokenPurchaseManager.buyTokens(gen: tokens) {
+                            self.model.tokenPurchaseManager.buyTokens(gen: tokens / 10) {
                                 self.dismiss(animated: true)
                                 self.closePaywall.isEnabled = true
                                 UIView.animate(withDuration: 0.3) {
@@ -384,12 +384,12 @@ extension TokenPaywallViewController: UICollectionViewDelegate, UICollectionView
         
         let item = model.tokenPurchaseManager.productsApphud[indexPath.row]
         
-        let tokens: Int = (Int(item.skProduct?.localizedTitle ?? "100") ?? 0) * 10
+      
         
         let amountLabel = UILabel()
         amountLabel.font = .appFont(.BodyEmphasized)
         amountLabel.textColor = .white
-        amountLabel.text = "\(tokens)"
+        amountLabel.text = item.skProduct?.localizedTitle ?? "100"
         cell.addSubview(amountLabel)
         amountLabel.snp.makeConstraints { make in
             make.left.equalToSuperview().inset(15)

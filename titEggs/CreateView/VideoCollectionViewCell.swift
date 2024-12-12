@@ -8,18 +8,12 @@
 import UIKit
 import AVFoundation
 import SnapKit
+import GSPlayer
 
 class VideoCollectionViewCell: UICollectionViewCell {
-    private var player: AVPlayer?
-    private var playerLayer: AVPlayerLayer?
+    private var player = VideoPlayerView()
     
-    // Контейнер для видео
-    let videoContainerView: UIView = {
-        let view = UIView()
-        view.clipsToBounds = true
-        view.layer.cornerRadius = 10
-        return view
-    }()
+
     
     // Метка
     let titleLabel: UILabel = {
@@ -32,9 +26,12 @@ class VideoCollectionViewCell: UICollectionViewCell {
     override init(frame: CGRect) {
         super.init(frame: frame)
         
+        player.clipsToBounds = true
+        player.layer.cornerRadius = 10
+        
         // Добавляем контейнер видео в ячейку
-        addSubview(videoContainerView)
-        videoContainerView.snp.makeConstraints { make in
+        addSubview(player)
+        player.snp.makeConstraints { make in
             make.left.right.top.equalToSuperview().inset(10)
             make.height.equalTo(128)
         }
@@ -51,36 +48,22 @@ class VideoCollectionViewCell: UICollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
 
-    func configure(with videoURL: URL, title: String) {
+    func configure(with videoURL: URL?, title: String) {
         titleLabel.text = title
         
-        // Удаляем предыдущий слой, если он существует
-        playerLayer?.removeFromSuperlayer()
-        
-        // Создаем AVPlayer для видео
-        player = AVPlayer(url: videoURL)
-        player?.isMuted = true
 
-        playerLayer = AVPlayerLayer(player: player)
-        playerLayer?.videoGravity = .resizeAspectFill
-        videoContainerView.layer.addSublayer(playerLayer!)
-
-        layoutIfNeeded()
-        playerLayer?.frame = videoContainerView.bounds
-
-        NotificationCenter.default.addObserver(forName: .AVPlayerItemDidPlayToEndTime, object: player?.currentItem, queue: .main) { [weak self] _ in
-            self?.player?.seek(to: .zero)
-            self?.player?.play()
+        if videoURL != nil {
+            player.play(for: videoURL!)
+            player.isMuted = true
         }
-        
-        player?.play()
+
     }
 
     
     override func prepareForReuse() {
         super.prepareForReuse()
-        player?.pause()
-        playerLayer?.removeFromSuperlayer()
+        player.pause(reason: .userInteraction)
+        player.removeFromSuperview()
     }
 }
 

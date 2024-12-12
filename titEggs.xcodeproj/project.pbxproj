@@ -80,6 +80,7 @@
 		15E627AE2CE3C61E00A2C10C /* Cake-ify_it1.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 15E627AD2CE3C61E00A2C10C /* Cake-ify_it1.mp4 */; };
 		15E9367D2CE4B4BA007B963B /* PreviewEffectViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15E9367C2CE4B4BA007B963B /* PreviewEffectViewController.swift */; };
 		15E9367F2CE762B5007B963B /* onbVideo3.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 15E9367E2CE762B5007B963B /* onbVideo3.mp4 */; };
+		15E976DE2D0B020E00EFAF1D /* GSPlayer in Frameworks */ = {isa = PBXBuildFile; productRef = 15E976DD2D0B020E00EFAF1D /* GSPlayer */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -159,6 +160,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				15E976DE2D0B020E00EFAF1D /* GSPlayer in Frameworks */,
 				15E6276E2CE3713300A2C10C /* FirebaseAnalytics in Frameworks */,
 				159C01F92CECA3BE009DEEE8 /* FacebookLogin in Frameworks */,
 				159C01FB2CECAA26009DEEE8 /* FacebookShare in Frameworks */,
@@ -348,9 +350,10 @@
 		15D0BFAD2CD8F6CD0011227E /* titEggs */ = {
 			isa = PBXGroup;
 			children = (
-				15AEF2822D0765B500156891 /* TokenPaywall */,
 				15D2857E2CF4C3A900998395 /* titEggs.entitlements */,
+				15D0BFBC2CD8F6CF0011227E /* Info.plist */,
 				15E627782CE374DF00A2C10C /* GoogleService-Info.plist */,
+				15AEF2822D0765B500156891 /* TokenPaywall */,
 				15542B1D2CDCF4B30045598C /* FullVideo */,
 				152C78852CDCCBEC00A2A977 /* MainModel */,
 				152C78722CDB7D6600A2A977 /* MyVideos */,
@@ -363,7 +366,6 @@
 				15D0BFC62CD8F9620011227E /* Extensions */,
 				15D0BFC32CD8F77B0011227E /* TabBar */,
 				15D0BFC22CD8F76B0011227E /* Other */,
-				15D0BFBC2CD8F6CF0011227E /* Info.plist */,
 			);
 			path = titEggs;
 			sourceTree = "<group>";
@@ -466,6 +468,7 @@
 				15D285A92CF4C8FA00998395 /* OneSignalFramework */,
 				15D285AB2CF4C8FA00998395 /* OneSignalInAppMessages */,
 				15D285AD2CF4C8FA00998395 /* OneSignalLocation */,
+				15E976DD2D0B020E00EFAF1D /* GSPlayer */,
 			);
 			productName = titEggs;
 			productReference = 15D0BFAB2CD8F6CD0011227E /* titEggs.app */;
@@ -505,6 +508,7 @@
 				15E6276C2CE3713300A2C10C /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
 				159C01EF2CECA3BE009DEEE8 /* XCRemoteSwiftPackageReference "facebook-ios-sdk" */,
 				15D2858F2CF4C75000998395 /* XCRemoteSwiftPackageReference "OneSignal-XCFramework" */,
+				15E976DC2D0B020E00EFAF1D /* XCRemoteSwiftPackageReference "GSPlayer" */,
 			);
 			productRefGroup = 15D0BFAC2CD8F6CD0011227E /* Products */;
 			projectDirPath = "";
@@ -778,7 +782,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.10;
+				MARKETING_VERSION = 1.11;
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_BUNDLE_IDENTIFIER = com.agh.p1i1ka;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -818,7 +822,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.10;
+				MARKETING_VERSION = 1.11;
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_BUNDLE_IDENTIFIER = com.agh.p1i1ka;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -926,6 +930,14 @@
 			requirement = {
 				kind = upToNextMajorVersion;
 				minimumVersion = 11.4.0;
+			};
+		};
+		15E976DC2D0B020E00EFAF1D /* XCRemoteSwiftPackageReference "GSPlayer" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/wxxsw/GSPlayer";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.2.28;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
@@ -1040,6 +1052,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 15E6276C2CE3713300A2C10C /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
 			productName = FirebaseCrashlytics;
+		};
+		15E976DD2D0B020E00EFAF1D /* GSPlayer */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 15E976DC2D0B020E00EFAF1D /* XCRemoteSwiftPackageReference "GSPlayer" */;
+			productName = GSPlayer;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

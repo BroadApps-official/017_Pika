@@ -77,7 +77,10 @@ class SettingsViewController: UIViewController {
         setupUI()
         subscribe()
         colelction.reloadData()
+        //openPaywallToken()
     }
+    
+    
 
     private func subscribe() {
         buyPublisher
