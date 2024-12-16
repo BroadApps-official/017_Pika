@@ -308,13 +308,11 @@ class TokenPaywallViewController: UIViewController {
                         let tokens: Int = Int(productToPurchase.skProduct?.localizedTitle ?? "100") ?? 0
                         print(tokens)
                         
-                        if dynamicAppHud?.segment == "v2" {
-                            self.model.tokenPurchaseManager.buyTokens(gen: tokens / 10) {
-                                self.dismiss(animated: true)
-                                self.closePaywall.isEnabled = true
-                                UIView.animate(withDuration: 0.3) {
-                                    self.activity.alpha = 0
-                                }
+                        self.model.tokenPurchaseManager.buyTokens(gen: tokens / 10) {
+                            self.dismiss(animated: true)
+                            self.closePaywall.isEnabled = true
+                            UIView.animate(withDuration: 0.3) {
+                                self.activity.alpha = 0
                             }
                         }
                     } else {

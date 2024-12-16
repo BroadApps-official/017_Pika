@@ -1,8 +1,8 @@
 //
-//  PaywallViewController.swift
+//  AllPaywallViewController.swift
 //  titEggs
 //
-//  Created by Владимир Кацап on 04.11.2024.
+//  Created by Владимир Кацап on 16.12.2024.
 //
 
 import UIKit
@@ -13,14 +13,26 @@ import AVFoundation
 import AVKit
 import FacebookCore
 
-
-class PaywallViewController: UIViewController {
+class AllPaywallViewController: UIViewController {
     
-    private var timer: Timer?
+    private let manager:PurchaseManager
+    private lazy var products: [ApphudProduct] = []
+    
+    init(manager: PurchaseManager) {
+        self.manager = manager
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    private lazy var selectedSubscribe = 0
+    var topStackView: UIStackView?
     
     private let topLabel: UILabel = {
         let label = UILabel()
-        label.text = "Unreal videos with\nPRO"
+        label.text = "Unlock Pika Premium"
         label.font = .appFont(.Title1Emphasized)
         label.textColor = .white
         label.textAlignment = .center
@@ -32,15 +44,24 @@ class PaywallViewController: UIViewController {
     private lazy var termsButton = createMiniButtons(title: "Terms of Use", color: .white.withAlphaComponent(0.4), font: .appFont(.Caption2Regular), isACancelAnytime: false)
     private lazy var restoreButton = createMiniButtons(title: "Restore Purchases", color: .white.withAlphaComponent(0.6), font: .appFont(.Caption1Regular), isACancelAnytime: false)
     
+    private lazy var activity: UIActivityIndicatorView = {
+        let view = UIActivityIndicatorView(style: .large)
+        view.color = .primary
+        view.backgroundColor = .black.withAlphaComponent(0.4)
+        view.layer.cornerRadius = 16
+        return view
+    }()
     
-    private lazy var continueButton = CreateElements.createPrimaryButton(title: "Continue")
-    private lazy var cancelAnytimeButton = createMiniButtons(title: "Cancel Anytime", color: .white.withAlphaComponent(0.4), font: .appFont(.Caption1Regular), isACancelAnytime: true)
-    
-    
-//    private lazy var annualButton = createSubscribeButtons(type: true, selected: true)
-//    private lazy var weeklyButton = createSubscribeButtons(type: false, selected: false)
-    private lazy var selectedSubscribe = 0
-    var topStackView: UIStackView?
+    private lazy var numberGenButton: UIButton = {
+        let button = UIButton()
+        button.layer.cornerRadius = 8
+        button.backgroundColor = .white.withAlphaComponent(0.08)
+        button.titleLabel?.font = .appFont(.Caption1Emphasized)
+        button.setTitleColor(.white, for: .normal)
+        button.contentEdgeInsets = UIEdgeInsets(top: 0, left: 10, bottom: 0, right: 10)
+        button.setTitle("100", for: .normal)
+        return button
+    }()
     
     private lazy var collection: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
@@ -54,59 +75,20 @@ class PaywallViewController: UIViewController {
         return collection
     }()
     
+    private lazy var cancelAnytimeButton = createMiniButtons(title: "Cancel Anytime", color: .white.withAlphaComponent(0.4), font: .appFont(.Caption1Regular), isACancelAnytime: true)
+    
     private lazy var progressView: UIActivityIndicatorView = {
         let view = UIActivityIndicatorView(style: .medium)
         view.color = .primary
         return view
     }()
     
-    
-    private lazy var closePaywall: UIButton = {
-        let button = UIButton(type: .system)
-        button.setBackgroundImage(.closePaywall, for: .normal)
-        button.alpha = 0
-        return button
-    }()
-    
-    private lazy var activity: UIActivityIndicatorView = {
-        let view = UIActivityIndicatorView(style: .large)
-        view.color = .primary
-        view.backgroundColor = .black.withAlphaComponent(0.4)
-        view.layer.cornerRadius = 16
-        return view
-    }()
-    private lazy var shadowImageView = UIImageView(image: .shadowPaywall)
-    private lazy var numberGenButton: UIButton = {
-        let button = UIButton()
-        button.layer.cornerRadius = 8
-        button.backgroundColor = .white.withAlphaComponent(0.08)
-        button.titleLabel?.font = .appFont(.Caption1Emphasized)
-        button.setTitleColor(.white, for: .normal)
-        button.contentEdgeInsets = UIEdgeInsets(top: 0, left: 10, bottom: 0, right: 10)
-        button.setTitle("100", for: .normal)
-        return button
-    }()
-    
-    //MARK: -Store
-    private let manager:PurchaseManager
-    private lazy var products: [ApphudProduct] = []
-    
-    
-    init(manager: PurchaseManager) {
-        self.manager = manager
-        super.init(nibName: nil, bundle: nil)
-    }
-    
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
+    private lazy var continueButton = CreateElements.createPrimaryButton(title: "Continue")
     
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .bgPrimary
         setupUI()
-        setupTimer()
         someMethod()
     }
     
@@ -120,11 +102,10 @@ class PaywallViewController: UIViewController {
         await loadProducts()
     }
     
-    
     private func loadProducts() async {
         // Ожидаем, пока массив products будет содержать 2 элемента
         while manager.productsApphud.count < 1 {
-            await Task.sleep(500_000_000) 
+            await Task.sleep(500_000_000)
         }
 
         // Когда продуктов достаточно, выполняем нужный код
@@ -138,16 +119,6 @@ class PaywallViewController: UIViewController {
             make.bottom.equalTo(cancelAnytimeButton.snp.top).inset(-20)
             make.height.equalTo(products.count * 60)
         }
-        shadowImageView.snp.remakeConstraints { make in
-            make.left.bottom.right.equalToSuperview()
-            if products.count == 2 {
-                make.height.equalTo(view.snp.height).multipliedBy(4 / 5.0)
-            } else {
-                make.height.equalTo(view.snp.height).multipliedBy(4.5 / 5.0)
-            }
-            make.height.lessThanOrEqualTo(600)
-        }
-        
         UIView.animate(withDuration: 0.3) {
             let time = self.returnType(product: self.products[0])
             
@@ -168,101 +139,45 @@ class PaywallViewController: UIViewController {
         }
     }
 
-
-    
-    private func setupTimer() {
-        timer = Timer.scheduledTimer(withTimeInterval: 2, repeats: false, block: { _ in
-            UIView.animate(withDuration: 0.3) {
-                self.closePaywall.alpha = 1
-            }
-            self.timer?.invalidate()
-        })
-    }
-    
     
     private func setupUI() {
+        view.addSubview(policyButton)
+        policyButton.snp.makeConstraints { make in
+            make.left.equalToSuperview().inset(15)
+            make.bottom.equalTo(view.safeAreaLayoutGuide.snp.bottom)
+        }
         
-        // Проверка наличия видеофайла
-        guard let path = Bundle.main.path(forResource: "Paywall", ofType: "mp4") else {
-            print("Video not found")
-            return
+        view.addSubview(restoreButton)
+        restoreButton.snp.makeConstraints { make in
+            make.bottom.equalTo(view.safeAreaLayoutGuide.snp.bottom)
+            make.centerX.equalToSuperview()
         }
-
-        let player = AVPlayer(url: URL(fileURLWithPath: path))
-        player.isMuted = true
-
-        // Создаем контейнер для видео
-        let videoContainerView = UIView()
-        videoContainerView.clipsToBounds = false
-        view.addSubview(videoContainerView)
-        videoContainerView.snp.makeConstraints { make in
-            make.left.right.equalToSuperview()
-            make.top.equalToSuperview()
-            make.height.equalTo(487)
-        }
-
-        // Создаем AVPlayerLayer и добавляем его в videoContainerView
-        let playerLayer = AVPlayerLayer(player: player)
-        playerLayer.videoGravity = .resizeAspectFill
-        videoContainerView.layer.addSublayer(playerLayer)
-
-        // Обновляем размер слоя после применения ограничений
-        view.layoutIfNeeded()
-        playerLayer.frame = videoContainerView.bounds
-
-        // Добавляем зацикливание видео
-        NotificationCenter.default.addObserver(forName: .AVPlayerItemDidPlayToEndTime, object: player.currentItem, queue: .main) { _ in
-            player.seek(to: .zero)
-            player.play()
-        }
-
-        // Запускаем воспроизведение
-        player.play()
-
-        // Создаем изображение тени и добавляем поверх видео
         
-        shadowImageView.clipsToBounds = false
-        view.addSubview(shadowImageView)
-        view.bringSubviewToFront(shadowImageView) // Убедитесь, что тень на переднем плане
-        shadowImageView.snp.makeConstraints { make in
-            make.left.bottom.right.equalToSuperview()
-            make.height.equalTo(view.snp.height).multipliedBy(3.8 / 5.0)
-            make.height.lessThanOrEqualTo(600)
+        view.addSubview(termsButton)
+        termsButton.snp.makeConstraints { make in
+            make.right.equalToSuperview().inset(15)
+            make.bottom.equalTo(view.safeAreaLayoutGuide.snp.bottom)
         }
-
-        view.layoutIfNeeded()
-
+        
         policyButton.addTarget(self, action: #selector(openPolicy), for: .touchUpInside)
         termsButton.addTarget(self, action: #selector(openTerms), for: .touchUpInside)
         restoreButton.addTarget(self, action: #selector(restore), for: .touchUpInside)
         
-        let stackViewBot = UIStackView(arrangedSubviews: [policyButton, restoreButton, termsButton])
-        stackViewBot.backgroundColor = .clear
-        stackViewBot.axis = .horizontal
-        stackViewBot.distribution = .equalSpacing
-        stackViewBot.spacing = 10
-        view.addSubview(stackViewBot)
-        stackViewBot.snp.makeConstraints { make in
-            make.left.right.equalToSuperview().inset(15)
-            make.bottom.equalTo(view.safeAreaLayoutGuide.snp.bottom).inset(10)
-        }
-        
         view.addSubview(continueButton)
+        continueButton.addTarget(self, action: #selector(createPurchase), for: .touchUpInside)
         continueButton.isEnabled = false
         continueButton.snp.makeConstraints { make in
             make.left.right.equalToSuperview().inset(15)
             make.height.equalTo(48)
-            make.bottom.equalTo(stackViewBot.snp.top).inset(-10)
+            make.bottom.equalTo(restoreButton.snp.top).inset(-15)
         }
-        continueButton.addTarget(self, action: #selector(createPurchase), for: .touchUpInside)
         
         cancelAnytimeButton.isUserInteractionEnabled = false
         view.addSubview(cancelAnytimeButton)
         cancelAnytimeButton.snp.makeConstraints { make in
             make.centerX.equalToSuperview()
-            make.bottom.equalTo(continueButton.snp.top).inset(-10)
+            make.bottom.equalTo(continueButton.snp.top).inset(-15)
         }
-        
         
         view.addSubview(progressView)
         progressView.startAnimating()
@@ -270,7 +185,6 @@ class PaywallViewController: UIViewController {
             make.height.equalTo(120)
             make.left.right.equalToSuperview().inset(15)
             make.bottom.equalTo(cancelAnytimeButton.snp.top).inset(-20)
-           
         }
         
         
@@ -281,6 +195,14 @@ class PaywallViewController: UIViewController {
             make.height.equalTo(products.count == 0 ? 120 : products.count * 60)
         }
         
+        
+        view.addSubview(activity)
+        activity.stopAnimating()
+        activity.snp.makeConstraints { make in
+            make.height.width.equalTo(60)
+            make.center.equalToSuperview()
+        }
+        activity.center = view.center
         
         topStackView = UIStackView(arrangedSubviews: [createTextGalc(text: "Full Access"), createTextGalc(text: "Share unique videos"), createTextGalc(text: "Quick generation")])
         
@@ -302,29 +224,11 @@ class PaywallViewController: UIViewController {
             make.centerX.equalToSuperview()
             make.bottom.equalTo(topStackView!.snp.top).inset(-10)
         }
-        
-        view.addSubview(closePaywall)
-        closePaywall.addTarget(self, action: #selector(close), for: .touchUpInside)
-        closePaywall.snp.makeConstraints { make in
-            make.height.equalTo(44)
-            make.width.equalTo(39)
-            make.right.equalToSuperview()
-            make.top.equalTo(view.safeAreaLayoutGuide.snp.top)
-        }
-        
-        view.addSubview(activity)
-        activity.startAnimating()
-        activity.alpha = 0 
-        activity.snp.makeConstraints { make in
-            make.height.width.equalTo(60)
-            make.center.equalToSuperview()
-        }
-        activity.center = view.center
     }
     
     @objc private func createPurchase() {
         UIView.animate(withDuration: 0.3) {
-            self.activity.alpha = 1
+            self.activity.startAnimating()
         }
         Task {
             do {
@@ -349,17 +253,46 @@ class PaywallViewController: UIViewController {
                     }
                     
                     UIView.animate(withDuration: 0.3) {
-                        self.activity.alpha = 0
+                        self.activity.stopAnimating()
                     }
                     
                 }
             }
         }
     }
-
     
-    @objc private func close() {
-        self.dismiss(animated: true)
+    @objc private func selectPlan(index: Int) {
+       selectedSubscribe = index
+        
+        collection.reloadData()
+    }
+    
+
+    private func createMiniButtons(title: String, color: UIColor, font: UIFont, isACancelAnytime: Bool) -> UIButton {
+        let button = UIButton(type: .system)
+        button.backgroundColor = .clear
+        button.setTitle(title, for: .normal)
+        button.titleLabel?.font = font
+        button.setTitleColor(color, for: .normal)
+        if isACancelAnytime {
+            button.setImage(.cancelAnyTimeIco.withRenderingMode(.alwaysTemplate).resize(targetSize: CGSize(width: 24, height: 24)), for: .normal)
+            button.tintColor = color
+        }
+        return button
+    }
+    
+    private func returnType(product: ApphudProduct) -> String {
+        guard let subscriptionPeriod = product.skProduct?.subscriptionPeriod else {
+            return ""
+        }
+
+        switch subscriptionPeriod.unit {
+        case .day: return "per week"
+        case .week: return "per week"
+        case .month: return "per month"
+        case .year: return "per year"
+        @unknown default: return "Unknown"
+        }
     }
     
     @objc private func openPolicy() {
@@ -376,7 +309,7 @@ class PaywallViewController: UIViewController {
     
     @objc private func restore() {
         UIView.animate(withDuration: 0.3) {
-            self.activity.alpha = 1
+            self.activity.startAnimating()
         }
             
         manager.restorePurchase { result in
@@ -385,86 +318,10 @@ class PaywallViewController: UIViewController {
             }
             
             UIView.animate(withDuration: 0.3) {
-                self.activity.alpha = 0
+                self.activity.stopAnimating()
             }
             
         }
-    }
-
-    
-    
-    private func createMiniButtons(title: String, color: UIColor, font: UIFont, isACancelAnytime: Bool) -> UIButton {
-        let button = UIButton(type: .system)
-        button.backgroundColor = .clear
-        button.setTitle(title, for: .normal)
-        button.titleLabel?.font = font
-        button.setTitleColor(color, for: .normal)
-        if isACancelAnytime {
-            button.setImage(.cancelAnyTimeIco.withRenderingMode(.alwaysTemplate).resize(targetSize: CGSize(width: 24, height: 24)), for: .normal)
-            button.tintColor = color
-        }
-        return button
-    }
-    
-
-    
-    @objc private func selectPlan(index: Int) {
-       selectedSubscribe = index
-        
-        collection.reloadData()
-    }
-    
-    private func returnName(product: ApphudProduct) -> String {
-        guard let subscriptionPeriod = product.skProduct?.subscriptionPeriod else {
-            return ""
-        }
-
-        switch subscriptionPeriod.unit {
-        case .day: return "Weekly"
-        case .week: return "Weekly"
-        case .month: return "Monthly"
-        case .year: return "Yearly"
-        @unknown default: return "Unknown"
-        }
-    }
-    
-    private func returnType(product: ApphudProduct) -> String {
-        guard let subscriptionPeriod = product.skProduct?.subscriptionPeriod else {
-            return ""
-        }
-
-        switch subscriptionPeriod.unit {
-        case .day: return "per week"
-        case .week: return "per week"
-        case .month: return "per month"
-        case .year: return "per year"
-        @unknown default: return "Unknown"
-        }
-    }
-
-
-    
-    @objc private func buttonTouchDown(_ sender: UIButton) {
-        sender.alpha = 0.7
-    }
-    
-    @objc private func buttonTouchUp(_ sender: UIButton) {
-        sender.alpha = 1
-    }
-    
-    private func createSaleView() -> UIView {
-        let view = UIView()
-        view.backgroundColor = .primary
-        view.layer.cornerRadius = 4
-        let label = UILabel()
-        label.text = "SAVE 80%"
-        label.font = .appFont(.Caption2Emphasized)
-        label.textColor = .black
-        view.addSubview(label)
-        label.snp.makeConstraints { make in
-            make.center.equalToSuperview()
-        }
-        return view
     }
     
     private func createTextGalc(text: String) -> UIView {
@@ -500,9 +357,38 @@ class PaywallViewController: UIViewController {
         return view
     }
     
+    private func returnName(product: ApphudProduct) -> String {
+        guard let subscriptionPeriod = product.skProduct?.subscriptionPeriod else {
+            return ""
+        }
+
+        switch subscriptionPeriod.unit {
+        case .day: return "Weekly"
+        case .week: return "Weekly"
+        case .month: return "Monthly"
+        case .year: return "Yearly"
+        @unknown default: return "Unknown"
+        }
+    }
+    
+    private func createSaleView() -> UIView {
+        let view = UIView()
+        view.backgroundColor = .primary
+        view.layer.cornerRadius = 4
+        let label = UILabel()
+        label.text = "SAVE 80%"
+        label.font = .appFont(.Caption2Emphasized)
+        label.textColor = .black
+        view.addSubview(label)
+        label.snp.makeConstraints { make in
+            make.center.equalToSuperview()
+        }
+        return view
+    }
+
 }
 
-extension PaywallViewController: UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
+extension AllPaywallViewController: UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return products.count
     }

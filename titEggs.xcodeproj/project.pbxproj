@@ -25,6 +25,8 @@
 		152C78812CDCCAFD00A2A977 /* NetWorking.swift in Sources */ = {isa = PBXBuildFile; fileRef = 152C78802CDCCAFD00A2A977 /* NetWorking.swift */; };
 		152C78842CDCCB1400A2A977 /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = 152C78832CDCCB1400A2A977 /* Alamofire */; };
 		152C78872CDCCC3900A2A977 /* DataModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 152C78862CDCCC3900A2A977 /* DataModel.swift */; };
+		154DDA1E2D106E9F0048495D /* NewPaywallViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 154DDA1D2D106E9F0048495D /* NewPaywallViewController.swift */; };
+		154DDA212D107B4E0048495D /* AllPaywallViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 154DDA202D107B4E0048495D /* AllPaywallViewController.swift */; };
 		15542B192CDCEFFB0045598C /* GenerateVideoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15542B182CDCEFFB0045598C /* GenerateVideoViewController.swift */; };
 		15542B1C2CDCF3D20045598C /* Lottie in Frameworks */ = {isa = PBXBuildFile; productRef = 15542B1B2CDCF3D20045598C /* Lottie */; };
 		15542B1F2CDCF4C80045598C /* OpenedViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15542B1E2CDCF4C80045598C /* OpenedViewController.swift */; };
@@ -113,6 +115,8 @@
 		152C78772CDB887E00A2A977 /* MainModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainModel.swift; sourceTree = "<group>"; };
 		152C78802CDCCAFD00A2A977 /* NetWorking.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetWorking.swift; sourceTree = "<group>"; };
 		152C78862CDCCC3900A2A977 /* DataModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataModel.swift; sourceTree = "<group>"; };
+		154DDA1D2D106E9F0048495D /* NewPaywallViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewPaywallViewController.swift; sourceTree = "<group>"; };
+		154DDA202D107B4E0048495D /* AllPaywallViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AllPaywallViewController.swift; sourceTree = "<group>"; };
 		15542B182CDCEFFB0045598C /* GenerateVideoViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GenerateVideoViewController.swift; sourceTree = "<group>"; };
 		15542B1E2CDCF4C80045598C /* OpenedViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenedViewController.swift; sourceTree = "<group>"; };
 		15542B212CDCFB390045598C /* Generate.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = Generate.json; sourceTree = "<group>"; };
@@ -221,6 +225,7 @@
 		152C78612CD95E8500A2A977 /* Paywall */ = {
 			isa = PBXGroup;
 			children = (
+				154DDA1F2D107B240048495D /* v2Paywall */,
 				152C78622CD95E9B00A2A977 /* PaywallViewController.swift */,
 				152C786A2CDA365100A2A977 /* PaywallButton.swift */,
 			);
@@ -259,6 +264,15 @@
 				152C78862CDCCC3900A2A977 /* DataModel.swift */,
 			);
 			path = MainModel;
+			sourceTree = "<group>";
+		};
+		154DDA1F2D107B240048495D /* v2Paywall */ = {
+			isa = PBXGroup;
+			children = (
+				154DDA1D2D106E9F0048495D /* NewPaywallViewController.swift */,
+				154DDA202D107B4E0048495D /* AllPaywallViewController.swift */,
+			);
+			path = v2Paywall;
 			sourceTree = "<group>";
 		};
 		15542B172CDCED760045598C /* GenerationVideo */ = {
@@ -590,6 +604,7 @@
 				15542B492CDE2AC40045598C /* VideoCollectionViewCell.swift in Sources */,
 				15AEF2862D076B5700156891 /* TokenManager.swift in Sources */,
 				15AEF2842D0765E300156891 /* TokenPaywallViewController.swift in Sources */,
+				154DDA212D107B4E0048495D /* AllPaywallViewController.swift in Sources */,
 				152C786D2CDA3A8000A2A977 /* CustomLikeViewController.swift in Sources */,
 				152C785E2CD949A900A2A977 /* ModelDataOnb.swift in Sources */,
 				152C785C2CD9469800A2A977 /* CreateElements.swift in Sources */,
@@ -598,6 +613,7 @@
 				15D0BFCA2CD9017A0011227E /* TabBarViewController.swift in Sources */,
 				15542B1F2CDCF4C80045598C /* OpenedViewController.swift in Sources */,
 				152C78742CDB7D7C00A2A977 /* MyVideosViewController.swift in Sources */,
+				154DDA1E2D106E9F0048495D /* NewPaywallViewController.swift in Sources */,
 				15542B192CDCEFFB0045598C /* GenerateVideoViewController.swift in Sources */,
 				152C78602CD9528A00A2A977 /* NotifyOnbViewController.swift in Sources */,
 				152C786B2CDA365100A2A977 /* PaywallButton.swift in Sources */,

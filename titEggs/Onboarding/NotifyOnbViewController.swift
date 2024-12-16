@@ -124,7 +124,21 @@ class NotifyOnbViewController: UIViewController {
     }
     
     @objc private func paywallButtonTapped() {
-        self.present(CreateElements.openPaywall(manager: paywall ), animated: true)
+        if dynamicAppHud?.segment == "v2" {
+            showNewPaywall()
+        } else {
+            self.present(CreateElements.openPaywall(manager: paywall), animated: true)
+        }
+    }
+    
+    func showNewPaywall() {
+        let paywallViewController = NewPaywallViewController(manager: paywall)
+        paywallViewController.modalPresentationStyle = .fullScreen
+        paywallViewController.modalTransitionStyle = .coverVertical
+        if #available(iOS 13.0, *) {
+            paywallViewController.isModalInPresentation = true
+        }
+        self.present(paywallViewController, animated: true)
     }
     
     private func requestNotificationAuthorization(completion: @escaping () -> Void) {

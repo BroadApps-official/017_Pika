@@ -243,25 +243,37 @@ class PreviewEffectViewController: UIViewController, UIImagePickerControllerDele
     @objc private func nextTapped() {
 
         if purchaseManager.hasUnlockedPro == true {
-            if dynamicAppHud?.segment == "v2" {
-                model.fetchUserInfo { isError in
-                   
-                    if isError == false {
-                        self.openAmountAlert()
-                    } else {
-                        self.cellTapped(index: self.index)
-                    }
+            model.fetchUserInfo { isError in
+                if isError == false {
+                    self.openAmountAlert()
+                } else {
+                    self.cellTapped(index: self.index)
                 }
-               
-            } else {
-                self.cellTapped(index: index)
             }
+           print("idjfoisjfosfsf, \(dynamicAppHud)")
         } else {
-            let vc = CreateElements.openPaywall(manager: purchaseManager)
-            self.present(vc, animated: true)
+            paywallButtonTapped()
             playPauseButton.setBackgroundImage(.bigPlay, for: .normal)
             playerView.pause(reason: .userInteraction)
         }
+    }
+    
+    @objc private func paywallButtonTapped() {
+        if dynamicAppHud?.segment == "v2" {
+            showNewPaywall()
+        } else {
+            self.present(CreateElements.openPaywall(manager: purchaseManager), animated: true)
+        }
+    }
+    
+    func showNewPaywall() {
+        let paywallViewController = NewPaywallViewController(manager: purchaseManager)
+        paywallViewController.modalPresentationStyle = .fullScreen
+        paywallViewController.modalTransitionStyle = .coverVertical
+        if #available(iOS 13.0, *) {
+            paywallViewController.isModalInPresentation = true
+        }
+        self.present(paywallViewController, animated: true)
     }
     
     private func openAmountAlert() {

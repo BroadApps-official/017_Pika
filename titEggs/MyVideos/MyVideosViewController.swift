@@ -127,7 +127,21 @@ class MyVideosViewController: UIViewController {
     }
     
     @objc private func paywallButtonTapped() {
-        self.present(CreateElements.openPaywall(manager: purchaseManager), animated: true)
+        if dynamicAppHud?.segment == "v2" {
+            showNewPaywall()
+        } else {
+            self.present(CreateElements.openPaywall(manager: purchaseManager), animated: true)
+        }
+    }
+    
+    func showNewPaywall() {
+        let paywallViewController = NewPaywallViewController(manager: purchaseManager)
+        paywallViewController.modalPresentationStyle = .fullScreen
+        paywallViewController.modalTransitionStyle = .coverVertical
+        if #available(iOS 13.0, *) {
+            paywallViewController.isModalInPresentation = true
+        }
+        self.present(paywallViewController, animated: true)
     }
     
     private func sheckVideos() {

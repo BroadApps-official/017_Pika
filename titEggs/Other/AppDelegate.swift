@@ -43,6 +43,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         userID = Apphud.userID()
         
+        print(Apphud.userID(), "IDDDDDDDD USER", userID)
+        print(dynamicAppHud?.segment, "segments")
+        
         ApplicationDelegate.shared.application(
             application,
             didFinishLaunchingWithOptions: launchOptions
@@ -65,7 +68,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                     let items = try JSONDecoder().decode([DynamicSegment].self, from: data)
                     
                     for i in items {
-                        if i.code == "pika_onboarding1" {
+                        if i.code == "pika_pay" {
                             dynamicAppHud = i
                         }
                     }
