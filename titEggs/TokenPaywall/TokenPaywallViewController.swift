@@ -305,15 +305,12 @@ class TokenPaywallViewController: UIViewController {
                         ]
                         AppEvents.shared.logEvent(AppEvents.Name("subscriptionPurchase_completed"), parameters: parameters)
                         
-                        let tokens: Int = Int(productToPurchase.skProduct?.localizedTitle ?? "100") ?? 0
-                        print(tokens)
+                       
                         
-                        self.model.tokenPurchaseManager.buyTokens(gen: tokens / 10) {
-                            self.dismiss(animated: true)
-                            self.closePaywall.isEnabled = true
-                            UIView.animate(withDuration: 0.3) {
-                                self.activity.alpha = 0
-                            }
+                        self.dismiss(animated: true)
+                        self.closePaywall.isEnabled = true
+                        UIView.animate(withDuration: 0.3) {
+                            self.activity.alpha = 0
                         }
                     } else {
                         self.showErrorAlert()
@@ -394,15 +391,7 @@ extension TokenPaywallViewController: UICollectionViewDelegate, UICollectionView
             make.centerY.equalToSuperview()
         }
         
-        let tokensLabel = UILabel()
-        tokensLabel.text = "tokens"
-        tokensLabel.textColor = .white.withAlphaComponent(0.6)
-        tokensLabel.font = .appFont(.BodyRegular)
-        cell.addSubview(tokensLabel)
-        tokensLabel.snp.makeConstraints { make in
-            make.centerY.equalToSuperview()
-            make.left.equalTo(amountLabel.snp.right).inset(-5)
-        }
+        
         
         
         let arrowImageView = UIImageView(image: .rightArrow1.withRenderingMode(.alwaysTemplate))

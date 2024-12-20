@@ -243,6 +243,7 @@ class PreviewEffectViewController: UIViewController, UIImagePickerControllerDele
     @objc private func nextTapped() {
 
         if purchaseManager.hasUnlockedPro == true {
+            //self.openAmountAlert()
             model.fetchUserInfo { isError in
                 if isError == false {
                     self.openAmountAlert()

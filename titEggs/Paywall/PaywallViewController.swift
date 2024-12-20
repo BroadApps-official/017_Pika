@@ -18,6 +18,7 @@ class PaywallViewController: UIViewController {
     
     private var timer: Timer?
     
+    
     private let topLabel: UILabel = {
         let label = UILabel()
         label.text = "Unreal videos with\nPRO"
@@ -341,6 +342,7 @@ class PaywallViewController: UIViewController {
                         if self.numberGenButton.titleLabel?.text == "10" {
                             UserDefaults.standard.setValue("100", forKey: "amountTokens")
                             UserDefaults.standard.setValue("100", forKey: "alltokens")
+                            
                         } else {
                             UserDefaults.standard.setValue("1000", forKey: "amountTokens")
                             UserDefaults.standard.setValue("1000", forKey: "alltokens")

@@ -17,6 +17,7 @@ class PurchaseManager: NSObject {
     let experementName = "wekly_and_motly_test"
     let paywallID = "main" //айди пэйволла //ПОМЕНЯТЬ НА main
     var productsApphud: [ApphudProduct] = [] //массив с продуктами
+    private let networking = NetWorking()
 
     
     override init() {
@@ -44,11 +45,15 @@ class PurchaseManager: NSObject {
             }
             debugPrint(result)
             if let subscription = result.subscription, subscription.isActive() {
-                buyPublisher.send(1) //паблишер, который обновляет показ кнопки PRO на контроллерах. В его теле идет вызов hasUnlockedPro
-                escaping(true)
+                self.fetchUserInfo { _ in
+                    buyPublisher.send(1)
+                    escaping(true)
+                }
             } else if let purchase = result.nonRenewingPurchase, purchase.isActive() {
-                buyPublisher.send(1)
-                escaping(true)
+                self.fetchUserInfo { _ in
+                    buyPublisher.send(1)
+                    escaping(true)
+                }
             } else {
                 if Apphud.hasActiveSubscription() {
                     buyPublisher.send(1)
@@ -105,6 +110,19 @@ class PurchaseManager: NSObject {
         
        
     }
+    
+    func fetchUserInfo(escaping: @escaping(Bool) -> Void) {
+        networking.fetchUserInfo { isError, weekgen  in
+            UserDefaults.standard.setValue("\(weekgen * 10)", forKey: "amountTokens")
+            if weekgen == 0 {
+                escaping(false)
+            } else {
+                escaping(true)
+            }
+        }
+    }
+    
+    
     
     
   

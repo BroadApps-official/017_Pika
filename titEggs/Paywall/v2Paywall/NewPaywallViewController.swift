@@ -298,6 +298,7 @@ class NewPaywallViewController: UIViewController {
                         
                         UserDefaults.standard.setValue("1000", forKey: "amountTokens")
                         UserDefaults.standard.setValue("1000", forKey: "alltokens")
+                        
                         self.dismiss(animated: true)
                     }
                     

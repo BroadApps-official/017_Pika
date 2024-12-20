@@ -203,7 +203,7 @@ class NetWorking {
             switch response.result {
             case .success(let data):
                 do {
-                    // Декодируем ответ
+                    // Декодируем
                     let userInfo = try JSONDecoder().decode(UserInfoResponse.self, from: data)
                     let availableGenerations = userInfo.data.availableGenerations
                     print("Available Generations:", availableGenerations)

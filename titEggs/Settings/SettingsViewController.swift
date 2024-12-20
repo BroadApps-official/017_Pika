@@ -591,7 +591,7 @@ extension SettingsViewController: UICollectionViewDelegate, UICollectionViewData
             }
         }
         
-        if indexPath.row == 0 && UserDefaults.standard.object(forKey: "alltokens") != nil {
+        if indexPath.row == 0  {
             let view = UIView()
             view.backgroundColor = .bgTeriary
             view.layer.cornerRadius = 10
@@ -645,7 +645,7 @@ extension SettingsViewController: UICollectionViewDelegate, UICollectionViewData
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         if indexPath.row == 0  {
-            return CGSize(width: collectionView.bounds.width, height: UserDefaults.standard.object(forKey: "alltokens") != nil ? 60 : 0)
+            return CGSize(width: collectionView.bounds.width, height: 60)
         } else {
             return CGSize(width: collectionView.bounds.width, height: indexPath.row == 4 ? 206 : 112)
         }

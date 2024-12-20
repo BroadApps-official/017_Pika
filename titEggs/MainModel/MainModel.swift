@@ -27,8 +27,14 @@ class MainModel {
     var errorPublisher = PassthroughSubject<(Bool, String), Never>()
     var videoDownloadedPublisher = PassthroughSubject<String, Never>()
     
+    private var timer: Timer?
+    
     init() {
+        startFetchingUserRepeat()
         checkStatus()
+        fetchUserInfo { _ in
+            print(1)
+        }
     }
     
     
@@ -245,6 +251,33 @@ class MainModel {
             }
         }
     }
+    
+    func startFetchingUserRepeat() {
+        // Останавливаем предыдущий таймер, если он был запущен
+        stopFetchingUserRepeat()
+        
+        // Создаем новый таймер
+        timer = Timer.scheduledTimer(withTimeInterval: 30.0, repeats: true) { [weak self] _ in
+            self?.fetchUserRepeat()
+        }
+        
+        // Добавляем таймер в текущий RunLoop
+        RunLoop.current.add(timer!, forMode: .common)
+    }
+    
+    func stopFetchingUserRepeat() {
+        timer?.invalidate()
+        timer = nil
+    }
+    
+    private func fetchUserRepeat() {
+        // Вызов метода
+        netWorking.fetchUserInfo { isOK, tokens in
+            UserDefaults.standard.setValue("\(tokens * 10)", forKey: "amountTokens")
+            print(tokens * 10, "TOFOMVVVV")
+        }
+    }
+    
 }
 
 
