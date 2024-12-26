@@ -352,7 +352,7 @@ extension CreateViewController: UICollectionViewDelegate, UICollectionViewDataSo
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         print(indexPath.row, "243")
         
-        self.navigationController?.pushViewController(PreviewEffectViewController(model: model, index: indexPath.row, purchaseManager: purchaseManager, publisher: publisher), animated: true)
+        self.navigationController?.pushViewController(PreviewEffectViewController(model: model, index: indexPath.row, purchaseManager: purchaseManager, publisher: publisher, ai: model.effectsArr[indexPath.row].ai), animated: true)
 
     }
     

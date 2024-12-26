@@ -138,7 +138,7 @@ class NetWorking {
 //                        UserDefaults.standard.setValue("\(amount)", forKey: "amountTokens")
 //                        UserDefaults.standard.synchronize()
 //                    }
-                    escaping(item.data.status, item.data.resultUrl ?? "")
+                    escaping(item.data.status ?? "", item.data.resultUrl ?? "")
                 } catch {
                     print("Ошибка декодирования JSON:", error.localizedDescription)
                     escaping("fail", "fail")

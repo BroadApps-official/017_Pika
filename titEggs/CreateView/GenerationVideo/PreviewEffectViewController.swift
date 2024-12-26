@@ -15,6 +15,7 @@ class PreviewEffectViewController: UIViewController, UIImagePickerControllerDele
     let model: MainModel
     let index: Int
     let purchaseManager: PurchaseManager
+    let ai: String
 
     
     private let playerView = VideoPlayerView()
@@ -33,11 +34,12 @@ class PreviewEffectViewController: UIViewController, UIImagePickerControllerDele
         return view
     }()
     
-    init(model: MainModel, index: Int, purchaseManager: PurchaseManager, publisher: PassthroughSubject<Bool, Never>) {
+    init(model: MainModel, index: Int, purchaseManager: PurchaseManager, publisher: PassthroughSubject<Bool, Never>, ai: String) {
         self.model = model
         self.index = index
         self.purchaseManager = purchaseManager
         self.publisher = publisher
+        self.ai = ai
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -259,6 +261,25 @@ class PreviewEffectViewController: UIViewController, UIImagePickerControllerDele
         }
     }
     
+    func resizeImagePixelVerse(image: UIImage, maxWidth: CGFloat, maxHeight: CGFloat) -> UIImage {
+        let originalWidth = image.size.width
+        let originalHeight = image.size.height
+        
+        let widthRatio = maxWidth / originalWidth
+        let heightRatio = maxHeight / originalHeight
+        
+        let scaleFactor = min(widthRatio, heightRatio)
+        
+        let newSize = CGSize(width: originalWidth * scaleFactor, height: originalHeight * scaleFactor)
+        
+        UIGraphicsBeginImageContextWithOptions(newSize, false, 0.0)
+        image.draw(in: CGRect(origin: .zero, size: newSize))
+        let resizedImage = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsEndImageContext()
+        
+        return resizedImage ?? image
+    }
+    
     @objc private func paywallButtonTapped() {
         if dynamicAppHud?.segment == "v2" {
             showNewPaywall()
@@ -375,7 +396,10 @@ class PreviewEffectViewController: UIViewController, UIImagePickerControllerDele
     }
     
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
-        if let image = info[.originalImage] as? UIImage {
+        if var image = info[.originalImage] as? UIImage {
+            if ai == "pv" {
+                image = resizeImagePixelVerse(image: image, maxWidth: 1900, maxHeight: 1150)
+            }
             if let imageData = image.jpegData(compressionQuality: 1.0) {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
                     self.selectedPhoto(image: imageData)

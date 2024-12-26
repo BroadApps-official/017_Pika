@@ -16,6 +16,7 @@ struct DataEffect: Codable {
 
 struct Effect: Codable {
     var id: Int
+    var ai: String
     var effect: String
     var preview: String? 
     var previewSmall: String?
@@ -70,7 +71,7 @@ struct Status: Codable {
 }
 
 struct StatusData: Codable {
-    let status: String
+    let status: String?
     let error: String?
     let resultUrl: String?
     let progress: Int?

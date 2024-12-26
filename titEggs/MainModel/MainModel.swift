@@ -144,7 +144,7 @@ class MainModel {
                 self.publisherVideo.send(1)
                 print("error load is - " , "\(self.arr[index].id)")
             } else if !(workItem?.isCancelled ?? true) {
-                print("Повторный запрос для индекса \(index) через 5 секунд...")
+                print("Повторный запрос для индекса \(index) через 20 секунд...")
                 self.publisherVideo.send(1)
                 DispatchQueue.global().asyncAfter(deadline: .now() + 20, execute: workItem!)
             }
@@ -190,12 +190,15 @@ class MainModel {
                             print(self.arr[index], "create genID")
                             self.arr[index].generationID = idVideo // Присваиваем полученный generationID
                             self.saveArr()
-                            self.checkStatusForIndex(index: index, workItem: workItem)
+                            
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 20) {
+                                self.checkStatusForIndex(index: index, workItem: workItem)
+                            }
                         }
                     }
                 } else {
                     // Если generationID уже есть, сразу вызываем проверку статуса
-                    DispatchQueue.main.async {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 20) {
                         self.checkStatusForIndex(index: index, workItem: workItem)
                     }
                 }
