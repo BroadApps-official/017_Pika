@@ -48,7 +48,6 @@
 		15542B732CDEBC7B0045598C /* onboardingVideo1.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 15542B6F2CDEBC7A0045598C /* onboardingVideo1.mp4 */; };
 		15542B742CDEBC7B0045598C /* onboardingVideo2.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 15542B702CDEBC7B0045598C /* onboardingVideo2.mp4 */; };
 		15542B752CDEBC7B0045598C /* Paywall.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 15542B712CDEBC7B0045598C /* Paywall.mp4 */; };
-		159C01CE2CEA302A009DEEE8 /* MainConfiguration.storekit in Resources */ = {isa = PBXBuildFile; fileRef = 159C01CD2CEA302A009DEEE8 /* MainConfiguration.storekit */; };
 		159C01D12CEA3106009DEEE8 /* TestSub.storekit in Resources */ = {isa = PBXBuildFile; fileRef = 159C01D02CEA3106009DEEE8 /* TestSub.storekit */; };
 		159C01F12CECA3BE009DEEE8 /* FacebookAEM in Frameworks */ = {isa = PBXBuildFile; productRef = 159C01F02CECA3BE009DEEE8 /* FacebookAEM */; };
 		159C01F32CECA3BE009DEEE8 /* FacebookBasics in Frameworks */ = {isa = PBXBuildFile; productRef = 159C01F22CECA3BE009DEEE8 /* FacebookBasics */; };
@@ -136,7 +135,6 @@
 		15542B6F2CDEBC7A0045598C /* onboardingVideo1.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = onboardingVideo1.mp4; sourceTree = "<group>"; };
 		15542B702CDEBC7B0045598C /* onboardingVideo2.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = onboardingVideo2.mp4; sourceTree = "<group>"; };
 		15542B712CDEBC7B0045598C /* Paywall.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = Paywall.mp4; sourceTree = "<group>"; };
-		159C01CD2CEA302A009DEEE8 /* MainConfiguration.storekit */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = MainConfiguration.storekit; path = ../../Downloads/MainConfiguration.storekit; sourceTree = "<group>"; };
 		159C01D02CEA3106009DEEE8 /* TestSub.storekit */ = {isa = PBXFileReference; lastKnownFileType = text; path = TestSub.storekit; sourceTree = "<group>"; };
 		15AEF2832D0765E300156891 /* TokenPaywallViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TokenPaywallViewController.swift; sourceTree = "<group>"; };
 		15AEF2852D076B5700156891 /* TokenManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TokenManager.swift; sourceTree = "<group>"; };
@@ -345,7 +343,6 @@
 			isa = PBXGroup;
 			children = (
 				159C01D02CEA3106009DEEE8 /* TestSub.storekit */,
-				159C01CD2CEA302A009DEEE8 /* MainConfiguration.storekit */,
 				15D0BFAD2CD8F6CD0011227E /* titEggs */,
 				15D285D42CF4CA9B00998395 /* OneSignalNotificationServiceExtension */,
 				15D0BFAC2CD8F6CD0011227E /* Products */,
@@ -563,7 +560,6 @@
 				15542B6B2CDEBC640045598C /* eye-pop_it1.mp4 in Resources */,
 				15542B652CDEBC640045598C /* Crush_it1.mp4 in Resources */,
 				15542B682CDEBC640045598C /* Ta-da_it1.mp4 in Resources */,
-				159C01CE2CEA302A009DEEE8 /* MainConfiguration.storekit in Resources */,
 				15D0BFB62CD8F6CD0011227E /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -798,7 +794,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.13;
+				MARKETING_VERSION = 2.5;
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_BUNDLE_IDENTIFIER = com.agh.p1i1ka;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -838,7 +834,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.13;
+				MARKETING_VERSION = 2.5;
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_BUNDLE_IDENTIFIER = com.agh.p1i1ka;
 				PRODUCT_NAME = "$(TARGET_NAME)";

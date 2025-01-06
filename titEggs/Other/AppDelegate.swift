@@ -23,10 +23,13 @@ let buyPublisher = PassthroughSubject<Any, Never>()
 var userID = ""
 var dynamicAppHud: DynamicSegment?
 
+var appVersion = "1.15"
+
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+        getAppStoreVersion()
         
         Apphud.start(apiKey: "app_Ya3A7cxvYehiiDp7nq6MARXH8adoTQ")
         Apphud.setDeviceIdentifiers(idfa: nil, idfv: UIDevice.current.identifierForVendor?.uuidString)
@@ -43,14 +46,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         userID = Apphud.userID()
         
-        print(Apphud.userID(), "IDDDDDDDD USER", userID)
-        print(dynamicAppHud?.segment, "segments")
+      //  print(Apphud.userID(), "IDDDDDDDD USER", userID)
+       // print(dynamicAppHud?.segment, "segments")
         
         ApplicationDelegate.shared.application(
             application,
             didFinishLaunchingWithOptions: launchOptions
         )
-
+        
         return true
     }
     
@@ -84,8 +87,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey : Any] = [:]) -> Bool {
         ApplicationDelegate.shared.application( app,open: url,
-            sourceApplication: options[UIApplication.OpenURLOptionsKey.sourceApplication] as? String,
-            annotation: options[UIApplication.OpenURLOptionsKey.annotation]
+                                                sourceApplication: options[UIApplication.OpenURLOptionsKey.sourceApplication] as? String,
+                                                annotation: options[UIApplication.OpenURLOptionsKey.annotation]
         )
     }
     
@@ -100,7 +103,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 case .denied:
                     print("Tracking authorization denied by the user.")
                     Settings.shared.isAdvertiserTrackingEnabled = false
-                   
+                    
                 case .restricted:
                     print("Tracking is restricted (e.g., parental controls).")
                     Settings.shared.isAdvertiserTrackingEnabled = false
@@ -114,6 +117,41 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             }
         }
     }
+    
+    private func getAppStoreVersion() {
+        let appID = "6737900240" // Замените на ваш идентификатор приложения в App Store
+        let urlString = "https://itunes.apple.com/lookup?id=\(appID)"
+        guard let url = URL(string: urlString) else {
+            return
+        }
+        
+        let task = URLSession.shared.dataTask(with: url) { data, response, error in
+            if let error = error {
+                print("Error fetching app store version: \(error)")
+                return
+            }
+            
+            guard let data = data else {
+                return
+            }
+            
+            do {
+                // Парсим данные JSON
+                if let jsonResponse = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any],
+                   let results = jsonResponse["results"] as? [[String: Any]],
+                   let appInfo = results.first,
+                   let version = appInfo["version"] as? String {
+                    appVersion = version
+                    print(version, "sdfgsd")
+                }
+            } catch {
+                print("Error parsing JSON: \(error)")
+            }
+        }
+        
+        task.resume()
+    }
+    
     
     
     // MARK: UISceneSession Lifecycle

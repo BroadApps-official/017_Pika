@@ -44,7 +44,9 @@ class MainModel {
             
             for i in effect {
                 if i.preview != nil && i.previewSmall != nil {
-                    arr.append(i)
+                    var item = i
+                    item.effect = item.title ?? i.effect
+                    arr.append(item)
                 }
             }
             

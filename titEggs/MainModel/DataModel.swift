@@ -16,6 +16,7 @@ struct DataEffect: Codable {
 
 struct Effect: Codable {
     var id: Int
+    var title: String?
     var ai: String
     var effect: String
     var preview: String? 

@@ -1,4 +1,14 @@
 {
+  "appPolicies" : {
+    "eula" : "",
+    "policies" : [
+      {
+        "locale" : "en_US",
+        "policyText" : "",
+        "policyURL" : ""
+      }
+    ]
+  },
   "identifier" : "0968CCFF",
   "nonRenewingSubscriptions" : [
 
@@ -148,7 +158,10 @@
           "recurringSubscriptionPeriod" : "P1W",
           "referenceName" : "Weekly",
           "subscriptionGroupID" : "351BB5AF",
-          "type" : "RecurringSubscription"
+          "type" : "RecurringSubscription",
+          "winbackOffers" : [
+
+          ]
         },
         {
           "adHocOffers" : [
@@ -173,7 +186,10 @@
           "recurringSubscriptionPeriod" : "P1Y",
           "referenceName" : "Yearly",
           "subscriptionGroupID" : "351BB5AF",
-          "type" : "RecurringSubscription"
+          "type" : "RecurringSubscription",
+          "winbackOffers" : [
+
+          ]
         },
         {
           "adHocOffers" : [
@@ -198,7 +214,10 @@
           "recurringSubscriptionPeriod" : "P1M",
           "referenceName" : "monthly_15_notrial",
           "subscriptionGroupID" : "351BB5AF",
-          "type" : "RecurringSubscription"
+          "type" : "RecurringSubscription",
+          "winbackOffers" : [
+
+          ]
         },
         {
           "adHocOffers" : [
@@ -223,7 +242,10 @@
           "recurringSubscriptionPeriod" : "P1Y",
           "referenceName" : "yearly_39.99_nottrial",
           "subscriptionGroupID" : "351BB5AF",
-          "type" : "RecurringSubscription"
+          "type" : "RecurringSubscription",
+          "winbackOffers" : [
+
+          ]
         },
         {
           "adHocOffers" : [
@@ -248,7 +270,10 @@
           "recurringSubscriptionPeriod" : "P1W",
           "referenceName" : "week_5.59_nottrial",
           "subscriptionGroupID" : "351BB5AF",
-          "type" : "RecurringSubscription"
+          "type" : "RecurringSubscription",
+          "winbackOffers" : [
+
+          ]
         },
         {
           "adHocOffers" : [
@@ -273,13 +298,16 @@
           "recurringSubscriptionPeriod" : "P1M",
           "referenceName" : "monthly_19.99",
           "subscriptionGroupID" : "351BB5AF",
-          "type" : "RecurringSubscription"
+          "type" : "RecurringSubscription",
+          "winbackOffers" : [
+
+          ]
         }
       ]
     }
   ],
   "version" : {
-    "major" : 3,
+    "major" : 4,
     "minor" : 0
   }
 }
