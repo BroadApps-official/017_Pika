@@ -23,7 +23,7 @@ let buyPublisher = PassthroughSubject<Any, Never>()
 var userID = ""
 var dynamicAppHud: DynamicSegment?
 
-var appVersion = "1.15"
+var appVersion = "10"
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -71,7 +71,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                     let items = try JSONDecoder().decode([DynamicSegment].self, from: data)
                     
                     for i in items {
-                        if i.code == "pika_pay" {
+                        if i.code == "diz_paywall" {
                             dynamicAppHud = i
                         }
                     }
@@ -119,7 +119,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
     
     private func getAppStoreVersion() {
-        let appID = "6737900240" // Замените на ваш идентификатор приложения в App Store
+        let appID = "6737900240" // Замени на твой идентификатор приложения
         let urlString = "https://itunes.apple.com/lookup?id=\(appID)"
         guard let url = URL(string: urlString) else {
             return
@@ -136,13 +136,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             }
             
             do {
-                // Парсим данные JSON
                 if let jsonResponse = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any],
                    let results = jsonResponse["results"] as? [[String: Any]],
                    let appInfo = results.first,
                    let version = appInfo["version"] as? String {
                     appVersion = version
-                    print(version, "sdfgsd")
+                    
                 }
             } catch {
                 print("Error parsing JSON: \(error)")

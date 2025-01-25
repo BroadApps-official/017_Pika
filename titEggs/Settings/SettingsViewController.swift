@@ -136,11 +136,12 @@ class SettingsViewController: UIViewController {
     }
     
     @objc private func paywallButtonTapped() {
-        if dynamicAppHud?.segment == "v2" {
+        if dynamicAppHud?.segment == "v1" {
             showNewPaywall()
         } else {
             self.present(CreateElements.openPaywall(manager: purchaseManager), animated: true)
         }
+       // showNewPaywall()
     }
     
     func showNewPaywall() {
@@ -152,10 +153,28 @@ class SettingsViewController: UIViewController {
         }
         self.present(paywallViewController, animated: true)
     }
-    @objc private func restorePur() {
-        purchaseManager.restorePurchase(escaping: { result in
-            buyPublisher.send(1)
-        })
+    
+    @objc private func restore() {
+        purchaseManager.restorePurchases { result in
+            switch result {
+            case .success(let isRestored):
+                if isRestored {
+                    self.showAlert(title: "Success", message: "Your purchases have been restored.")
+                } else {
+                    self.showAlert(title: "Attention", message: "No purchases found. Write to us if this is not the case.")
+                }
+            case .failure(let error):
+                self.showAlert(title: "Error", message: "An error occurred while restoring purchases: \(error.localizedDescription)")
+            }
+        }
+    }
+    
+    
+    private func showAlert(title: String, message: String) {
+        let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        let okAction = UIAlertAction(title: "Ok", style: .default)
+        alert.addAction(okAction)
+        self.present(alert, animated: true)
     }
     
     
@@ -200,7 +219,7 @@ class SettingsViewController: UIViewController {
             stackView.addArrangedSubview(viewOne)
             stackView.addArrangedSubview(viewTwo)
             viewOne.addTarget(self, action: #selector(paywallButtonTapped), for: .touchUpInside)
-            viewTwo.addTarget(self, action: #selector(restorePur), for: .touchUpInside)
+            viewTwo.addTarget(self, action: #selector(restore), for: .touchUpInside)
         case 1:
             let viewOne = createSubView(text: "Notifications", isArrow: false, image: .t2R1, isBotSeparator: true)
             let swithcer = UISwitch()
@@ -334,10 +353,8 @@ class SettingsViewController: UIViewController {
         let subject = "Support Request" // Тема письма
         let body = "App ver: \(versionText), User id - \(userID)" // Текст письма
 
-        // Создаем URL с добавлением темы и тела письма
         let emailURL = "mailto:\(email)?subject=\(subject)&body=\(body)"
         
-        // Кодируем URL
         if let encodedURL = emailURL.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed),
            let url = URL(string: encodedURL) {
             if UIApplication.shared.canOpenURL(url) {
@@ -470,8 +487,8 @@ class SettingsViewController: UIViewController {
         // Настройка для iPad
         if let popoverController = activityViewController.popoverPresentationController {
             popoverController.sourceView = self.view
-            popoverController.sourceRect = CGRect(x: self.view.bounds.midX, y: self.view.bounds.midY, width: 0, height: 0) // Центр экрана
-            popoverController.permittedArrowDirections = [] // Убираем стрелку поповера
+            popoverController.sourceRect = CGRect(x: self.view.bounds.midX, y: self.view.bounds.midY, width: 0, height: 0)
+            popoverController.permittedArrowDirections = []
         }
         
         present(activityViewController, animated: true, completion: nil)

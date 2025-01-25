@@ -325,13 +325,14 @@ class PaywallViewController: UIViewController {
     
     @objc private func createPurchase() {
         UIView.animate(withDuration: 0.3) {
-            self.activity.alpha = 1
+            self.activity.startAnimating()
         }
         Task {
             do {
                 let productToPurchase = products[selectedSubscribe]
                 manager.startPurchase(produst: productToPurchase) { result in
                     if result == true {
+                        print("DKDKDKKDKKDKDK")
                         
                         let parameters: [AppEvents.ParameterName: Any] = [
                             .init("product_id"): productToPurchase.skProduct?.productIdentifier ?? "no id", // Уникальный ID продукта
@@ -342,7 +343,6 @@ class PaywallViewController: UIViewController {
                         if self.numberGenButton.titleLabel?.text == "10" {
                             UserDefaults.standard.setValue("100", forKey: "amountTokens")
                             UserDefaults.standard.setValue("100", forKey: "alltokens")
-                            
                         } else {
                             UserDefaults.standard.setValue("1000", forKey: "amountTokens")
                             UserDefaults.standard.setValue("1000", forKey: "alltokens")
@@ -351,14 +351,13 @@ class PaywallViewController: UIViewController {
                     }
                     
                     UIView.animate(withDuration: 0.3) {
-                        self.activity.alpha = 0
+                        self.activity.stopAnimating()
                     }
                     
                 }
             }
         }
     }
-
     
     @objc private func close() {
         self.dismiss(animated: true)
@@ -378,19 +377,37 @@ class PaywallViewController: UIViewController {
     
     @objc private func restore() {
         UIView.animate(withDuration: 0.3) {
+            self.activity.startAnimating()
             self.activity.alpha = 1
         }
-            
-        manager.restorePurchase { result in
-            if result == true {
-                self.dismiss(animated: true)
-            }
-            
-            UIView.animate(withDuration: 0.3) {
+        
+        
+        manager.restorePurchases { result in
+            switch result {
+            case .success(let isRestored):
+                if isRestored {
+                    self.showAlert(title: "Success", message: "Your purchases have been restored.")
+                    self.activity.stopAnimating()
+                    self.activity.alpha = 0
+                } else {
+                    self.showAlert(title: "Attention", message: "No purchases found. Write to us if this is not the case.")
+                    self.activity.stopAnimating()
+                    self.activity.alpha = 0
+                }
+            case .failure(let error):
+                self.showAlert(title: "Error", message: "An error occurred while restoring purchases: \(error.localizedDescription)")
+                self.activity.stopAnimating()
                 self.activity.alpha = 0
             }
-            
         }
+    }
+    
+    
+    private func showAlert(title: String, message: String) {
+        let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        let okAction = UIAlertAction(title: "Ok", style: .default)
+        alert.addAction(okAction)
+        self.present(alert, animated: true)
     }
 
     
@@ -528,6 +545,8 @@ extension PaywallViewController: UICollectionViewDelegate, UICollectionViewDataS
             make.height.width.equalTo(32)
         }
         
+        let znak = products[indexPath.row].skProduct?.priceLocale.currencySymbol
+        
         let typeLabel = UILabel()
         typeLabel.text = returnName(product: products[indexPath.row])
         
@@ -548,7 +567,7 @@ extension PaywallViewController: UICollectionViewDelegate, UICollectionViewDataS
     
         let saleLabel = UILabel()
         saleLabel.font = .appFont(.Caption1Regular)
-        saleLabel.textColor = .white.withAlphaComponent(0.4)
+        saleLabel.textColor = .white.withAlphaComponent(0.6)
         saleLabel.text = "$0.87 per week"
         
         if typeLabel.text == "Yearly" {
@@ -565,9 +584,10 @@ extension PaywallViewController: UICollectionViewDelegate, UICollectionViewDataS
         
         
         
-        let znak = products[indexPath.row].skProduct?.priceLocale.currencySymbol
+        
         if let price = products[indexPath.row].skProduct?.price.stringValue {
-            countlabel.text = (znak ?? "$") + price
+            countlabel.text = "\((znak ?? "$") + price)/\(returnType(product: products[indexPath.row]))"
+            saleLabel.text = (znak ?? "$") + price
         } else {
             countlabel.text = ""
         }
@@ -576,28 +596,41 @@ extension PaywallViewController: UICollectionViewDelegate, UICollectionViewDataS
         cell.addSubview(countlabel)
         countlabel.snp.makeConstraints { make in
             make.right.equalToSuperview().inset(15)
-            make.top.equalToSuperview().inset(10)
+            make.centerY.equalToSuperview()
         }
         
-        let textLabel = UILabel()
-        textLabel.textColor = .white.withAlphaComponent(0.6)
-        textLabel.font = .appFont(.Caption1Regular)
-        textLabel.text = returnType(product: products[indexPath.row])
-        cell.addSubview(textLabel)
-        textLabel.snp.makeConstraints { make in
-            make.right.equalToSuperview().inset(15)
-            make.bottom.equalToSuperview().inset(10)
-        }
+//        if typeLabel.text != "Yearly" {
+//            let textLabel = UILabel()
+//            textLabel.textColor = .white.withAlphaComponent(0.6)
+//            textLabel.font = .appFont(.Caption1Regular)
+//            textLabel.text = returnType(product: products[indexPath.row])
+//            cell.addSubview(textLabel)
+//            textLabel.snp.makeConstraints { make in
+//                make.right.equalToSuperview().inset(15)
+//                make.bottom.equalToSuperview().inset(10)
+//            }
+//        }
+        
         
         if typeLabel.text == "Yearly" {
+            countlabel.text = "🔥 $0.87/per week 🔥"
+            countlabel.font = .appFont(.FootnoteEmphasized)
+            countlabel.snp.remakeConstraints { make in
+                make.right.bottom.equalToSuperview().inset(10)
+            }
+            
+            
             let view = createSaleView()
             cell.addSubview(view)
             view.snp.makeConstraints { make in
-                make.centerY.equalTo(countlabel)
+                make.top.equalToSuperview().inset(5)
                 make.height.equalTo(21)
                 make.width.equalTo(66)
-                make.right.equalTo(countlabel.snp.left).inset(-5)
+                make.right.equalToSuperview().inset(10)
             }
+        } else {
+            countlabel.textColor = .white.withAlphaComponent(0.6)
+            countlabel.font = .appFont(.FootnoteRegular)
         }
         
         

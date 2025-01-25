@@ -82,6 +82,7 @@
 		15E9367D2CE4B4BA007B963B /* PreviewEffectViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15E9367C2CE4B4BA007B963B /* PreviewEffectViewController.swift */; };
 		15E9367F2CE762B5007B963B /* onbVideo3.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 15E9367E2CE762B5007B963B /* onbVideo3.mp4 */; };
 		15E976DE2D0B020E00EFAF1D /* GSPlayer in Frameworks */ = {isa = PBXBuildFile; productRef = 15E976DD2D0B020E00EFAF1D /* GSPlayer */; };
+		7CA9D7AF2D3FC58F00E337D2 /* AllPaywallViewControllerV2.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CA9D7AE2D3FC58F00E337D2 /* AllPaywallViewControllerV2.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -155,6 +156,7 @@
 		15E627AD2CE3C61E00A2C10C /* Cake-ify_it1.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Cake-ify_it1.mp4"; sourceTree = "<group>"; };
 		15E9367C2CE4B4BA007B963B /* PreviewEffectViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreviewEffectViewController.swift; sourceTree = "<group>"; };
 		15E9367E2CE762B5007B963B /* onbVideo3.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = onbVideo3.mp4; sourceTree = "<group>"; };
+		7CA9D7AE2D3FC58F00E337D2 /* AllPaywallViewControllerV2.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AllPaywallViewControllerV2.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -268,6 +270,7 @@
 			isa = PBXGroup;
 			children = (
 				154DDA1D2D106E9F0048495D /* NewPaywallViewController.swift */,
+				7CA9D7AE2D3FC58F00E337D2 /* AllPaywallViewControllerV2.swift */,
 				154DDA202D107B4E0048495D /* AllPaywallViewController.swift */,
 			);
 			path = v2Paywall;
@@ -611,6 +614,7 @@
 				152C78742CDB7D7C00A2A977 /* MyVideosViewController.swift in Sources */,
 				154DDA1E2D106E9F0048495D /* NewPaywallViewController.swift in Sources */,
 				15542B192CDCEFFB0045598C /* GenerateVideoViewController.swift in Sources */,
+				7CA9D7AF2D3FC58F00E337D2 /* AllPaywallViewControllerV2.swift in Sources */,
 				152C78602CD9528A00A2A977 /* NotifyOnbViewController.swift in Sources */,
 				152C786B2CDA365100A2A977 /* PaywallButton.swift in Sources */,
 				152C78702CDA43D100A2A977 /* SettingsViewController.swift in Sources */,
@@ -794,7 +798,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2.5;
+				MARKETING_VERSION = 2.7;
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_BUNDLE_IDENTIFIER = com.agh.p1i1ka;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -834,7 +838,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2.5;
+				MARKETING_VERSION = 2.7;
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_BUNDLE_IDENTIFIER = com.agh.p1i1ka;
 				PRODUCT_NAME = "$(TARGET_NAME)";

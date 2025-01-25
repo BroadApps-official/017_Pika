@@ -13,7 +13,7 @@ import AVFoundation
 import AVKit
 import FacebookCore
 
-class AllPaywallViewController: UIViewController {
+class AllPaywallViewControllerV2: UIViewController {
     
     private let manager:PurchaseManager
     private lazy var products: [ApphudProduct] = []
@@ -402,7 +402,7 @@ class AllPaywallViewController: UIViewController {
 
 }
 
-extension AllPaywallViewController: UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
+extension AllPaywallViewControllerV2: UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return products.count
     }
@@ -426,6 +426,8 @@ extension AllPaywallViewController: UICollectionViewDelegate, UICollectionViewDa
             make.height.width.equalTo(32)
         }
         
+        let znak = products[indexPath.row].skProduct?.priceLocale.currencySymbol
+        
         let typeLabel = UILabel()
         typeLabel.text = returnName(product: products[indexPath.row])
         
@@ -446,7 +448,7 @@ extension AllPaywallViewController: UICollectionViewDelegate, UICollectionViewDa
     
         let saleLabel = UILabel()
         saleLabel.font = .appFont(.Caption1Regular)
-        saleLabel.textColor = .white.withAlphaComponent(0.4)
+        saleLabel.textColor = .white.withAlphaComponent(0.6)
         saleLabel.text = "$0.87 per week"
         
         if typeLabel.text == "Yearly" {
@@ -463,9 +465,10 @@ extension AllPaywallViewController: UICollectionViewDelegate, UICollectionViewDa
         
         
         
-        let znak = products[indexPath.row].skProduct?.priceLocale.currencySymbol
+        
         if let price = products[indexPath.row].skProduct?.price.stringValue {
-            countlabel.text = (znak ?? "$") + price
+            countlabel.text = "\((znak ?? "$") + price)/\(returnType(product: products[indexPath.row]))"
+            saleLabel.text = (znak ?? "$") + price
         } else {
             countlabel.text = ""
         }
@@ -474,28 +477,41 @@ extension AllPaywallViewController: UICollectionViewDelegate, UICollectionViewDa
         cell.addSubview(countlabel)
         countlabel.snp.makeConstraints { make in
             make.right.equalToSuperview().inset(15)
-            make.top.equalToSuperview().inset(10)
+            make.centerY.equalToSuperview()
         }
         
-        let textLabel = UILabel()
-        textLabel.textColor = .white.withAlphaComponent(0.6)
-        textLabel.font = .appFont(.Caption1Regular)
-        textLabel.text = returnType(product: products[indexPath.row])
-        cell.addSubview(textLabel)
-        textLabel.snp.makeConstraints { make in
-            make.right.equalToSuperview().inset(15)
-            make.bottom.equalToSuperview().inset(10)
-        }
+//        if typeLabel.text != "Yearly" {
+//            let textLabel = UILabel()
+//            textLabel.textColor = .white.withAlphaComponent(0.6)
+//            textLabel.font = .appFont(.Caption1Regular)
+//            textLabel.text = returnType(product: products[indexPath.row])
+//            cell.addSubview(textLabel)
+//            textLabel.snp.makeConstraints { make in
+//                make.right.equalToSuperview().inset(15)
+//                make.bottom.equalToSuperview().inset(10)
+//            }
+//        }
+        
         
         if typeLabel.text == "Yearly" {
+            countlabel.text = "🔥 $0.87/per week 🔥"
+            countlabel.font = .appFont(.FootnoteEmphasized)
+            countlabel.snp.remakeConstraints { make in
+                make.right.bottom.equalToSuperview().inset(10)
+            }
+            
+            
             let view = createSaleView()
             cell.addSubview(view)
             view.snp.makeConstraints { make in
-                make.centerY.equalTo(countlabel)
+                make.top.equalToSuperview().inset(5)
                 make.height.equalTo(21)
                 make.width.equalTo(66)
-                make.right.equalTo(countlabel.snp.left).inset(-5)
+                make.right.equalToSuperview().inset(10)
             }
+        } else {
+            countlabel.textColor = .white.withAlphaComponent(0.6)
+            countlabel.font = .appFont(.FootnoteRegular)
         }
         
         

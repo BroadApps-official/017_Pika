@@ -17,6 +17,7 @@ class NewPaywallViewController: UIViewController {
     
     private let manager:PurchaseManager
     private lazy var products: [ApphudProduct] = []
+    private let topLabelPrice = UILabel()
     
     init(manager: PurchaseManager) {
         self.manager = manager
@@ -75,7 +76,7 @@ class NewPaywallViewController: UIViewController {
     private lazy var policyButton = createMiniButtons(title: "Privacy Policy", color: .white.withAlphaComponent(0.4), font: .appFont(.Caption2Regular), isACancelAnytime: false)
     private lazy var termsButton = createMiniButtons(title: "Terms of Use", color: .white.withAlphaComponent(0.4), font: .appFont(.Caption2Regular), isACancelAnytime: false)
     private lazy var restoreButton = createMiniButtons(title: "Restore Purchases", color: .white.withAlphaComponent(0.6), font: .appFont(.Caption1Regular), isACancelAnytime: false)
-
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .bgPrimary
@@ -105,8 +106,9 @@ class NewPaywallViewController: UIViewController {
             self.continueButton.alpha = 1
             self.progressView.stopAnimating()
         }
+        topLabelPrice.text = "\(returnWeek()) / week, billed annually at \(returnAnnual())"
     }
-      
+    
     private func createMiniButtons(title: String, color: UIColor, font: UIFont, isACancelAnytime: Bool) -> UIButton {
         let button = UIButton(type: .system)
         button.backgroundColor = .clear
@@ -119,7 +121,7 @@ class NewPaywallViewController: UIViewController {
         }
         return button
     }
-
+    
     
     private func setupUI() {
         
@@ -127,10 +129,10 @@ class NewPaywallViewController: UIViewController {
             print("Video not found")
             return
         }
-
+        
         let player = AVPlayer(url: URL(fileURLWithPath: path))
         player.isMuted = true
-
+        
         // Создаем контейнер для видео
         let videoContainerView = UIView()
         videoContainerView.clipsToBounds = false
@@ -140,25 +142,25 @@ class NewPaywallViewController: UIViewController {
             make.top.equalToSuperview()
             make.height.equalTo(487)
         }
-
+        
         // Создаем AVPlayerLayer и добавляем его в videoContainerView
         let playerLayer = AVPlayerLayer(player: player)
         playerLayer.videoGravity = .resizeAspectFill
         videoContainerView.layer.addSublayer(playerLayer)
-
+        
         // Обновляем размер слоя после применения ограничений
         view.layoutIfNeeded()
         playerLayer.frame = videoContainerView.bounds
-
+        
         // Добавляем зацикливание видео
         NotificationCenter.default.addObserver(forName: .AVPlayerItemDidPlayToEndTime, object: player.currentItem, queue: .main) { _ in
             player.seek(to: .zero)
             player.play()
         }
-
+        
         // Запускаем воспроизведение
         player.play()
-
+        
         // Создаем изображение тени и добавляем поверх видео
         
         shadowImageView.clipsToBounds = false
@@ -169,7 +171,7 @@ class NewPaywallViewController: UIViewController {
             make.height.equalTo(view.snp.height).multipliedBy(3 / 5.0)
             make.height.lessThanOrEqualTo(600)
         }
-
+        
         view.layoutIfNeeded()
         
         view.addSubview(policyButton)
@@ -234,12 +236,13 @@ class NewPaywallViewController: UIViewController {
             make.bottom.equalTo(continueButton.snp.top).inset(-15)
         }
         
-        let topLabel = UILabel()
-        topLabel.text = "$0.87 / week, billed annually at $19.99"
-        topLabel.textColor = .white.withAlphaComponent(0.6)
-        topLabel.font = .appFont(.SubheadlineRegular)
-        view.addSubview(topLabel)
-        topLabel.snp.makeConstraints { make in
+        
+        
+        topLabelPrice.text = "0.87 / week, billed annually at $19.99"
+        topLabelPrice.textColor = .white.withAlphaComponent(0.6)
+        topLabelPrice.font = .appFont(.SubheadlineRegular)
+        view.addSubview(topLabelPrice)
+        topLabelPrice.snp.makeConstraints { make in
             make.bottom.equalTo(allPlansButton.snp.top).inset(-15)
             make.centerX.equalToSuperview()
         }
@@ -253,31 +256,58 @@ class NewPaywallViewController: UIViewController {
         view.addSubview(mainLabel)
         mainLabel.snp.makeConstraints { make in
             make.left.right.equalToSuperview().inset(15)
-            make.bottom.equalTo(topLabel.snp.top).inset(-15)
+            make.bottom.equalTo(topLabelPrice.snp.top).inset(-15)
         }
         
         
     }
     
-    @objc private func openAll() {
-        let vc = AllPaywallViewController(manager: manager)
-
-        // Устанавливаем стиль модального представления
-        vc.modalPresentationStyle = .pageSheet
-
-        // Настраиваем размер
-        if let sheet = vc.sheetPresentationController {
-            sheet.detents = [
-                .custom { context in
-                    return context.maximumDetentValue * 0.7 // 70% высоты экрана
-                }
-            ]
-            sheet.prefersGrabberVisible = true // Опционально: Добавить ручку для удобства
-        }
-
-        present(vc, animated: true, completion: nil)
+    
+    
+    private func returnWeek() -> String {
+        let oneCount: Double = (products[0].skProduct?.price.doubleValue ?? 0) / 52
+        let formattedOneCount = String(format: "%.2f", oneCount)
+        return "\(products[0].skProduct?.priceLocale.currencySymbol ?? "")\(formattedOneCount)"
     }
-
+    
+    private func returnAnnual() -> String {
+        let oneCount: Double = (products[0].skProduct?.price.doubleValue ?? 0)
+        let formattedOneCount = String(format: "%.2f", oneCount)
+        return "\(products[0].skProduct?.priceLocale.currencySymbol ?? "")\(formattedOneCount)"
+    }
+    
+    @objc private func openAll() {
+        
+        if dynamicAppHud?.segment == "v2"  {
+            let vc = AllPaywallViewControllerV2(manager: manager)
+            vc.modalPresentationStyle = .pageSheet
+            if let sheet = vc.sheetPresentationController {
+                sheet.detents = [
+                    .custom { context in
+                        return context.maximumDetentValue * 0.7
+                    }
+                ]
+                sheet.prefersGrabberVisible = true
+            }
+            present(vc, animated: true, completion: nil)
+            return
+        } else {
+            let vc = AllPaywallViewController(manager: manager)
+            vc.modalPresentationStyle = .pageSheet
+            if let sheet = vc.sheetPresentationController {
+                sheet.detents = [
+                    .custom { context in
+                        return context.maximumDetentValue * 0.7
+                    }
+                ]
+                sheet.prefersGrabberVisible = true
+            }
+            present(vc, animated: true, completion: nil)
+        }
+            
+        
+    }
+    
     
     @objc private func buy() {
         UIView.animate(withDuration: 0.3) {
@@ -340,18 +370,32 @@ class NewPaywallViewController: UIViewController {
         UIView.animate(withDuration: 0.3) {
             self.activity.startAnimating()
         }
-            
-        manager.restorePurchase { result in
-            if result == true {
-                self.dismiss(animated: true)
-            }
-            
-            UIView.animate(withDuration: 0.3) {
+        
+        
+        manager.restorePurchases { result in
+            switch result {
+            case .success(let isRestored):
+                if isRestored {
+                    self.showAlert(title: "Success", message: "Your purchases have been restored.")
+                    self.activity.stopAnimating()
+                } else {
+                    self.showAlert(title: "Attention", message: "No purchases found. Write to us if this is not the case.")
+                    self.activity.stopAnimating()
+                }
+            case .failure(let error):
+                self.showAlert(title: "Error", message: "An error occurred while restoring purchases: \(error.localizedDescription)")
                 self.activity.stopAnimating()
             }
-            
         }
     }
-   
-
+    
+    
+    private func showAlert(title: String, message: String) {
+        let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        let okAction = UIAlertAction(title: "Ok", style: .default)
+        alert.addAction(okAction)
+        self.present(alert, animated: true)
+    }
+    
+    
 }

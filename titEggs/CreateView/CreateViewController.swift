@@ -155,11 +155,12 @@ class CreateViewController: UIViewController, UIImagePickerControllerDelegate, U
     }
     
     @objc private func paywallButtonTapped() {
-        if dynamicAppHud?.segment == "v2" {
+        if dynamicAppHud?.segment == "v1" {
             showNewPaywall()
         } else {
             self.present(CreateElements.openPaywall(manager: purchaseManager), animated: true)
         }
+      //  showNewPaywall()
     }
     
     func showNewPaywall() {

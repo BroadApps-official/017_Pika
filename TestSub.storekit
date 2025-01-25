@@ -302,6 +302,62 @@
           "winbackOffers" : [
 
           ]
+        },
+        {
+          "adHocOffers" : [
+
+          ],
+          "codeOffers" : [
+
+          ],
+          "displayPrice" : "29.99",
+          "familyShareable" : false,
+          "groupNumber" : 1,
+          "internalID" : "BA23E42C",
+          "introductoryOffer" : null,
+          "localizations" : [
+            {
+              "description" : "",
+              "displayName" : "Monthly",
+              "locale" : "en_US"
+            }
+          ],
+          "productID" : "montly_29.99_nottrial",
+          "recurringSubscriptionPeriod" : "P1M",
+          "referenceName" : "montly_29.99_nottrial",
+          "subscriptionGroupID" : "351BB5AF",
+          "type" : "RecurringSubscription",
+          "winbackOffers" : [
+
+          ]
+        },
+        {
+          "adHocOffers" : [
+
+          ],
+          "codeOffers" : [
+
+          ],
+          "displayPrice" : "59.99",
+          "familyShareable" : false,
+          "groupNumber" : 1,
+          "internalID" : "C887F179",
+          "introductoryOffer" : null,
+          "localizations" : [
+            {
+              "description" : "",
+              "displayName" : "Yearly",
+              "locale" : "en_US"
+            }
+          ],
+          "productID" : "yearly_59.99_nottrial",
+          "recurringSubscriptionPeriod" : "P1Y",
+          "referenceName" : "yearly_59.99_nottrial",
+          "subscriptionGroupID" : "351BB5AF",
+          "type" : "RecurringSubscription",
+          "winbackOffers" : [
+
+          ]
         }
       ]
     }

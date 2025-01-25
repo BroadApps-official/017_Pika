@@ -243,7 +243,7 @@ class PreviewEffectViewController: UIViewController, UIImagePickerControllerDele
     
     
     @objc private func nextTapped() {
-        
+       // self.cellTapped(index: self.index)
         if !checkAppVersion() {
             openUpdateAlert()
             return
@@ -318,11 +318,12 @@ class PreviewEffectViewController: UIViewController, UIImagePickerControllerDele
     }
     
     @objc private func paywallButtonTapped() {
-        if dynamicAppHud?.segment == "v2" {
+        if dynamicAppHud?.segment == "v1" {
             showNewPaywall()
         } else {
             self.present(CreateElements.openPaywall(manager: purchaseManager), animated: true)
         }
+     //   showNewPaywall()
     }
     
     func showNewPaywall() {

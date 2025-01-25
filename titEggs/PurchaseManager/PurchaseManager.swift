@@ -14,7 +14,6 @@ import FacebookCore
 
 class PurchaseManager: NSObject {
     
-    let experementName = "wekly_and_motly_test"
     let paywallID = "main" //айди пэйволла //ПОМЕНЯТЬ НА main
     var productsApphud: [ApphudProduct] = [] //массив с продуктами
     private let networking = NetWorking()
@@ -39,6 +38,13 @@ class PurchaseManager: NSObject {
     @MainActor func startPurchase(produst: ApphudProduct, escaping: @escaping(Bool) -> Void) {
         let selectedProduct = produst
         Apphud.purchase(selectedProduct) { result in
+            
+            print(result.success , "LDLDLLDLDLDLD")
+            
+            if result.success == false {
+                escaping(false)
+            }
+            
             if let error = result.error {
                 debugPrint(error.localizedDescription)
                escaping(false)
@@ -60,27 +66,34 @@ class PurchaseManager: NSObject {
                     escaping(true)
                 }
             }
+            
+            
         }
     }
     
     //MARK: - vосстановление покупок
-    @MainActor func restorePurchase(escaping: @escaping(Bool) -> Void) {
-        print("restore")
-        Apphud.restorePurchases {  subscriptions, _, error in
+    @MainActor
+    func restorePurchases(completion: @escaping (Result<Bool, Error>) -> Void) {
+        debugPrint("Restore started")
+        
+        Apphud.restorePurchases { subscriptions, _, error in
             if let error = error {
-                debugPrint(error.localizedDescription)
-                escaping(false)
-                buyPublisher.send(1)
-            }
-            if subscriptions?.first?.isActive() ?? false {
-                buyPublisher.send(1)
-                escaping(true)
+                debugPrint("Restore failed: \(error.localizedDescription)")
+                completion(.failure(error))
                 return
             }
             
-            if Apphud.hasActiveSubscription() {
-                escaping(true)
+            if let subscription = subscriptions?.first, subscription.isActive() {
+                debugPrint("Subscription restored and active: \(subscription.productId)")
                 buyPublisher.send(1)
+                completion(.success(true))
+            } else if Apphud.hasActiveSubscription() {
+                buyPublisher.send(1)
+                debugPrint("Active subscription exists")
+                completion(.success(true))
+            } else {
+                debugPrint("No active subscription found during restore")
+                completion(.success(false))
             }
         }
     }
@@ -95,7 +108,7 @@ class PurchaseManager: NSObject {
             if let paywall = paywalls.first(where: { $0.identifier == self.paywallID}) {
                 Apphud.paywallShown(paywall)
                 
-                paywall.experimentName
+                //paywall.experimentName
                 
                 let products = paywall.products
                 self.productsApphud = products
