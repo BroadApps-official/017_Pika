@@ -173,7 +173,6 @@ class PreviewEffectViewController: UIViewController, UIImagePickerControllerDele
         self.view.layoutIfNeeded()
     }
     
-   
     
     private func setupPlayer() {
         playerView.play(for: URL(string: model.effectsArr[index].preview!)!)
@@ -243,12 +242,6 @@ class PreviewEffectViewController: UIViewController, UIImagePickerControllerDele
     
     
     @objc private func nextTapped() {
-//        self.cellTapped(index: self.index)
-        if !checkAppVersion() {
-            openUpdateAlert()
-            return
-        }
-
         if purchaseManager.hasUnlockedPro == true {
 //            self.openAmountAlert()
             model.fetchUserInfo { isError in
@@ -266,37 +259,7 @@ class PreviewEffectViewController: UIViewController, UIImagePickerControllerDele
         }
     }
     
-    private func openUpdateAlert() {
-        let alert = UIAlertController(title: "Attention", message: "Please update the app for more stable performance", preferredStyle: .alert)
-        let cancelAction = UIAlertAction(title: "Cancel", style: .cancel)
-        alert.addAction(cancelAction)
-        
-        let updateAction = UIAlertAction(title: "Update", style: .default) { _ in
-            let url = URL(string: "https://itunes.apple.com/us/app/preview-effects/id6737900240")!
-            UIApplication.shared.open(url)
-        }
-        alert.addAction(updateAction)
-        
-        self.present(alert, animated: true)
-    }
-    
-    
-    private func checkAppVersion() -> Bool {
-           guard let currentVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String else {
-               return false
-           }
-           
-        let minimumRequiredVersion = appVersion
-           
-           if compareVersion(currentVersion, with: minimumRequiredVersion) == .orderedAscending {
-               return false
-           }
-           return true
-    }
-    
-    private func compareVersion(_ version1: String, with version2: String) -> ComparisonResult {
-        return version1.compare(version2, options: .numeric)
-    }
+
     
     func resizeImagePixelVerse(image: UIImage, maxWidth: CGFloat, maxHeight: CGFloat) -> UIImage {
         let originalWidth = image.size.width

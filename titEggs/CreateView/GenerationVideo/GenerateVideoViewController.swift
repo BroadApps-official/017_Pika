@@ -122,7 +122,6 @@ class GenerateVideoViewController: UIViewController {
   }
 
   private func openOpenedViewController() {
-      // Пытаемся получить presentingViewController как UINavigationController
       if let navController = self.presentingViewController as? UINavigationController {
           let openedVC = OpenedViewController(model: self.model, index: self.index)
           navController.pushViewController(openedVC, animated: true)
@@ -137,7 +136,6 @@ class GenerateVideoViewController: UIViewController {
           }
       }
   }
-
 
     private func addImageInarr() {
         if model.workItems.count >= 2 {
