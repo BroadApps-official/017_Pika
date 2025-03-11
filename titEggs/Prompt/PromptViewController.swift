@@ -85,13 +85,22 @@ class PromptViewController: UIViewController, UIImagePickerControllerDelegate, U
         fatalError("init(coder:) has not been implemented")
     }
 
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        view.backgroundColor = .bgPrimary
-        setupUI()
-        setupNavController()
-        requestTextView.delegate = self
-    }
+  override func viewDidLoad() {
+    super.viewDidLoad()
+    view.backgroundColor = .bgPrimary
+    setupUI()
+    setupNavController()
+    self.title = "Promt"
+    requestTextView.delegate = self
+  }
+
+  override func viewWillAppear(_ animated: Bool) {
+         super.viewWillAppear(animated)
+
+         self.title = "Prompt"
+
+         setupNavController()
+     }
 
     // MARK: - UI Setup
   private let uploadImageView: UIImageView = {
@@ -163,9 +172,42 @@ class PromptViewController: UIViewController, UIImagePickerControllerDelegate, U
   }
 
 
-    private func setupNavController() {
-        self.title = "Prompt"
-    }
+  private func setupNavController() {
+         tabBarController?.title = "Prompt"
+         tabBarController?.navigationController?.navigationBar.prefersLargeTitles = true
+         let appearance = UINavigationBarAppearance()
+         appearance.configureWithOpaqueBackground()
+         appearance.backgroundColor = .clear
+         appearance.titleTextAttributes = [
+             .foregroundColor: UIColor.white,
+             .font: UIFont.appFont(.HeadlineRegular)
+         ]
+         appearance.largeTitleTextAttributes = [
+             .foregroundColor: UIColor.white,
+             .font: UIFont.appFont(.LargeTitleEmphasized)
+         ]
+         tabBarController?.navigationController?.navigationBar.standardAppearance = appearance
+         tabBarController?.navigationController?.navigationBar.scrollEdgeAppearance = appearance
+
+         if purchaseManager.hasUnlockedPro == false {
+             rightButton.addTarget(self, action: #selector(paywallButtonTapped), for: .touchUpInside)
+
+             let barButtonItem = UIBarButtonItem(customView: rightButton)
+
+             tabBarController?.navigationItem.rightBarButtonItem = barButtonItem
+             rightButton.snp.makeConstraints { make in
+                 make.width.equalTo(80)
+                 make.height.equalTo(32)
+             }
+             rightButton.addTouchFeedback()
+         }
+     }
+
+  @objc private func paywallButtonTapped() {
+        let paywallVC = NewPaywallViewController(manager: purchaseManager)
+          paywallVC.modalPresentationStyle = .fullScreen
+          present(paywallVC, animated: true)
+      }
 
     // MARK: - Actions
   @objc private func uploadTapped() {
