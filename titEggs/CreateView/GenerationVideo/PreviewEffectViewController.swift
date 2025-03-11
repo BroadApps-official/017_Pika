@@ -244,12 +244,12 @@ class PreviewEffectViewController: UIViewController, UIImagePickerControllerDele
     
     @objc private func nextTapped() {
        // self.cellTapped(index: self.index)
-        if !checkAppVersion() {
-            openUpdateAlert()
-            return
-        }
+//        if !checkAppVersion() {
+//            openUpdateAlert()
+//            return
+//        }
 
-        if purchaseManager.hasUnlockedPro == true {
+//        if purchaseManager.hasUnlockedPro == true {
             //self.openAmountAlert()
             model.fetchUserInfo { isError in
                 if isError == false {
@@ -259,11 +259,11 @@ class PreviewEffectViewController: UIViewController, UIImagePickerControllerDele
                 }
             }
            //print("idjfoisjfosfsf, \(dynamicAppHud)")
-        } else {
-            paywallButtonTapped()
-            playPauseButton.setBackgroundImage(.bigPlay, for: .normal)
-            playerView.pause(reason: .userInteraction)
-        }
+//        } else {
+//            paywallButtonTapped()
+//            playPauseButton.setBackgroundImage(.bigPlay, for: .normal)
+//            playerView.pause(reason: .userInteraction)
+//        }
     }
     
     private func openUpdateAlert() {

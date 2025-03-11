@@ -37,24 +37,24 @@ class MainModel {
         }
     }
     
-    
-    func loadEffectArr(escaping: @escaping() -> Void) {
-        netWorking.loadEffectsArr { effect in
-            var arr: [Effect] = []
-            
-            for i in effect {
-                if i.preview != nil && i.previewSmall != nil {
-                    var item = i
-                    item.effect = item.title ?? i.effect
-                    arr.append(item)
-                }
-            }
-            
-            self.effectsArr = arr
-            escaping()
-        }
-    }
-    
+  func loadEffectArr(escaping: @escaping () -> Void) {
+      netWorking.loadEffectsArr { categories in
+          var arr: [Effect] = []
+
+          for category in categories { // Теперь category - это Category
+              for var effect in category.templates { // Теперь category.templates - это [Effect]
+                  if let preview = effect.preview, let previewSmall = effect.previewSmall {
+                      effect.effect = effect.title
+                      arr.append(effect)
+                  }
+              }
+          }
+
+          self.effectsArr = arr
+          escaping()
+      }
+  }
+
 
     func checkConnect(completion: @escaping (Bool) -> Void) {
         let monitor = NWPathMonitor()
@@ -153,67 +153,83 @@ class MainModel {
         }
     }
     
-    func checkStatus() {
-        workItems.forEach { $0.cancel() }
-        workItems.removeAll()
-        // Поиск индексов для проверки
-        var indices: [Int] = []
-        for (index, element) in arr.enumerated() {
-            if (element.resultURL == nil || element.video == nil) && element.status != "error" {
-                indices.append(index)
-            }
-        }
-        print(indices, arr)
+  func checkStatus() {
+      workItems.forEach { $0.cancel() }
+      workItems.removeAll()
 
-        for index in indices {
-            var workItem: DispatchWorkItem?
-            workItem = DispatchWorkItem { [weak self] in
-                guard let self = self else { return }
-                
-                // Дополнительная проверка на существование индекса
-                guard index < self.arr.count else {
-                    print("Index \(index) out of range")
-                    return
-                }
-                
-                if self.arr[index].generationID == nil || self.arr[index].generationID == "error" {
-                    
-                    let idEffect = "\(self.arr[index].effectID)"
-                    self.netWorking.createVideo(data: self.arr[index].image, idEffect: idEffect) { [weak self] idVideo in
-                        guard let self = self else { return }
-                        
-                        DispatchQueue.main.async {
-                            // Еще раз проверяем наличие индекса перед доступом
-                            guard index < self.arr.count else {
-                                print("Index \(index) out of range in completion")
-                                return
-                            }
-                            
-                            print(self.arr[index], "create genID")
-                            self.arr[index].generationID = idVideo // Присваиваем полученный generationID
-                            self.saveArr()
-                            
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 20) {
-                                self.checkStatusForIndex(index: index, workItem: workItem)
-                            }
-                        }
-                    }
-                } else {
-                    // Если generationID уже есть, сразу вызываем проверку статуса
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 20) {
-                        self.checkStatusForIndex(index: index, workItem: workItem)
-                    }
-                }
-            }
+      // Поиск индексов для проверки
+      var indices: [Int] = []
+      for (index, element) in arr.enumerated() {
+          if (element.resultURL == nil || element.video == nil) && element.status != "error" {
+              indices.append(index)
+          }
+      }
+      print("📌 Индексы для проверки:", indices)
 
-            if let workItem = workItem {
-                workItems.append(workItem)
-                DispatchQueue.global().async(execute: workItem)
-            }
-        }
-    }
+      for index in indices {
+          var workItem: DispatchWorkItem?
+          workItem = DispatchWorkItem { [weak self] in
+              guard let self = self else { return }
 
-    
+              // Проверяем, что индекс существует в массиве
+              guard index < self.arr.count else {
+                  print("❌ Ошибка: Index \(index) out of range")
+                  return
+              }
+
+              let effectID = "\(self.arr[index].effectID)"
+              let effectName = self.arr[index].effectName
+              let isHugAndKiss = effectName.contains("Hug") || effectName.contains("Kiss")
+
+              // Определяем, в каком режиме было выбрано изображение
+              let imagesToSend: [Data]
+
+              if isHugAndKiss, let images = self.arr[index].image as? [Data], images.count == 2 {
+                  // Если Hug and Kiss + Split Mode, отправляем 2 фото
+                  imagesToSend = images
+                  print("📸 Hug and Kiss + Split Mode → 2 изображения")
+              } else {
+                  // В остальных случаях (Single Mode или обычный эффект) отправляем 1 фото
+                  imagesToSend = [self.arr[index].image as? Data ?? Data()]
+                  print("📷 Hug and Kiss + Single Mode или обычный эффект → 1 изображение")
+              }
+
+              if self.arr[index].generationID == nil || self.arr[index].generationID == "error" {
+                  print("🚀 Отправляем видео на генерацию: \(effectName), \(imagesToSend.count) изображений")
+
+                  self.netWorking.createVideo(data: imagesToSend, idEffect: effectID, isHugAndKiss: isHugAndKiss) { [weak self] idVideo in
+                      guard let self = self else { return }
+
+                      DispatchQueue.main.async {
+                          guard index < self.arr.count else {
+                              print("❌ Ошибка: Index \(index) out of range в completion")
+                              return
+                          }
+
+                          print("✅ Успешно создано: \(self.arr[index]) → generationID: \(idVideo)")
+                          self.arr[index].generationID = idVideo
+                          self.saveArr()
+
+                          DispatchQueue.main.asyncAfter(deadline: .now() + 20) {
+                              self.checkStatusForIndex(index: index, workItem: workItem)
+                          }
+                      }
+                  }
+              } else {
+                  // Если уже есть generationID, просто проверяем статус
+                  DispatchQueue.main.asyncAfter(deadline: .now() + 20) {
+                      self.checkStatusForIndex(index: index, workItem: workItem)
+                  }
+              }
+          }
+
+          if let workItem = workItem {
+              workItems.append(workItem)
+              DispatchQueue.global().async(execute: workItem)
+          }
+      }
+  }
+
     
     private func loadVideoArrFromCache() -> [Video]? {
         let fileManager = FileManager.default

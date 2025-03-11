@@ -534,7 +534,7 @@ class MyVideosViewController: UIViewController {
     }
     
     private func openGenerateVC(video: Video) {
-        let generateVC = GenerateVideoViewController(model: self.model, image: video.image, index: video.effectID, publisher: publisher, video: video)
+      let generateVC = GenerateVideoViewController(model: self.model, image: video.image, index: video.effectID, publisher: publisher, video: video)
         generateVC.modalPresentationStyle = .fullScreen
         generateVC.modalTransitionStyle = .coverVertical
         if #available(iOS 13.0, *) {
@@ -620,7 +620,7 @@ extension MyVideosViewController: UICollectionViewDelegate, UICollectionViewData
             make.height.equalTo(21)
             make.width.equalTo(56)
         }
-        let blurEffect = UIBlurEffect(style: .systemThinMaterialDark) // или .dark, .extraLight и т.д.
+        let blurEffect = UIBlurEffect(style: .systemThinMaterialDark) 
         let blurView = UIVisualEffectView(effect: blurEffect)
         blurView.layer.cornerRadius = 6
         blurView.clipsToBounds = true

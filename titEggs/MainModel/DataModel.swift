@@ -7,21 +7,32 @@
 
 import Foundation
 
-
 struct DataEffect: Codable {
     let error: Bool
     let messages: [String]
-    let data: [Effect]
+    let data: [Category]
+}
+
+// Структура для категорий
+struct Category: Codable {
+    let categoryId: Int
+    let categoryTitleRu: String
+    let categoryTitleEn: String
+    let templates: [Effect]
 }
 
 struct Effect: Codable {
-    var id: Int
-    var title: String?
-    var ai: String
+    let id: Int
+    let title: String
+    let categoryId: Int
+    let categoryTitleRu: String
+    let categoryTitleEn: String
+    let ai: String
     var effect: String
-    var preview: String? 
-    var previewSmall: String?
+    let preview: String?
+    let previewSmall: String?
 }
+
 
 
 //video

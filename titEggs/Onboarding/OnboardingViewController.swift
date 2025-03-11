@@ -73,18 +73,22 @@ class OnboardingViewController: UIViewController {
         
     }
     
-    private func loadEffects() {
-        network.loadEffectsArr { escaping in
-            var arr: [URL] = []
-            for i in escaping {
-                if i.previewSmall != nil {
-                    arr.append(URL(string: i.previewSmall ?? "")!)
-                }
-            }
-            VideoPreloadManager.shared.set(waiting: arr)
-        }
-    }
-    
+  private func loadEffects() {
+      network.loadEffectsArr { categories in
+          var arr: [URL] = []
+
+          for category in categories { 
+              for effect in category.templates {
+                  if let previewURL = effect.previewSmall, let url = URL(string: previewURL) {
+                      arr.append(url)
+                  }
+              }
+          }
+
+          VideoPreloadManager.shared.set(waiting: arr)
+      }
+  }
+
 
     private func setupUI() {
         

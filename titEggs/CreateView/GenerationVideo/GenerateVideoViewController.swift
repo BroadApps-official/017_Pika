@@ -10,20 +10,20 @@ import Lottie
 import Combine
 
 class GenerateVideoViewController: UIViewController {
-    
+
     var model: MainModel
     var image: Data
     var index: Int
     var publisher: PassthroughSubject<Bool, Never>
     var video: Video?
-    
+
     var uuidVideo = ""
-    
+
     //other
     private var timer: Timer?
     private var count = 0.0
     private lazy var cancellabel = [AnyCancellable]()
-    
+
     private var progressView: UIProgressView = {
         let prog = UIProgressView(progressViewStyle: .bar)
         prog.layer.cornerRadius = 3
@@ -32,7 +32,8 @@ class GenerateVideoViewController: UIViewController {
         prog.progressTintColor = UIColor.primary
         return prog
     }()
-    
+
+    // Основной инициализатор, принимающий массив изображений.
     init(model: MainModel, image: Data, index:  Int, publisher: PassthroughSubject<Bool, Never>, video: Video?) {
         self.model = model
         self.image = image
@@ -41,12 +42,12 @@ class GenerateVideoViewController: UIViewController {
         self.video = video
         super.init(nibName: nil, bundle: nil)
     }
-    
+
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
-    
+
+
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .bgPrimary
@@ -56,23 +57,23 @@ class GenerateVideoViewController: UIViewController {
         addImageInarr()
         supscribe()
     }
-    
+
     private func supscribe() {
         model.errorPublisher
             .sink { (error, id) in
                 self.alertError(id: id)
             }
             .store(in: &cancellabel)
-        
+
         model.videoDownloadedPublisher
             .sink { id in
                 self.videoIsDownload(id: id)
             }
             .store(in: &cancellabel)
     }
-    
+
     private func alertError(id: String) {
-        print("error laod generate page - ", "\(uuidVideo)")
+        print("error load generate page - ", "\(uuidVideo)")
         if id == uuidVideo {
             DispatchQueue.main.async {
                 self.openAlert()
@@ -80,10 +81,9 @@ class GenerateVideoViewController: UIViewController {
             }
         }
     }
-    
+
     private func videoIsDownload(id: String) {
         print(id, uuidVideo, "ID VIDEO AND UUID")
-
         if id == uuidVideo {
             DispatchQueue.main.async { [self] in
                 publisher.send(true)
@@ -93,9 +93,7 @@ class GenerateVideoViewController: UIViewController {
             }
         }
     }
-    
-   
-    
+
     private func addImageInarr() {
         if model.workItems.count >= 2 {
             DispatchQueue.main.async {
@@ -103,11 +101,20 @@ class GenerateVideoViewController: UIViewController {
             }
             return
         } else {
-            
             var videoLoad = video
-            
+
             if video?.id == nil {
-                videoLoad = Video(image: image, effectID: model.effectsArr[index].id, video: nil, generationID: nil, resultURL: nil, dataGenerate: self.getTodayFormattedData(), effectName: model.effectsArr[index].effect, status: nil)
+                // Используем первое изображение из массива – в случае сплита здесь можно решить, как объединять 2 картинки
+                videoLoad = Video(
+                    image: image,
+                    effectID: model.effectsArr[index].id,
+                    video: nil,
+                    generationID: nil,
+                    resultURL: nil,
+                    dataGenerate: self.getTodayFormattedData(),
+                    effectName: model.effectsArr[index].effect,
+                    status: nil
+                )
                 model.arr.append(videoLoad!)
                 model.saveArr()
                 print("new video")
@@ -115,7 +122,6 @@ class GenerateVideoViewController: UIViewController {
                 videoLoad = video
                 print("old video")
                 var index = 0
-                
                 for _ in 0..<model.arr.count {
                     if model.arr[index].id == videoLoad?.id {
                         model.arr[index] = videoLoad!
@@ -125,9 +131,9 @@ class GenerateVideoViewController: UIViewController {
                     }
                 }
             }
-            
+
             uuidVideo = "\(videoLoad!.id)"
-            
+
             model.createVideo(escaping: { result in
                 if result == false {
                     DispatchQueue.main.async {
@@ -137,32 +143,32 @@ class GenerateVideoViewController: UIViewController {
             })
         }
     }
-    
+
     func getTodayFormattedData() -> String {
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "dd.MM.yy"
         let today = Date()
         return dateFormatter.string(from: today)
     }
-    
+
     private func limitAlert() {
-        let alert = UIAlertController(title: "You have reached the simultaneous generation limit ", message: "You cannot generate more than 2 videos at the same time", preferredStyle: .alert)
-        
+        let alert = UIAlertController(title: "You have reached the simultaneous generation limit", message: "You cannot generate more than 2 videos at the same time", preferredStyle: .alert)
+
         let cancelButton = UIAlertAction(title: "Got it", style: .cancel) { _ in
             self.closeVC()
         }
         alert.addAction(cancelButton)
         self.present(alert, animated: true)
     }
-    
+
     private func openAlert() {
         let alert = UIAlertController(title: "Video generation error", message: "Something went wrong or the server is not responding. Try again or do it later.", preferredStyle: .alert)
-        
+
         let cancelButton = UIAlertAction(title: "Cancel", style: .cancel) { _ in
             self.closeVC()
         }
         alert.addAction(cancelButton)
-        
+
         let repeatButton = UIAlertAction(title: "Try Again", style: .default) { _ in
             self.count = 0.0
             self.addImageInarr()
@@ -182,7 +188,7 @@ class GenerateVideoViewController: UIViewController {
             make.top.equalTo(view.safeAreaLayoutGuide.snp.top)
         }
         closeGenButton.addTarget(self, action: #selector(closeVC), for: .touchUpInside)
-        
+
         let lottieView = LottieAnimationView(name: "Generate")
         lottieView.loopMode = .loop
         lottieView.play()
@@ -193,7 +199,7 @@ class GenerateVideoViewController: UIViewController {
             make.width.equalTo(263)
             make.centerY.equalToSuperview().offset(-120)
         }
-        
+
         let topLabel = UILabel()
         topLabel.text = "Video Generation..."
         topLabel.textColor = .white
@@ -203,7 +209,7 @@ class GenerateVideoViewController: UIViewController {
             make.top.equalTo(lottieView.snp.bottom)
             make.centerX.equalToSuperview()
         }
-        
+
         let botLabel = UILabel()
         botLabel.text = "Generation usually takes about a minute"
         botLabel.textColor = .white.withAlphaComponent(0.8)
@@ -213,7 +219,7 @@ class GenerateVideoViewController: UIViewController {
             make.centerX.equalToSuperview()
             make.top.equalTo(topLabel.snp.bottom).inset(-3)
         }
-        
+
         progressView.setProgress(0, animated: false)
         view.addSubview(progressView)
         progressView.snp.makeConstraints { make in
@@ -223,7 +229,7 @@ class GenerateVideoViewController: UIViewController {
             make.bottom.equalTo(view.safeAreaLayoutGuide.snp.bottom).inset(60)
         }
     }
-    
+
     private func setupTimer() {
         count = 0
         timer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { _ in
@@ -239,7 +245,7 @@ class GenerateVideoViewController: UIViewController {
             }
         }
     }
-    
+
     private func openLike() {
         if UserDefaults.standard.object(forKey: "rewiew") == nil {
             var like: Int = UserDefaults.standard.integer(forKey: "likes")
@@ -250,14 +256,11 @@ class GenerateVideoViewController: UIViewController {
             if like == 1 {
                 self.openCustomLike()
             }
-                
             UserDefaults.standard.setValue(like, forKey: "likes")
             print(like, "like")
         }
     }
-    
-    
-    
+
     private func openCustomLike() {
         let customViewController = CustomLikeViewController()
         customViewController.modalPresentationStyle = .fullScreen
@@ -268,26 +271,19 @@ class GenerateVideoViewController: UIViewController {
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
             self.present(customViewController, animated: true, completion: nil)
         }
-        
     }
 
-    
     deinit {
-        self.index = 00
-        self.image = Data()
+        self.index = 0
+//        self.images = nil
         timer?.invalidate()
         timer = nil
     }
-    
+
     @objc private func closeVC() {
         self.dismiss(animated: true)
         publisher.send(false)
         timer?.invalidate()
         timer = nil
     }
-    
 }
-
-
-
-

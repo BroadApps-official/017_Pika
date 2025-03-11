@@ -9,19 +9,19 @@ import UIKit
 import SnapKit
 
 class TabBarViewController: UITabBarController {
-    
+
     private var manager: PurchaseManager
     private var model = MainModel()
-    
+
     init(manager: PurchaseManager) {
         self.manager = manager
         super.init(nibName: nil, bundle: nil)
     }
-    
+
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
+
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         let backItem = UIBarButtonItem()
@@ -29,19 +29,19 @@ class TabBarViewController: UITabBarController {
         navigationItem.backBarButtonItem = backItem
         self.navigationItem.setHidesBackButton(true, animated: true)
     }
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
     }
-    
+
     private func setupUI() {
         tabBar.unselectedItemTintColor = .white.withAlphaComponent(0.4)
         tabBar.tintColor = .primary
         tabBar.backgroundColor = .bgChromeMaterialbar
         tabBar.isTranslucent = false
         tabBar.barTintColor = UIColor.bgChromeMaterialbar
-        
+
         let separatorView = UIView()
         separatorView.backgroundColor = .white.withAlphaComponent(0.24)
         tabBar.addSubview(separatorView)
@@ -50,19 +50,20 @@ class TabBarViewController: UITabBarController {
             make.left.right.equalToSuperview()
             make.top.equalToSuperview()
         }
-        
+
         let createVCNo = CreateViewController(purchaseManager: manager, model: model)
+        let promtVCNo = PromptViewController(purchaseManager: manager, model: model)
         let settingsVCNo = SettingsViewController(purchaseManager: manager, model: model)
         let myVideosVCNo = MyVideosViewController(purchaseManager: manager, model: model)
-        
+
         let createVc = createVC(VC: createVCNo, image: .create.resize(targetSize: CGSize(width: 32, height: 32)), title: "Create")
+        let promtVc = createVC(VC: promtVCNo, image: .prompt.resize(targetSize: CGSize(width: 32, height: 32)), title: "Prompt")
         let videosVc = createVC(VC: myVideosVCNo, image: .myVideos.resize(targetSize: CGSize(width: 32, height: 32)), title: "My Videos")
         let settingsVc = createVC(VC: settingsVCNo, image: .settings.resize(targetSize: CGSize(width: 20, height: 20)), title: "Settings")
 
-        
-        viewControllers = [createVc, videosVc, settingsVc]
+        viewControllers = [createVc, promtVc, videosVc, settingsVc]
     }
-   
+
     private func createVC(VC: UIViewController, image: UIImage, title: String) -> UIViewController {
         let tapItem = UITabBarItem(title: title, image: image, tag: 0)
         VC.tabBarItem = tapItem
