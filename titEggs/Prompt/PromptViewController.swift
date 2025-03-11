@@ -1,12 +1,20 @@
 import UIKit
+import Combine
 import SnapKit
 
-class PromptViewController: UIViewController, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
+class PromptViewController: UIViewController, UIImagePickerControllerDelegate, UINavigationControllerDelegate, UITextViewDelegate {
 
-  var purchaseManager: PurchaseManager
-  var model: MainModel
-  
+    var purchaseManager: PurchaseManager
+    var model: MainModel
+
     private let rightButton = PaywallButton()
+    private var selectedImage: UIImage? {
+        didSet { updateUIState() }
+    }
+
+    private var promptText: String? {
+        didSet { updateUIState() }
+    }
 
     private let uploadView: UIView = {
         let view = UIView()
@@ -22,20 +30,20 @@ class PromptViewController: UIViewController, UIImagePickerControllerDelegate, U
         return imageView
     }()
 
-  private let uploadLabel: UILabel = {
-      let label = UILabel()
-      let attributedText = NSAttributedString(
-          string: "Upload or take a photo",
-          attributes: [
-              .foregroundColor: UIColor.white.withAlphaComponent(0.8),
-              .font: UIFont.appFont(.BodyRegular),
-              .underlineStyle: NSUnderlineStyle.single.rawValue
-          ]
-      )
-      label.attributedText = attributedText
-      label.textAlignment = .center
-      return label
-  }()
+    private let uploadLabel: UILabel = {
+        let label = UILabel()
+        let attributedText = NSAttributedString(
+            string: "Upload or take a photo",
+            attributes: [
+                .foregroundColor: UIColor.white.withAlphaComponent(0.8),
+                .font: UIFont.appFont(.BodyRegular),
+                .underlineStyle: NSUnderlineStyle.single.rawValue
+            ]
+        )
+        label.attributedText = attributedText
+        label.textAlignment = .center
+        return label
+    }()
 
     private lazy var uploadButton: UIButton = {
         let button = UIButton(type: .system)
@@ -47,7 +55,7 @@ class PromptViewController: UIViewController, UIImagePickerControllerDelegate, U
         let textView = UITextView()
         textView.backgroundColor = .white.withAlphaComponent(0.08)
         textView.layer.cornerRadius = 16
-        textView.text = "Enter your request"
+        textView.text = "Use English for best results"
         textView.textColor = .white.withAlphaComponent(0.4)
         textView.font = .appFont(.BodyRegular)
         textView.isScrollEnabled = false
@@ -58,133 +66,201 @@ class PromptViewController: UIViewController, UIImagePickerControllerDelegate, U
     private let createButton: UIButton = {
         let button = UIButton(type: .system)
         button.setTitle("Create", for: .normal)
-        button.setTitleColor(.white.withAlphaComponent(0.8), for: .normal)
+        button.setTitleColor(UIColor(hex: "#FFEBCDB2").withAlphaComponent(0.7), for: .normal)
         button.backgroundColor = .white.withAlphaComponent(0.08)
-        button.layer.cornerRadius = 16
-        button.titleLabel?.font = .appFont(.HeadlineRegular)
+        button.layer.cornerRadius = 10
+        button.isEnabled = false
+        button.addTarget(self, action: #selector(createTapped), for: .touchUpInside)
         return button
     }()
+
+    // MARK: - Init
+    init(purchaseManager: PurchaseManager, model: MainModel) {
+        self.purchaseManager = purchaseManager
+        self.model = model
+        super.init(nibName: nil, bundle: nil)
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
 
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .bgPrimary
         setupUI()
         setupNavController()
-        self.title = "Promt"
+        requestTextView.delegate = self
     }
 
-  override func viewWillAppear(_ animated: Bool) {
-      super.viewWillAppear(animated)
+    // MARK: - UI Setup
+  private let uploadImageView: UIImageView = {
+      let imageView = UIImageView()
+      imageView.contentMode = .scaleAspectFill
+      imageView.layer.cornerRadius = 12
+      imageView.clipsToBounds = true
+      imageView.isHidden = true
+      return imageView
+  }()
 
-      self.title = "Prompt"
+  private func setupUI() {
+      view.addSubview(uploadView)
 
-      setupNavController()
-  }
+      let uploadStackView = UIStackView(arrangedSubviews: [uploadIcon, uploadLabel])
+      uploadStackView.axis = .vertical
+      uploadStackView.alignment = .center
+      uploadStackView.spacing = 8
 
-  private func setupNavController() {
-      tabBarController?.title = "Prompt"
-      tabBarController?.navigationController?.navigationBar.prefersLargeTitles = true
-      let appearance = UINavigationBarAppearance()
-      appearance.configureWithOpaqueBackground()
-      appearance.backgroundColor = .clear
-      appearance.titleTextAttributes = [
-          .foregroundColor: UIColor.white,
-          .font: UIFont.appFont(.HeadlineRegular)
-      ]
-      appearance.largeTitleTextAttributes = [
-          .foregroundColor: UIColor.white,
-          .font: UIFont.appFont(.LargeTitleEmphasized)
-      ]
-      tabBarController?.navigationController?.navigationBar.standardAppearance = appearance
-      tabBarController?.navigationController?.navigationBar.scrollEdgeAppearance = appearance
+      let uploadContentStackView = UIStackView(arrangedSubviews: [uploadImageView, uploadStackView])
+      uploadContentStackView.axis = .horizontal
+      uploadContentStackView.alignment = .center
+      uploadContentStackView.spacing = 12
 
-      if purchaseManager.hasUnlockedPro == false {
-          rightButton.addTarget(self, action: #selector(paywallButtonTapped), for: .touchUpInside)
+      uploadView.addSubview(uploadContentStackView)
+      uploadView.addSubview(uploadButton)
 
-          let barButtonItem = UIBarButtonItem(customView: rightButton)
+      view.addSubview(requestTextView)
+      view.addSubview(createButton)
 
-          tabBarController?.navigationItem.rightBarButtonItem = barButtonItem
-          rightButton.snp.makeConstraints { make in
-              make.width.equalTo(80)
-              make.height.equalTo(32)
-          }
-          rightButton.addTouchFeedback()
+      uploadView.snp.makeConstraints { make in
+          make.top.equalTo(view.safeAreaLayoutGuide).offset(20)
+          make.left.right.equalToSuperview().inset(20)
+          make.height.equalTo(140)
+      }
+
+      uploadContentStackView.snp.makeConstraints { make in
+          make.center.equalToSuperview()
+          make.left.right.equalToSuperview().inset(10)
+      }
+
+      uploadImageView.snp.makeConstraints { make in
+          make.width.height.equalTo(120)
+      }
+
+      uploadIcon.snp.makeConstraints { make in
+          make.width.height.equalTo(24)
+      }
+
+      uploadLabel.snp.makeConstraints { make in
+          make.width.lessThanOrEqualTo(200)
+      }
+
+      uploadButton.snp.makeConstraints { make in
+          make.edges.equalToSuperview()
+      }
+
+      requestTextView.snp.makeConstraints { make in
+          make.top.equalTo(uploadView.snp.bottom).offset(20)
+          make.left.right.equalToSuperview().inset(20)
+          make.height.equalTo(163)
+      }
+
+      createButton.snp.makeConstraints { make in
+          make.bottom.equalTo(view.safeAreaLayoutGuide).inset(20)
+          make.left.right.equalToSuperview().inset(20)
+          make.height.equalTo(50)
       }
   }
 
-  init(purchaseManager: PurchaseManager, model: MainModel) {
-      self.purchaseManager = purchaseManager
-      self.model = model
-      super.init(nibName: nil, bundle: nil)
+
+    private func setupNavController() {
+        self.title = "Prompt"
+    }
+
+    // MARK: - Actions
+  @objc private func uploadTapped() {
+      let picker = UIImagePickerController()
+      picker.delegate = self
+
+      let alert = UIAlertController(
+          title: "Select action",
+          message: "Add a photo so we can do a cool effect with it",
+          preferredStyle: .actionSheet
+      )
+
+      let dynamicTextColor = UIColor { traitCollection in
+          return traitCollection.userInterfaceStyle == .dark ? .white : .black
+      }
+
+      let photoAction = UIAlertAction(title: "Take a photo", style: .default) { _ in
+          picker.sourceType = .camera
+          self.present(picker, animated: true)
+      }
+      photoAction.setValue(dynamicTextColor, forKey: "titleTextColor")
+      alert.addAction(photoAction)
+
+      let galleryAction = UIAlertAction(title: "Select from gallery", style: .default) { _ in
+          picker.sourceType = .photoLibrary
+          self.present(picker, animated: true)
+      }
+      galleryAction.setValue(dynamicTextColor, forKey: "titleTextColor")
+      alert.addAction(galleryAction)
+
+      let cancelAction = UIAlertAction(title: "Cancel", style: .cancel)
+      cancelAction.setValue(dynamicTextColor, forKey: "titleTextColor")
+      alert.addAction(cancelAction)
+
+      if let popoverController = alert.popoverPresentationController {
+          popoverController.sourceView = self.view
+          popoverController.sourceRect = CGRect(
+              x: self.view.bounds.midX,
+              y: self.view.bounds.midY,
+              width: 0,
+              height: 0
+          )
+          popoverController.permittedArrowDirections = []
+      }
+
+      present(alert, animated: true)
   }
 
-  required init?(coder: NSCoder) {
-    fatalError("init(coder:) has not been implemented")
+
+    @objc private func createTapped() {
+        guard let imageData = selectedImage?.pngData() else { return }
+        openGenerateVC(images: [imageData])
+    }
+
+    // MARK: - Image Picker Delegate
+  func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey: Any]) {
+      picker.dismiss(animated: true)
+      if let image = info[.editedImage] as? UIImage ?? info[.originalImage] as? UIImage {
+          selectedImage = image
+          uploadImageView.image = image
+          uploadImageView.isHidden = false
+          uploadIcon.isHidden = false
+          uploadLabel.isHidden = false
+      }
   }
-  
-    private func setupUI() {
-        view.addSubview(uploadView)
-        uploadView.addSubview(uploadIcon)
-        uploadView.addSubview(uploadLabel)
-        uploadView.addSubview(uploadButton)
 
-        view.addSubview(requestTextView)
-        view.addSubview(createButton)
-
-        uploadView.snp.makeConstraints { make in
-            make.top.equalTo(view.safeAreaLayoutGuide).offset(20)
-            make.left.right.equalToSuperview().inset(20)
-            make.height.equalTo(140)
-        }
-
-        uploadIcon.snp.makeConstraints { make in
-            make.centerX.equalToSuperview()
-            make.centerY.equalToSuperview()
-            make.width.height.equalTo(24)
-        }
-
-        uploadLabel.snp.makeConstraints { make in
-            make.top.equalTo(uploadIcon.snp.bottom).offset(8)
-            make.centerX.equalToSuperview()
-        }
-
-        uploadButton.snp.makeConstraints { make in
-            make.edges.equalToSuperview()
-        }
-
-        requestTextView.snp.makeConstraints { make in
-            make.top.equalTo(uploadView.snp.bottom).offset(20)
-            make.left.right.equalToSuperview().inset(20)
-            make.height.equalTo(163)
-        }
-
-        createButton.snp.makeConstraints { make in
-            make.bottom.equalTo(view.safeAreaLayoutGuide).inset(20)
-            make.left.right.equalToSuperview().inset(20)
-            make.height.equalTo(50)
-        }
-    }
-
-    @objc private func uploadTapped() {
-        let picker = UIImagePickerController()
-        picker.delegate = self
-        picker.sourceType = .photoLibrary
-        picker.allowsEditing = true
-        present(picker, animated: true)
-    }
-
-    @objc private func paywallButtonTapped() {
-      let paywallVC = NewPaywallViewController(manager: purchaseManager)
-        paywallVC.modalPresentationStyle = .fullScreen
-        present(paywallVC, animated: true)
-    }
-
-    // MARK: - UIImagePickerControllerDelegate
-    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey: Any]) {
-        picker.dismiss(animated: true, completion: nil)
-    }
 
     func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
-        picker.dismiss(animated: true, completion: nil)
+        picker.dismiss(animated: true)
+    }
+
+    // MARK: - TextView Delegate
+    func textViewDidBeginEditing(_ textView: UITextView) {
+        if textView.text == "Use English for best results" {
+            textView.text = ""
+            textView.textColor = .white
+        }
+    }
+
+    func textViewDidChange(_ textView: UITextView) {
+        promptText = textView.text.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
+    // MARK: - UI Updates
+    private func updateUIState() {
+        let isReady = selectedImage != nil && !(promptText?.isEmpty ?? true)
+        createButton.isEnabled = isReady
+        createButton.titleLabel?.textColor = isReady ? .black : UIColor(hex: "#FFEBCDB2").withAlphaComponent(0.7)
+        createButton.backgroundColor = isReady ? UIColor(hex: "#FFEBCD") : .white.withAlphaComponent(0.08)
+    }
+
+    // MARK: - Open Generate VC
+    private func openGenerateVC(images: [Data]) {
+      let generateVC = GenerateVideoViewController(model: model, image: images, index: 0, publisher: PassthroughSubject(), video: nil, promptText: promptText)
+        generateVC.modalPresentationStyle = .fullScreen
+        present(generateVC, animated: true)
     }
 }

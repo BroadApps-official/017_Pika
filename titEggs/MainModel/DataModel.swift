@@ -46,9 +46,18 @@ struct Video: Codable, Identifiable {
     var resultURL: String?
     var dataGenerate: String
     var status: String?
-    
-    init(image: Data, effectID: Int, video: Data?, generationID: String?, resultURL: String?, dataGenerate: String, effectName: String, status: String?) {
-        self.status = status
+    var secondImage: Data? // Делаем опциональным
+
+    init(image: Data,
+         effectID: Int,
+         video: Data? = nil,
+         generationID: String? = nil,
+         resultURL: String? = nil,
+         dataGenerate: String,
+         effectName: String,
+         status: String? = nil,
+         secondImage: Data? = nil) { // Теперь опционально
+
         self.id = UUID()
         self.image = image
         self.effectID = effectID
@@ -57,8 +66,11 @@ struct Video: Codable, Identifiable {
         self.resultURL = resultURL
         self.dataGenerate = dataGenerate
         self.effectName = effectName
+        self.status = status
+        self.secondImage = secondImage // Теперь можно не передавать
     }
 }
+
 
 //work
 
@@ -100,4 +112,10 @@ struct UserInfoResponse: Decodable {
 
 struct UserData: Decodable {
     let availableGenerations: Int
+}
+
+struct ImgToVideoResponse: Codable {
+    let error: Bool
+    let messages: [String]
+    let data: DataGenerate
 }

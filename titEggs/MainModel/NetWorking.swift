@@ -83,12 +83,70 @@ class NetWorking {
 //        }
 //    }
     
-    
+
+  func uploadImageToVideo(imagePath: String, promptText: String, completion: @escaping (Result<String, Error>) -> Void) {
+      let url = URL(string: "https://vewapnew.online/api/generate/img2video")!
+      let token = "rE176kzVVqjtWeGToppo4lRcbz3HRLoBrZREEvgQ8fKdWuxySCw6tv52BdLKBkZTOHWda5ISwLUVTyRoZEF0A33Xpk63lF9wTCtDxOs8XK3YArAiqIXVb7ZS4IK61TYPQMu5WqzFWwXtZc1jo8w"
+      var request = URLRequest(url: url)
+      request.httpMethod = "POST"
+      request.addValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+
+      let boundary = "Boundary-\(UUID().uuidString)"
+      request.addValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
+
+      var body = Data()
+
+      // Image file
+      if let imageData = try? Data(contentsOf: URL(fileURLWithPath: imagePath)) {
+          body.append("--\(boundary)\r\n".data(using: .utf8)!)
+          body.append("Content-Disposition: form-data; name=\"image\"; filename=\"\(imagePath.split(separator: "/").last!)\"\r\n".data(using: .utf8)!)
+          body.append("Content-Type: image/png\r\n\r\n".data(using: .utf8)!)
+          body.append(imageData)
+          body.append("\r\n".data(using: .utf8)!)
+      }
+
+      // Text parameters
+      let params = ["promptText": promptText, "userId": userID, "appId": Bundle.main.bundleIdentifier ?? "pika"]
+      for (key, value) in params {
+          body.append("--\(boundary)\r\n".data(using: .utf8)!)
+          body.append("Content-Disposition: form-data; name=\"\(key)\"\r\n\r\n".data(using: .utf8)!)
+          body.append("\(value)\r\n".data(using: .utf8)!)
+      }
+
+      body.append("--\(boundary)--\r\n".data(using: .utf8)!)
+      request.httpBody = body
+
+      let task = URLSession.shared.dataTask(with: request) { data, response, error in
+          if let error = error {
+              completion(.failure(error))
+              return
+          }
+
+          if let data = data {
+              do {
+                  let decodedResponse = try JSONDecoder().decode(ImgToVideoResponse.self, from: data)
+                  if !decodedResponse.error {
+                      completion(.success(decodedResponse.data.generationId))
+                  } else {
+                      completion(.failure(NSError(domain: "API Error", code: 1, userInfo: [NSLocalizedDescriptionKey: "API returned an error"])))
+                  }
+              } catch {
+                  completion(.failure(error))
+              }
+          }
+      }
+
+      task.resume()
+  }
+
     
   func createVideo(data: [Data], idEffect: String, isHugAndKiss: Bool, escaping: @escaping (String) -> Void) {
       let token = "rE176kzVVqjtWeGToppo4lRcbz3HRLoBrZREEvgQ8fKdWuxySCw6tv52BdLKBkZTOHWda5ISwLUVTyRoZEF0A33Xpk63lF9wTCtDxOs8XK3YArAiqIXVb7ZS4IK61TYPQMu5WqzFWwXtZc1jo8w"
 
-      let headers: HTTPHeaders = [(.authorization(bearerToken: token))]
+      let headers: HTTPHeaders = [
+          "Authorization": "Bearer \(token)",
+          "Content-Type": "multipart/form-data"
+      ]
 
       AF.upload(multipartFormData: { multipartFormData in
           print("➡️ Отправка запроса на генерацию видео")
@@ -101,21 +159,32 @@ class NetWorking {
           multipartFormData.append(Data(userID.utf8), withName: "userId")
           multipartFormData.append(Data((Bundle.main.bundleIdentifier ?? "pika").utf8), withName: "appId")
 
-          if isHugAndKiss, data.count == 2 {
-              // Для Hug and Kiss передаем два изображения
-              multipartFormData.append(data[0], withName: "image[0]", fileName: "image1.jpg", mimeType: "image/jpeg")
-              multipartFormData.append(data[1], withName: "image[1]", fileName: "image2.jpg", mimeType: "image/jpeg")
-          } else {
-              // Для всех остальных передаем одно изображение
-              multipartFormData.append(data.first!, withName: "image", fileName: "image.jpg", mimeType: "image/jpeg")
-          }
+        for (index, imageData) in data.enumerated() {
+            print("🖼 Отправляется изображение \(index + 1)")
+            print("📏 Размер: \(imageData.count) байт")
+
+            if isHugAndKiss {
+                multipartFormData.append(data[0], withName: "image", fileName: "image1.jpg", mimeType: "image/jpeg")
+
+                if data.count > 1 { // Проверяем, есть ли второе изображение
+                    multipartFormData.append(data[1], withName: "image", fileName: "image2.jpg", mimeType: "image/jpeg")
+                } else {
+                    print("⚠️ Внимание! Hug/Kiss режим, но второе изображение отсутствует.")
+                }
+            } else {
+                multipartFormData.append(imageData, withName: "image", fileName: "image.jpg", mimeType: "image/jpeg")
+            }
+        }
+
 
       }, to: "https://vewapnew.online/api/generate", headers: headers)
+      .validate(statusCode: 200..<300)
       .responseData { response in
+          print("📡 HTTP Код ответа:", response.response?.statusCode ?? "нет данных")
+
           if let jsonString = String(data: response.data ?? Data(), encoding: .utf8) {
               print("📝 Ответ сервера: \(jsonString)")
           }
-          print("📡 Статус код:", response.response?.statusCode ?? "нет данных")
 
           switch response.result {
           case .success(let data):
@@ -123,15 +192,16 @@ class NetWorking {
                   let effects = try JSONDecoder().decode(Generate.self, from: data)
                   escaping(effects.data.generationId)
               } catch {
-                  print("Ошибка декодирования JSON:", error.localizedDescription)
+                  print("❌ Ошибка декодирования JSON:", error.localizedDescription)
                   escaping("error")
               }
           case .failure(let error):
-              print("Ошибка запроса:", error.localizedDescription)
+              print("❌ Ошибка запроса:", error.localizedDescription)
               escaping("error")
           }
       }
   }
+
 
     
     //status & url
@@ -150,12 +220,6 @@ class NetWorking {
             case .success(let data):
                 do {
                     let item = try JSONDecoder().decode(Status.self, from: data)
-//                    let amount = 100 - item.data.totalWeekGenerations * 10
-//                    if dynamicAppHud?.segment == "v2" {
-//                        UserDefaults.standard.setValue("\(item.data.maxGenerations)", forKey: "maxGenWeek")
-//                        UserDefaults.standard.setValue("\(amount)", forKey: "amountTokens")
-//                        UserDefaults.standard.synchronize()
-//                    }
                     escaping(item.data.status ?? "", item.data.resultUrl ?? "")
                 } catch {
                     print("Ошибка декодирования JSON:", error.localizedDescription)
@@ -166,7 +230,6 @@ class NetWorking {
                 escaping("fail", "fail")
             }
         }
-        
     }
     
 

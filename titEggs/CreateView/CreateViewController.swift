@@ -90,7 +90,6 @@ class CreateViewController: UIViewController, UIImagePickerControllerDelegate, U
              if self.model.effectsArr.count > 0 {
                  var groupedEffects = Dictionary(grouping: self.model.effectsArr) { $0.categoryTitleEn }
 
-                 // Преобразуем в массив кортежей и сортируем Hug and Kiss наверх
                  self.categories = groupedEffects.map { (key, value) in
                      return (title: key, effects: value)
                  }.sorted { category1, category2 in
@@ -129,7 +128,7 @@ class CreateViewController: UIViewController, UIImagePickerControllerDelegate, U
             print("ПАБЛИШЕР У КРЕЙТ ВС СДЕЛАН")
             if result == true {
                 if let tabBarController = self.tabBarController {
-                    tabBarController.selectedIndex = 1
+                    tabBarController.selectedIndex = 2
                 }
             }
         }
@@ -249,17 +248,17 @@ class CreateViewController: UIViewController, UIImagePickerControllerDelegate, U
         self.present(alert, animated: true)
     }
 
-    private func selectedPhoto(image: Data) {
+    private func selectedPhoto(image: [Data]) {
         openGenerateVC(image: image)
     }
 
-    private func openGenerateVC(image: Data) {
+    private func openGenerateVC(image: [Data]) {
         let generateVC = GenerateVideoViewController(
             model: model,
             image: image,
             index: selectedIndex,
             publisher: publisher,
-            video: nil
+            video: nil, promptText: nil
         )
         generateVC.modalPresentationStyle = .fullScreen
         generateVC.modalTransitionStyle = .coverVertical
@@ -343,7 +342,7 @@ class CreateViewController: UIViewController, UIImagePickerControllerDelegate, U
         if let image = info[.originalImage] as? UIImage {
             if let imageData = image.jpegData(compressionQuality: 1.0) {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                    self.selectedPhoto(image: imageData)
+                    self.selectedPhoto(image: [imageData])
                 }
             }
         }

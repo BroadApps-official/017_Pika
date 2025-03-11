@@ -12,14 +12,14 @@ import Combine
 class GenerateVideoViewController: UIViewController {
 
     var model: MainModel
-    var image: Data
+    var image: [Data]
     var index: Int
     var publisher: PassthroughSubject<Bool, Never>
     var video: Video?
-
+    var promptText: String?
     var uuidVideo = ""
 
-    //other
+    // Другие свойства (таймер, прогресс, подписки и т.д.)
     private var timer: Timer?
     private var count = 0.0
     private lazy var cancellabel = [AnyCancellable]()
@@ -33,13 +33,14 @@ class GenerateVideoViewController: UIViewController {
         return prog
     }()
 
-    // Основной инициализатор, принимающий массив изображений.
-    init(model: MainModel, image: Data, index:  Int, publisher: PassthroughSubject<Bool, Never>, video: Video?) {
+    // Основной инициализатор
+    init(model: MainModel, image: [Data], index: Int, publisher: PassthroughSubject<Bool, Never>, video: Video?, promptText: String?) {
         self.model = model
         self.image = image
         self.index = index
         self.publisher = publisher
         self.video = video
+        self.promptText = promptText
         super.init(nibName: nil, bundle: nil)
     }
 
@@ -47,15 +48,36 @@ class GenerateVideoViewController: UIViewController {
         fatalError("init(coder:) has not been implemented")
     }
 
-
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .bgPrimary
         setupUI()
         setupTimer()
         openLike()
-        addImageInarr()
+        processGeneration()
         supscribe()
+    }
+
+    private func processGeneration() {
+        if let prompt = promptText, !prompt.isEmpty {
+            uploadImageToVideo()
+        } else {
+            addImageInarr()
+        }
+    }
+
+    private func uploadImageToVideo() {
+        guard let imageData = image.first, let prompt = promptText else { return }
+
+        model.imageToVideo(imageData: imageData, promptText: prompt) { [weak self] success, newId in
+            guard let self = self else { return }
+            if success, let videoId = newId {
+                self.uuidVideo = videoId
+                print("Установлен uuidVideo: \(videoId)")
+            } else {
+                DispatchQueue.main.async { self.openAlert() }
+            }
+        }
     }
 
     private func supscribe() {
@@ -73,7 +95,7 @@ class GenerateVideoViewController: UIViewController {
     }
 
     private func alertError(id: String) {
-        print("error load generate page - ", "\(uuidVideo)")
+        print("error load generate page -", "\(uuidVideo)")
         if id == uuidVideo {
             DispatchQueue.main.async {
                 self.openAlert()
@@ -82,17 +104,40 @@ class GenerateVideoViewController: UIViewController {
         }
     }
 
-    private func videoIsDownload(id: String) {
-        print(id, uuidVideo, "ID VIDEO AND UUID")
-        if id == uuidVideo {
-            DispatchQueue.main.async { [self] in
-                publisher.send(true)
-                self.dismiss(animated: true)
-                timer?.invalidate()
-                print("ВИДЕО ФУЛЛ ЗАГРУЖЕНО")
-            }
-        }
-    }
+  private func videoIsDownload(id: String) {
+      print(id, uuidVideo, "ID VIDEO AND UUID")
+      if id == uuidVideo {
+          DispatchQueue.main.async { [weak self] in
+              guard let self = self else { return }
+              self.timer?.invalidate()
+              print("ВИДЕО ФУЛЛ ЗАГРУЖЕНО")
+              self.dismiss(animated: true) {
+                  // Через небольшую задержку вызываем метод для перехода
+                  DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                      self.openOpenedViewController()
+                  }
+              }
+          }
+      }
+  }
+
+  private func openOpenedViewController() {
+      // Пытаемся получить presentingViewController как UINavigationController
+      if let navController = self.presentingViewController as? UINavigationController {
+          let openedVC = OpenedViewController(model: self.model, index: self.index)
+          navController.pushViewController(openedVC, animated: true)
+      } else {
+
+          if let window = UIApplication.shared.connectedScenes
+              .compactMap({ $0 as? UIWindowScene })
+              .first?.windows.first(where: { $0.isKeyWindow }),
+             let navController = window.rootViewController as? UINavigationController {
+              let openedVC = OpenedViewController(model: self.model, index: self.index)
+              navController.pushViewController(openedVC, animated: true)
+          }
+      }
+  }
+
 
     private func addImageInarr() {
         if model.workItems.count >= 2 {
@@ -100,60 +145,56 @@ class GenerateVideoViewController: UIViewController {
                 self.limitAlert()
             }
             return
+        }
+        var videoLoad = video
+        if video?.id == nil {
+            let imageToUse: Data = image.first!
+            let secondImageToUse: Data? = image.count == 2 ? image[1] : nil
+            videoLoad = Video(
+                image: imageToUse,
+                effectID: model.effectsArr[index].id,
+                video: nil,
+                generationID: nil,
+                resultURL: nil,
+                dataGenerate: self.getTodayFormattedDate(),
+                effectName: model.effectsArr[index].effect,
+                status: nil,
+                secondImage: secondImageToUse
+            )
+            model.arr.append(videoLoad!)
+            model.saveArr()
+            print("📌 new video")
         } else {
-            var videoLoad = video
-
-            if video?.id == nil {
-                // Используем первое изображение из массива – в случае сплита здесь можно решить, как объединять 2 картинки
-                videoLoad = Video(
-                    image: image,
-                    effectID: model.effectsArr[index].id,
-                    video: nil,
-                    generationID: nil,
-                    resultURL: nil,
-                    dataGenerate: self.getTodayFormattedData(),
-                    effectName: model.effectsArr[index].effect,
-                    status: nil
-                )
-                model.arr.append(videoLoad!)
-                model.saveArr()
-                print("new video")
-            } else {
-                videoLoad = video
-                print("old video")
-                var index = 0
-                for _ in 0..<model.arr.count {
-                    if model.arr[index].id == videoLoad?.id {
-                        model.arr[index] = videoLoad!
-                        model.saveArr()
-                    } else {
-                        index += 1
-                    }
+            videoLoad = video
+            print("📌 old video")
+            var index = 0
+            for _ in 0..<model.arr.count {
+                if model.arr[index].id == videoLoad?.id {
+                    model.arr[index] = videoLoad!
+                    model.saveArr()
+                } else {
+                    index += 1
                 }
             }
-
-            uuidVideo = "\(videoLoad!.id)"
-
-            model.createVideo(escaping: { result in
-                if result == false {
-                    DispatchQueue.main.async {
-                        self.openAlert()
-                    }
-                }
-            })
         }
+        uuidVideo = "\(videoLoad!.id)"
+        model.createVideo(escaping: { result in
+            if result == false {
+                DispatchQueue.main.async {
+                    self.openAlert()
+                }
+            }
+        })
     }
 
-    func getTodayFormattedData() -> String {
+    func getTodayFormattedDate() -> String {
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "dd.MM.yy"
-        let today = Date()
-        return dateFormatter.string(from: today)
+        return dateFormatter.string(from: Date())
     }
 
     private func limitAlert() {
         let alert = UIAlertController(title: "You have reached the simultaneous generation limit", message: "You cannot generate more than 2 videos at the same time", preferredStyle: .alert)
-
         let cancelButton = UIAlertAction(title: "Got it", style: .cancel) { _ in
             self.closeVC()
         }
@@ -163,12 +204,10 @@ class GenerateVideoViewController: UIViewController {
 
     private func openAlert() {
         let alert = UIAlertController(title: "Video generation error", message: "Something went wrong or the server is not responding. Try again or do it later.", preferredStyle: .alert)
-
         let cancelButton = UIAlertAction(title: "Cancel", style: .cancel) { _ in
             self.closeVC()
         }
         alert.addAction(cancelButton)
-
         let repeatButton = UIAlertAction(title: "Try Again", style: .default) { _ in
             self.count = 0.0
             self.addImageInarr()
@@ -275,7 +314,7 @@ class GenerateVideoViewController: UIViewController {
 
     deinit {
         self.index = 0
-//        self.images = nil
+        self.image = [Data()]
         timer?.invalidate()
         timer = nil
     }

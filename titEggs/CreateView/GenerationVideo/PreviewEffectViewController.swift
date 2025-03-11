@@ -243,14 +243,14 @@ class PreviewEffectViewController: UIViewController, UIImagePickerControllerDele
     
     
     @objc private func nextTapped() {
-       // self.cellTapped(index: self.index)
-//        if !checkAppVersion() {
-//            openUpdateAlert()
-//            return
-//        }
+//        self.cellTapped(index: self.index)
+        if !checkAppVersion() {
+            openUpdateAlert()
+            return
+        }
 
-//        if purchaseManager.hasUnlockedPro == true {
-            //self.openAmountAlert()
+        if purchaseManager.hasUnlockedPro == true {
+//            self.openAmountAlert()
             model.fetchUserInfo { isError in
                 if isError == false {
                     self.openAmountAlert()
@@ -259,11 +259,11 @@ class PreviewEffectViewController: UIViewController, UIImagePickerControllerDele
                 }
             }
            //print("idjfoisjfosfsf, \(dynamicAppHud)")
-//        } else {
-//            paywallButtonTapped()
-//            playPauseButton.setBackgroundImage(.bigPlay, for: .normal)
-//            playerView.pause(reason: .userInteraction)
-//        }
+        } else {
+            paywallButtonTapped()
+            playPauseButton.setBackgroundImage(.bigPlay, for: .normal)
+            playerView.pause(reason: .userInteraction)
+        }
     }
     
     private func openUpdateAlert() {
@@ -391,12 +391,12 @@ class PreviewEffectViewController: UIViewController, UIImagePickerControllerDele
         self.present(alert, animated: true)
     }
     
-    private func selectedPhoto(image: Data) {
+    private func selectedPhoto(image: [Data]) {
         openGenerateVC(image: image)
     }
     
-    private func openGenerateVC(image: Data) {
-        let generateVC = GenerateVideoViewController(model: model, image: image, index: index, publisher: publisher, video: nil)
+    private func openGenerateVC(image: [Data]) {
+      let generateVC = GenerateVideoViewController(model: model, image: image, index: index, publisher: publisher, video: nil, promptText: nil)
         generateVC.modalPresentationStyle = .fullScreen
         generateVC.modalTransitionStyle = .coverVertical
         if #available(iOS 13.0, *) {
@@ -440,7 +440,7 @@ class PreviewEffectViewController: UIViewController, UIImagePickerControllerDele
             }
             if let imageData = image.jpegData(compressionQuality: 1.0) {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                    self.selectedPhoto(image: imageData)
+                    self.selectedPhoto(image: [imageData])
                 }
             }
         }

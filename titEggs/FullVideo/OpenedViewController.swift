@@ -13,19 +13,19 @@ import MobileCoreServices
 import Combine
 
 class OpenedViewController: UIViewController {
-    
+
     let model: MainModel
     let index: Int
 
-    
+
     private var player: AVPlayer?
     private var playerLayer: AVPlayerLayer?
-    private let videoContainerView = UIView() // Контейнер для видео
+    private let videoContainerView = UIView() 
     private var playPauseButton: UIButton!
     private var hideButtonTimer: DispatchWorkItem?
-    
+
     private var tempURL: URL?
-    
+
     private lazy var shareButton: UIButton = {
         let button = UIButton(type: .system)
         button.addTouchFeedback()
@@ -39,31 +39,31 @@ class OpenedViewController: UIViewController {
         button.tintColor = .black
         return button
     }()
-    
+
     private lazy var taps = 0
-    
+
     init(model: MainModel, index: Int) {
         self.model = model
         self.index = index
         super.init(nibName: nil, bundle: nil)
     }
-    
+
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
+
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         setupNavController()
     }
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .bgPrimary
         hidesBottomBarWhenPushed = true
         setupUI()
     }
-    
+
     private func setupNavController() {
         self.title = "Result"
         self.navigationItem.setHidesBackButton(false, animated: true)
@@ -81,11 +81,11 @@ class OpenedViewController: UIViewController {
         ]
         navigationController?.navigationBar.standardAppearance = appearance
         navigationController?.navigationBar.scrollEdgeAppearance = appearance
-        
+
         let backBarButtonItem = UIBarButtonItem(title: "Back", style: .plain, target: nil, action: nil)
         navigationItem.backBarButtonItem = backBarButtonItem
         navigationController?.navigationBar.tintColor = .primary
-        
+
         let detailButton = UIButton(type: .system)
         detailButton.setBackgroundImage(.detailVideo, for: .normal)
         let barButtonItem = UIBarButtonItem(customView: detailButton)
@@ -95,11 +95,11 @@ class OpenedViewController: UIViewController {
             make.height.equalTo(22)
         }
         detailButton.addTarget(self, action: #selector(buttonTapped), for: .touchUpInside)
-        
+
     }
-    
+
     private func setupUI() {
-        
+
         view.addSubview(shareButton)
         shareButton.snp.makeConstraints { make in
             make.height.equalTo(48)
@@ -107,7 +107,7 @@ class OpenedViewController: UIViewController {
             make.bottom.equalTo(view.safeAreaLayoutGuide.snp.bottom).inset(10)
         }
         shareButton.addTarget(self, action: #selector(shareVideo), for: .touchUpInside)
-        
+
         // Добавляем контейнер для видео
         view.addSubview(videoContainerView)
         videoContainerView.layer.cornerRadius = 20
@@ -119,15 +119,15 @@ class OpenedViewController: UIViewController {
             make.centerY.equalToSuperview()
         }
         videoContainerView.backgroundColor = .clear
-        
+
         // Настраиваем кнопку play/pause
         playPauseButton = UIButton(type: .custom)
         playPauseButton.setBackgroundImage(.bigPlay, for: .normal)
         playPauseButton.addTarget(self, action: #selector(playPauseTapped), for: .touchUpInside)
         playPauseButton.backgroundColor = .clear
-        
+
         playPauseButton.alpha = 0   //self.setupPlayer(with: videoData)
-        
+
         // Добавляем тап жест для видео
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(videoTapped))
         videoContainerView.addGestureRecognizer(tapGesture)
@@ -140,40 +140,40 @@ class OpenedViewController: UIViewController {
         self.setupPlayer(with: videoData)
         self.view.layoutIfNeeded()
     }
-    
+
     private func setupPlayer(with videoData: Data) {
-        
+
         let tempDirectory = FileManager.default.temporaryDirectory
         tempURL = tempDirectory.appendingPathComponent("tempVideo.mp4")
-        
+
         // Пытаемся сохранить data как временный файл
         guard let tempFileURL = tempURL else { return }
-        
+
         do {
             try videoData.write(to: tempFileURL)
         } catch {
             return
         }
-        
+
         // Инициализируем AVPlayer с URL видеофайла
         player = AVPlayer(url: tempFileURL)
-        
+
         // Настраиваем слой для отображения видео
         playerLayer = AVPlayerLayer(player: player)
         playerLayer?.videoGravity = .resizeAspectFill
         playerLayer?.cornerRadius = 20
         player?.actionAtItemEnd = .none
-        
+
         videoContainerView.layoutIfNeeded()
         playerLayer?.frame = videoContainerView.bounds
-        
+
         if let playerLayer = playerLayer {
             videoContainerView.layer.addSublayer(playerLayer)
         }
-        
+
         // Следим за окончанием видео
         NotificationCenter.default.addObserver(self, selector: #selector(videoDidFinish), name: .AVPlayerItemDidPlayToEndTime, object: player?.currentItem)
-        
+
         videoContainerView.addSubview(playPauseButton)
         playPauseButton.snp.makeConstraints { make in
             make.height.width.equalTo(76)
@@ -182,29 +182,29 @@ class OpenedViewController: UIViewController {
         playPauseButton.alpha = 0
         playPauseTapped()
 
-        
+
     }
-    
-    
+
+
     @objc private func shareVideo() {
         guard let tempURL = tempURL else {
             print("Нет временного файла для видео.")
             return
         }
-        
+
         let activityViewController = UIActivityViewController(activityItems: [tempURL], applicationActivities: nil)
-        
+
         activityViewController.excludedActivityTypes = [
             .addToReadingList,
         ]
-        
+
         // Настройка для iPad
         if let popoverController = activityViewController.popoverPresentationController {
             popoverController.sourceView = self.view
             popoverController.sourceRect = CGRect(x: self.view.bounds.midX, y: self.view.bounds.midY, width: 0, height: 0) // Центр экрана
             popoverController.permittedArrowDirections = [] // Убираем стрелку поповера
         }
-        
+
         self.present(activityViewController, animated: true, completion: {
             if UserDefaults.standard.object(forKey: "rewiew") == nil {
                 var share: Int = UserDefaults.standard.integer(forKey: "share")
@@ -217,7 +217,7 @@ class OpenedViewController: UIViewController {
         })
     }
 
-    
+
     private func rateApp() {
         if #available(iOS 14, *) {
             if let scene = UIApplication.shared.connectedScenes.first(where: { $0.activationState == .foregroundActive }) as? UIWindowScene {
@@ -232,26 +232,26 @@ class OpenedViewController: UIViewController {
             }
         }
     }
-    
-    
+
+
     private func presentShareSheet(with videoURL: URL) {
-        
+
         let activityViewController = UIActivityViewController(activityItems: [videoURL], applicationActivities: nil)
         DispatchQueue.main.async {
             self.present(activityViewController, animated: true, completion: nil)
         }
     }
-    
-    
+
+
     @objc private func videoTapped() {
-        
+
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
             self.playPauseButton.alpha = 1
         }
         playPauseButton.isSelected = player?.rate != 0
-        
+
         hideButtonTimer?.cancel()
-        
+
         hideButtonTimer = DispatchWorkItem { [weak self] in
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
                 self?.playPauseButton.alpha = 0
@@ -259,8 +259,8 @@ class OpenedViewController: UIViewController {
         }
         DispatchQueue.main.asyncAfter(deadline: .now() + 3, execute: hideButtonTimer!)
     }
-    
-    
+
+
     @objc private func playPauseTapped() {
         taps += 1
         if player?.rate == 0 {
@@ -270,32 +270,32 @@ class OpenedViewController: UIViewController {
             player?.pause()
             playPauseButton.setBackgroundImage(.bigPlay, for: .normal)
         }
-        
+
         hideButtonTimer?.cancel()
-        
+
         // Запускаем новый таймер для скрытия кнопки через 2 секунды
         hideButtonTimer = DispatchWorkItem { [weak self] in
             self?.playPauseButton.alpha = 0
         }
         DispatchQueue.main.asyncAfter(deadline: .now() + 2, execute: hideButtonTimer!)
-        
+
     }
-    
+
     @objc private func videoDidFinish() {
         player?.seek(to: .zero)
         player?.play()
     }
-    
-   
-    
+
+
+
     func removeTempFile() {
         guard let tempURL = tempURL else { return }
         try? FileManager.default.removeItem(at: tempURL)
         self.tempURL = nil
     }
-    
+
     @objc private func buttonTapped(_ sender: UIButton) {
-        
+
         let imageSave = getImageForCurrentTheme(image: UIImage.saveGallery)
         let firstAction = UIAction(title: "Save to gallery", image: imageSave.resize(targetSize: CGSize(width: 20, height: 20))) { _ in
             self.saveInGallery()
@@ -305,7 +305,7 @@ class OpenedViewController: UIViewController {
         let secondAction = UIAction(title: "Save to files", image: imageSaveFiled.resize(targetSize: CGSize(width: 20, height: 44))) { _ in
             self.saveToFiles()
         }
-        
+
         let redTextAttributes: [NSAttributedString.Key: Any] = [
             .foregroundColor: UIColor.red
         ]
@@ -315,32 +315,32 @@ class OpenedViewController: UIViewController {
         let threeAction = UIAction(title: deleteTitle.string, image: imageTrash.resize(targetSize: CGSize(width: 20, height: 44))) { _ in
             self.delete()
         }
-        
+
         let menu = UIMenu(title: "", children: [firstAction, secondAction, threeAction])
-        
+
 
         if #available(iOS 14.0, *) {
             sender.menu = menu
             sender.showsMenuAsPrimaryAction = true
         }
     }
-    
+
     //DataFlow
-    
+
     private func saveToFiles() {
         // Проверяем, что tempURL не равен nil
         guard let tempURL = tempURL else {
             showErrorAlertFiles()
             return
         }
-        
+
         // Проверяем, что файл существует
         if !FileManager.default.fileExists(atPath: tempURL.path) {
             print("Файл не найден по пути: \(tempURL.path)")
             showErrorAlertFiles()
             return
         }
-        
+
         // Создаем Document Picker для экспорта файла
         let documentPicker = UIDocumentPickerViewController(forExporting: [tempURL])
         documentPicker.delegate = self
@@ -349,7 +349,7 @@ class OpenedViewController: UIViewController {
     }
 
 
-    
+
     private func showErrorAlertFiles() {
         let alert = UIAlertController(title: "Error, video not saved to files", message: "Something went wrong or the server is not responding. Try again or do it later.", preferredStyle: .alert)
 
@@ -357,10 +357,10 @@ class OpenedViewController: UIViewController {
             self.saveToFiles()
         }
         alert.addAction(retryAction)
-        
+
         let cancelAction = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
         alert.addAction(cancelAction)
-        
+
         present(alert, animated: true, completion: nil)
     }
 
@@ -369,18 +369,18 @@ class OpenedViewController: UIViewController {
 
         let okAction = UIAlertAction(title: "OK", style: .default, handler: nil)
         alert.addAction(okAction)
-        
+
         present(alert, animated: true, completion: nil)
     }
 
 
-    
+
     private func saveInGallery() {
         guard let videoURL = tempURL else {
             self.showErrorAlert()
             return
         }
-        
+
         PHPhotoLibrary.requestAuthorization { status in
             switch status {
             case .authorized:
@@ -416,7 +416,7 @@ class OpenedViewController: UIViewController {
             }
         }
     }
-    
+
     private func showErrorAlert() {
         let alert = UIAlertController(title: "Error, video not saved to gallery", message: "Something went wrong or the server is not responding. Try again or do it later.", preferredStyle: .alert)
 
@@ -424,10 +424,10 @@ class OpenedViewController: UIViewController {
             self.saveInGallery()
         }
         alert.addAction(retryAction)
-        
+
         let cancelAction = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
         alert.addAction(cancelAction)
-        
+
         present(alert, animated: true, completion: nil)
     }
 
@@ -436,17 +436,17 @@ class OpenedViewController: UIViewController {
 
         let okAction = UIAlertAction(title: "OK", style: .default, handler: nil)
         alert.addAction(okAction)
-        
+
         present(alert, animated: true, completion: nil)
     }
 
-    
+
     private func delete() {
         let alertController = UIAlertController(title: "Delete this video?", message: "It will disappear from the history in the My Videos tab. You will not be able to restore it after deletion.", preferredStyle: .alert)
-        
+
         let cancel = UIAlertAction(title: "Cancel", style: .cancel)
         alertController.addAction(cancel)
-        
+
         let ok = UIAlertAction(title: "Delete", style: .destructive) { [self] _ in
             model.arr.remove(at: index)
             model.saveArr()
@@ -454,12 +454,12 @@ class OpenedViewController: UIViewController {
             self.navigationController?.popViewController(animated: true)
         }
         alertController.addAction(ok)
-        
+
         self.present(alertController, animated: true)
     }
-    
+
     //
-    
+
     func getImageForCurrentTheme(image: UIImage) -> UIImage {
         let currentMode = traitCollection.userInterfaceStyle
         let image = image.withRenderingMode(.alwaysTemplate)
@@ -473,13 +473,13 @@ class OpenedViewController: UIViewController {
         }
     }
 
-    
-    
+
+
     deinit {
         removeTempFile()
         hideButtonTimer?.cancel()
     }
-    
+
 }
 
 
@@ -488,7 +488,7 @@ extension OpenedViewController: UIDocumentPickerDelegate {
         // Обработка завершения выбора, если нужно
         print("Видео сохранено в: \(urls.first?.path ?? "Unknown")")
     }
-    
+
     func documentPickerWasCancelled(_ controller: UIDocumentPickerViewController) {
         print("Пользователь отменил выбор")
     }
