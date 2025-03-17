@@ -525,8 +525,8 @@ extension CreateViewController: UICollectionViewDelegate,
               purchaseManager: purchaseManager,
               model: model,
               publisher: publisher,
-              effectID: effect.id,        // Передаём ID эффекта
-              effectTitle: effect.effect  // Передаём название эффекта
+              effectID: effect.id,
+              effectTitle: effect.effect  
           )
           navigationController?.pushViewController(createImageVC, animated: true)
       } else {

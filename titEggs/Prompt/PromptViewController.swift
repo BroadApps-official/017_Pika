@@ -74,6 +74,15 @@ class PromptViewController: UIViewController, UIImagePickerControllerDelegate, U
         return button
     }()
 
+    private let uploadImageView: UIImageView = {
+        let imageView = UIImageView()
+        imageView.contentMode = .scaleAspectFill
+        imageView.layer.cornerRadius = 12
+        imageView.clipsToBounds = true
+        imageView.isHidden = true
+        return imageView
+    }()
+
     // MARK: - Init
     init(purchaseManager: PurchaseManager, model: MainModel) {
         self.purchaseManager = purchaseManager
@@ -85,195 +94,207 @@ class PromptViewController: UIViewController, UIImagePickerControllerDelegate, U
         fatalError("init(coder:) has not been implemented")
     }
 
-  override func viewDidLoad() {
-    super.viewDidLoad()
-    view.backgroundColor = .bgPrimary
-    setupUI()
-    setupNavController()
-    self.title = "Promt"
-    requestTextView.delegate = self
-  }
+    // MARK: - Lifecycle
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        view.backgroundColor = .bgPrimary
+        setupUI()
+        setupNavController()
+        title = "Prompt"
 
-  override func viewWillAppear(_ animated: Bool) {
-         super.viewWillAppear(animated)
+        requestTextView.delegate = self
+        requestTextView.addDoneButtonOnKeyboard()  // Добавляем кнопку Done над клавиатурой
 
-         self.title = "Prompt"
+        // Добавляем жест, чтобы скрывать клавиатуру по тапу вне текстового поля
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
+        // Позволяем распознавать тапы и на других сабвью
+        tapGesture.cancelsTouchesInView = false
+        view.addGestureRecognizer(tapGesture)
+    }
 
-         setupNavController()
-     }
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        title = "Prompt"
+        setupNavController()
+    }
+
+    // MARK: - Скрытие клавиатуры
+    @objc private func dismissKeyboard() {
+        view.endEditing(true)
+    }
 
     // MARK: - UI Setup
-  private let uploadImageView: UIImageView = {
-      let imageView = UIImageView()
-      imageView.contentMode = .scaleAspectFill
-      imageView.layer.cornerRadius = 12
-      imageView.clipsToBounds = true
-      imageView.isHidden = true
-      return imageView
-  }()
+    private func setupUI() {
+        view.addSubview(uploadView)
 
-  private func setupUI() {
-      view.addSubview(uploadView)
+        let uploadStackView = UIStackView(arrangedSubviews: [uploadIcon, uploadLabel])
+        uploadStackView.axis = .vertical
+        uploadStackView.alignment = .center
+        uploadStackView.spacing = 8
 
-      let uploadStackView = UIStackView(arrangedSubviews: [uploadIcon, uploadLabel])
-      uploadStackView.axis = .vertical
-      uploadStackView.alignment = .center
-      uploadStackView.spacing = 8
+        let uploadContentStackView = UIStackView(arrangedSubviews: [uploadImageView, uploadStackView])
+        uploadContentStackView.axis = .horizontal
+        uploadContentStackView.alignment = .center
+        uploadContentStackView.spacing = 12
 
-      let uploadContentStackView = UIStackView(arrangedSubviews: [uploadImageView, uploadStackView])
-      uploadContentStackView.axis = .horizontal
-      uploadContentStackView.alignment = .center
-      uploadContentStackView.spacing = 12
+        uploadView.addSubview(uploadContentStackView)
+        uploadView.addSubview(uploadButton)
 
-      uploadView.addSubview(uploadContentStackView)
-      uploadView.addSubview(uploadButton)
+        view.addSubview(requestTextView)
+        view.addSubview(createButton)
 
-      view.addSubview(requestTextView)
-      view.addSubview(createButton)
+        uploadView.snp.makeConstraints { make in
+            make.top.equalTo(view.safeAreaLayoutGuide).offset(20)
+            make.left.right.equalToSuperview().inset(20)
+            make.height.equalTo(140)
+        }
 
-      uploadView.snp.makeConstraints { make in
-          make.top.equalTo(view.safeAreaLayoutGuide).offset(20)
-          make.left.right.equalToSuperview().inset(20)
-          make.height.equalTo(140)
-      }
+        uploadContentStackView.snp.makeConstraints { make in
+            make.center.equalToSuperview()
+            make.left.right.equalToSuperview().inset(10)
+        }
 
-      uploadContentStackView.snp.makeConstraints { make in
-          make.center.equalToSuperview()
-          make.left.right.equalToSuperview().inset(10)
-      }
+        uploadImageView.snp.makeConstraints { make in
+            make.width.height.equalTo(120)
+        }
 
-      uploadImageView.snp.makeConstraints { make in
-          make.width.height.equalTo(120)
-      }
+        uploadIcon.snp.makeConstraints { make in
+            make.width.height.equalTo(24)
+        }
 
-      uploadIcon.snp.makeConstraints { make in
-          make.width.height.equalTo(24)
-      }
+        uploadLabel.snp.makeConstraints { make in
+            make.width.lessThanOrEqualTo(200)
+        }
 
-      uploadLabel.snp.makeConstraints { make in
-          make.width.lessThanOrEqualTo(200)
-      }
+        uploadButton.snp.makeConstraints { make in
+            make.edges.equalToSuperview()
+        }
 
-      uploadButton.snp.makeConstraints { make in
-          make.edges.equalToSuperview()
-      }
+        requestTextView.snp.makeConstraints { make in
+            make.top.equalTo(uploadView.snp.bottom).offset(20)
+            make.left.right.equalToSuperview().inset(20)
+            make.height.equalTo(163)
+        }
 
-      requestTextView.snp.makeConstraints { make in
-          make.top.equalTo(uploadView.snp.bottom).offset(20)
-          make.left.right.equalToSuperview().inset(20)
-          make.height.equalTo(163)
-      }
+        createButton.snp.makeConstraints { make in
+            make.bottom.equalTo(view.safeAreaLayoutGuide).inset(20)
+            make.left.right.equalToSuperview().inset(20)
+            make.height.equalTo(50)
+        }
+    }
 
-      createButton.snp.makeConstraints { make in
-          make.bottom.equalTo(view.safeAreaLayoutGuide).inset(20)
-          make.left.right.equalToSuperview().inset(20)
-          make.height.equalTo(50)
-      }
-  }
+    private func setupNavController() {
+        tabBarController?.title = "Prompt"
+        tabBarController?.navigationController?.navigationBar.prefersLargeTitles = true
+        let appearance = UINavigationBarAppearance()
+        appearance.configureWithOpaqueBackground()
+        appearance.backgroundColor = .clear
+        appearance.titleTextAttributes = [
+            .foregroundColor: UIColor.white,
+            .font: UIFont.appFont(.HeadlineRegular)
+        ]
+        appearance.largeTitleTextAttributes = [
+            .foregroundColor: UIColor.white,
+            .font: UIFont.appFont(.LargeTitleEmphasized)
+        ]
+        tabBarController?.navigationController?.navigationBar.standardAppearance = appearance
+        tabBarController?.navigationController?.navigationBar.scrollEdgeAppearance = appearance
 
+        // Показываем кнопку Paywall, если нет подписки
+        if purchaseManager.hasUnlockedPro == false {
+            rightButton.addTarget(self, action: #selector(paywallButtonTapped), for: .touchUpInside)
+            let barButtonItem = UIBarButtonItem(customView: rightButton)
+            tabBarController?.navigationItem.rightBarButtonItem = barButtonItem
 
-  private func setupNavController() {
-         tabBarController?.title = "Prompt"
-         tabBarController?.navigationController?.navigationBar.prefersLargeTitles = true
-         let appearance = UINavigationBarAppearance()
-         appearance.configureWithOpaqueBackground()
-         appearance.backgroundColor = .clear
-         appearance.titleTextAttributes = [
-             .foregroundColor: UIColor.white,
-             .font: UIFont.appFont(.HeadlineRegular)
-         ]
-         appearance.largeTitleTextAttributes = [
-             .foregroundColor: UIColor.white,
-             .font: UIFont.appFont(.LargeTitleEmphasized)
-         ]
-         tabBarController?.navigationController?.navigationBar.standardAppearance = appearance
-         tabBarController?.navigationController?.navigationBar.scrollEdgeAppearance = appearance
+            rightButton.snp.makeConstraints { make in
+                make.width.equalTo(80)
+                make.height.equalTo(32)
+            }
+            rightButton.addTouchFeedback()
+        }
+    }
 
-         if purchaseManager.hasUnlockedPro == false {
-             rightButton.addTarget(self, action: #selector(paywallButtonTapped), for: .touchUpInside)
-
-             let barButtonItem = UIBarButtonItem(customView: rightButton)
-
-             tabBarController?.navigationItem.rightBarButtonItem = barButtonItem
-             rightButton.snp.makeConstraints { make in
-                 make.width.equalTo(80)
-                 make.height.equalTo(32)
-             }
-             rightButton.addTouchFeedback()
-         }
-     }
-
-  @objc private func paywallButtonTapped() {
+    // MARK: - Paywall
+    @objc private func paywallButtonTapped() {
         let paywallVC = NewPaywallViewController(manager: purchaseManager)
-          paywallVC.modalPresentationStyle = .fullScreen
-          present(paywallVC, animated: true)
-      }
+        paywallVC.modalPresentationStyle = .fullScreen
+        present(paywallVC, animated: true)
+    }
 
     // MARK: - Actions
-  @objc private func uploadTapped() {
-      let picker = UIImagePickerController()
-      picker.delegate = self
+    @objc private func uploadTapped() {
+        let picker = UIImagePickerController()
+        picker.delegate = self
 
-      let alert = UIAlertController(
-          title: "Select action",
-          message: "Add a photo so we can do a cool effect with it",
-          preferredStyle: .actionSheet
-      )
+        let alert = UIAlertController(
+            title: "Select action",
+            message: "Add a photo so we can do a cool effect with it",
+            preferredStyle: .actionSheet
+        )
 
-      let dynamicTextColor = UIColor { traitCollection in
-          return traitCollection.userInterfaceStyle == .dark ? .white : .black
-      }
+        let dynamicTextColor = UIColor { traitCollection in
+            return traitCollection.userInterfaceStyle == .dark ? .white : .black
+        }
 
-      let photoAction = UIAlertAction(title: "Take a photo", style: .default) { _ in
-          picker.sourceType = .camera
-          self.present(picker, animated: true)
-      }
-      photoAction.setValue(dynamicTextColor, forKey: "titleTextColor")
-      alert.addAction(photoAction)
+        let photoAction = UIAlertAction(title: "Take a photo", style: .default) { _ in
+            picker.sourceType = .camera
+            self.present(picker, animated: true)
+        }
+        photoAction.setValue(dynamicTextColor, forKey: "titleTextColor")
+        alert.addAction(photoAction)
 
-      let galleryAction = UIAlertAction(title: "Select from gallery", style: .default) { _ in
-          picker.sourceType = .photoLibrary
-          self.present(picker, animated: true)
-      }
-      galleryAction.setValue(dynamicTextColor, forKey: "titleTextColor")
-      alert.addAction(galleryAction)
+        let galleryAction = UIAlertAction(title: "Select from gallery", style: .default) { _ in
+            picker.sourceType = .photoLibrary
+            self.present(picker, animated: true)
+        }
+        galleryAction.setValue(dynamicTextColor, forKey: "titleTextColor")
+        alert.addAction(galleryAction)
 
-      let cancelAction = UIAlertAction(title: "Cancel", style: .cancel)
-      cancelAction.setValue(dynamicTextColor, forKey: "titleTextColor")
-      alert.addAction(cancelAction)
+        let cancelAction = UIAlertAction(title: "Cancel", style: .cancel)
+        cancelAction.setValue(dynamicTextColor, forKey: "titleTextColor")
+        alert.addAction(cancelAction)
 
-      if let popoverController = alert.popoverPresentationController {
-          popoverController.sourceView = self.view
-          popoverController.sourceRect = CGRect(
-              x: self.view.bounds.midX,
-              y: self.view.bounds.midY,
-              width: 0,
-              height: 0
-          )
-          popoverController.permittedArrowDirections = []
-      }
+        if let popoverController = alert.popoverPresentationController {
+            popoverController.sourceView = self.view
+            popoverController.sourceRect = CGRect(
+                x: self.view.bounds.midX,
+                y: self.view.bounds.midY,
+                width: 0,
+                height: 0
+            )
+            popoverController.permittedArrowDirections = []
+        }
 
-      present(alert, animated: true)
-  }
-
+        present(alert, animated: true)
+    }
 
     @objc private func createTapped() {
+        // Скрываем клавиатуру, если открыта
+        view.endEditing(true)
+
+        // Если нет подписки — открываем пейвол и не продолжаем
+        guard purchaseManager.hasUnlockedPro else {
+            paywallButtonTapped()
+            return
+        }
+
+        // Если подписка есть — переходим к генерации
         guard let imageData = selectedImage?.pngData() else { return }
         openGenerateVC(images: [imageData])
     }
 
     // MARK: - Image Picker Delegate
-  func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey: Any]) {
-      picker.dismiss(animated: true)
-      if let image = info[.editedImage] as? UIImage ?? info[.originalImage] as? UIImage {
-          selectedImage = image
-          uploadImageView.image = image
-          uploadImageView.isHidden = false
-          uploadIcon.isHidden = false
-          uploadLabel.isHidden = false
-      }
-  }
-
+    func imagePickerController(_ picker: UIImagePickerController,
+                               didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey: Any]) {
+        picker.dismiss(animated: true)
+        if let image = info[.editedImage] as? UIImage ?? info[.originalImage] as? UIImage {
+            selectedImage = image
+            uploadImageView.image = image
+            uploadImageView.isHidden = false
+            uploadIcon.isHidden = false
+            uploadLabel.isHidden = false
+        }
+    }
 
     func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
         picker.dismiss(animated: true)
@@ -295,14 +316,51 @@ class PromptViewController: UIViewController, UIImagePickerControllerDelegate, U
     private func updateUIState() {
         let isReady = selectedImage != nil && !(promptText?.isEmpty ?? true)
         createButton.isEnabled = isReady
-        createButton.titleLabel?.textColor = isReady ? .black : UIColor(hex: "#FFEBCDB2").withAlphaComponent(0.7)
+        createButton.setTitleColor(isReady ? .black : UIColor(hex: "#FFEBCDB2").withAlphaComponent(0.7), for: .normal)
         createButton.backgroundColor = isReady ? UIColor(hex: "#FFEBCD") : .white.withAlphaComponent(0.08)
     }
 
     // MARK: - Open Generate VC
     private func openGenerateVC(images: [Data]) {
-      let generateVC = GenerateVideoViewController(model: model, image: images, index: 0, publisher: PassthroughSubject(), video: nil, promptText: promptText)
+        let generateVC = GenerateVideoViewController(
+            model: model,
+            image: images,
+            index: 0,
+            publisher: PassthroughSubject(),
+            video: nil,
+            promptText: promptText
+        )
         generateVC.modalPresentationStyle = .fullScreen
         present(generateVC, animated: true)
+    }
+}
+
+// MARK: - Extension для добавления кнопки Done в UITextView
+extension UITextView {
+    func addDoneButtonOnKeyboard() {
+        let doneToolbar = UIToolbar(frame: CGRect(
+            x: 0, y: 0,
+            width: UIScreen.main.bounds.width,
+            height: 50
+        ))
+        doneToolbar.barStyle = .default
+
+        let flexSpace = UIBarButtonItem(barButtonSystemItem: .flexibleSpace,
+                                        target: nil,
+                                        action: nil)
+        let done = UIBarButtonItem(title: "Done",
+                                   style: .done,
+                                   target: self,
+                                   action: #selector(self.endEditingForced))
+
+        let items = [flexSpace, done]
+        doneToolbar.items = items
+        doneToolbar.sizeToFit()
+
+        self.inputAccessoryView = doneToolbar
+    }
+
+    @objc private func endEditingForced() {
+        self.resignFirstResponder()
     }
 }

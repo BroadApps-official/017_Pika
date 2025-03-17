@@ -17,6 +17,7 @@ class MainModel {
     var effectsArr: [Effect] = []
 
     var workItems: [DispatchWorkItem] = []
+    private let workItemsQueue = DispatchQueue(label: "workItemsQueue", attributes: .concurrent)
 
     var publisherVideo = PassthroughSubject<Any, Never>()
     var errorPublisher = PassthroughSubject<(Bool, String), Never>()
@@ -85,123 +86,151 @@ class MainModel {
         }
     }
 
-  func checkStatusForIndex(index: Int) {
-      guard index < self.arr.count else {
-          print("Index \(index) out of range in completion")
+    func checkStatusForIndex(index: Int) {
+        guard index < self.arr.count else {
+            print("Index \(index) out of range in completion")
+            return
+        }
+
+        let workItem = DispatchWorkItem { [weak self] in
+            guard let self = self else { return }
+            guard index < self.arr.count else { return }
+            
+            let itemId = self.arr[index].generationID ?? ""
+            
+            // Добавляем проверку на пустой ID
+            guard !itemId.isEmpty else {
+                print("Empty generation ID for index \(index)")
+                return
+            }
+            
+            self.netWorking.getStatus(itemId: itemId) { [weak self] status, resultUrl in
+                guard let self = self else { return }
+                
+                // Выполняем на главном потоке
+                DispatchQueue.main.async {
+                    guard index < self.arr.count else { return }
+                    
+                    print(status, itemId, "fsfdsvfsdvccsv")
+                    if status != "fail" && resultUrl != "fail" && resultUrl != "" && status != "error" {
+                        print("Получены данные для индекса \(index): статус - \(status), URL - \(resultUrl), idGen - \(self.arr[index].generationID)")
+                        self.arr[index].resultURL = resultUrl
+                        self.arr[index].status = status
+                        self.saveArr()
+
+                        self.netWorking.downloadVideo(from: resultUrl) { data, error in
+                            if error == nil, let data = data {
+                                self.arr[index].video = data
+                                self.saveArr()
+                                self.publisherVideo.send(1)
+                                self.checkStatus() // Обновляем проверки для других элементов
+                                self.videoDownloadedPublisher.send("\(self.arr[index].id)")
+                            }
+                        }
+                    } else if status == "error" || status == "fail" {
+                        print("error load is -", "\(self.arr[index].id)")
+                        self.arr[index].status = "error"
+                        self.saveArr()
+                        self.errorPublisher.send((false, "\(self.arr[index].id)"))
+                        self.publisherVideo.send(1)
+                    } else {
+                        print("Повторный запрос для индекса \(index) через 20 секунд...")
+                        DispatchQueue.global().asyncAfter(deadline: .now() + 20) {
+                            self.checkStatusForIndex(index: index)
+                        }
+                    }
+                }
+            }
+        }
+        
+      workItemsQueue.async(flags: .barrier) {
+          self.workItems.append(workItem)
+      }
+
+        DispatchQueue.global().async(execute: workItem)
+    }
+
+  func checkStatus() {
+      workItems.forEach {
+          if !$0.isCancelled {
+              $0.cancel()
+          }
+      }
+
+      workItems.removeAll()
+
+      if arr.isEmpty {
+          print("📌 Массив `arr` пуст, проверка статусов не выполняется.")
           return
       }
 
-      let workItem = DispatchWorkItem { [weak self] in
-          guard let self = self else { return }
-          let itemId = self.arr[index].generationID ?? ""
-          print(itemId, "fgvxbnv")
-          self.netWorking.getStatus(itemId: itemId) { status, resultUrl in
-              print(status, itemId, "fsfdsvfsdvccsv")
-              if status != "fail" && resultUrl != "fail" && resultUrl != "" && status != "error" {
-                  print("Получены данные для индекса \(index): статус - \(status), URL - \(resultUrl), idGen - \(self.arr[index].generationID)")
-                  self.arr[index].resultURL = resultUrl
-                  self.arr[index].status = status
-                  self.saveArr()
+      var indices: [Int] = []
+      for (index, element) in arr.enumerated() {
+          if (element.resultURL == nil || element.video == nil) && element.status != "error" {
+              indices.append(index)
+          }
+      }
+      print("📌 Индексы для проверки:", indices)
 
-                  self.netWorking.downloadVideo(from: resultUrl) { data, error in
-                      if error == nil, let data = data {
-                          self.arr[index].video = data
+      for index in indices {
+          guard index < arr.count else { continue }
+
+          let workItem = DispatchWorkItem { [weak self] in
+              guard let self = self else {
+                  print("❌ self освобождён, работа отменена")
+                  return
+              }
+
+              guard index < self.arr.count else {
+                  print("❌ Ошибка: Index \(index) out of range")
+                  return
+              }
+
+              let effectID = "\(self.arr[index].effectID)"
+              let effectName = self.arr[index].effectName
+              let isHugAndKiss = effectName.contains("Hug") || effectName.contains("Kiss")
+
+              var imagesToSend: [Data] = []
+              if isHugAndKiss {
+                  if let secondImage = self.arr[index].secondImage {
+                      imagesToSend = [self.arr[index].image, secondImage]
+                  } else {
+                      imagesToSend = [self.arr[index].image]
+                  }
+              } else {
+                  imagesToSend = [self.arr[index].image]
+              }
+
+              if self.arr[index].generationID == nil || self.arr[index].generationID == "error" {
+                  self.netWorking.createVideo(data: imagesToSend, idEffect: effectID, isHugAndKiss: isHugAndKiss) { [weak self] idVideo in
+                      guard let self = self else { return }
+                      DispatchQueue.main.async {
+                          guard index < self.arr.count else {
+                              print("❌ Ошибка: Index \(index) out of range в completion")
+                              return
+                          }
+                          print("✅ Успешно создано: \(self.arr[index]) → generationID: \(idVideo)")
+                          self.arr[index].generationID = idVideo
                           self.saveArr()
-                          self.publisherVideo.send(1)
-                          self.checkStatus() // Обновляем проверки для других элементов
-                          self.videoDownloadedPublisher.send("\(self.arr[index].id)")
+                          DispatchQueue.main.asyncAfter(deadline: .now() + 20) {
+                              self.checkStatusForIndex(index: index)
+                          }
                       }
                   }
-              } else if status == "error" || status == "fail" {
-                  print("error load is -", "\(self.arr[index].id)")
-                  self.arr[index].status = "error"
-                  self.saveArr()
-                  self.errorPublisher.send((false, "\(self.arr[index].id)"))
-                  self.publisherVideo.send(1)
               } else {
-                  print("Повторный запрос для индекса \(index) через 20 секунд...")
-                  DispatchQueue.global().asyncAfter(deadline: .now() + 20) {
+                  DispatchQueue.main.asyncAfter(deadline: .now() + 20) {
                       self.checkStatusForIndex(index: index)
                   }
               }
           }
+
+          workItemsQueue.async(flags: .barrier) {
+              self.workItems.append(workItem)
+          }
+
+          DispatchQueue.global().async(execute: workItem)
       }
-
-      workItems.append(workItem)
-      DispatchQueue.global().async(execute: workItem)
   }
-
-
-    func checkStatus() {
-        workItems.forEach { $0.cancel() }
-        workItems.removeAll()
-
-        if arr.isEmpty {
-            print("📌 Массив `arr` пуст, проверка статусов не выполняется.")
-            return
-        }
-
-        var indices: [Int] = []
-        for (index, element) in arr.enumerated() {
-            if (element.resultURL == nil || element.video == nil) && element.status != "error" {
-                indices.append(index)
-            }
-        }
-        print("📌 Индексы для проверки:", indices)
-
-        for index in indices {
-            var workItem: DispatchWorkItem?
-            workItem = DispatchWorkItem { [weak self] in
-                guard let self = self else { return }
-
-                guard index < self.arr.count else {
-                    print("❌ Ошибка: Index \(index) out of range")
-                    return
-                }
-
-                let effectID = "\(self.arr[index].effectID)"
-                let effectName = self.arr[index].effectName
-                let isHugAndKiss = effectName.contains("Hug") || effectName.contains("Kiss")
-
-                var imagesToSend: [Data] = []
-                if isHugAndKiss {
-                    if let secondImage = self.arr[index].secondImage {
-                        imagesToSend = [self.arr[index].image, secondImage]
-                    } else {
-                        imagesToSend = [self.arr[index].image]
-                    }
-                } else {
-                    imagesToSend = [self.arr[index].image]
-                }
-
-                if self.arr[index].generationID == nil || self.arr[index].generationID == "error" {
-                    self.netWorking.createVideo(data: imagesToSend, idEffect: effectID, isHugAndKiss: isHugAndKiss) { [weak self] idVideo in
-                        guard let self = self else { return }
-                        DispatchQueue.main.async {
-                            guard index < self.arr.count else {
-                                print("❌ Ошибка: Index \(index) out of range в completion")
-                                return
-                            }
-                            print("✅ Успешно создано: \(self.arr[index]) → generationID: \(idVideo)")
-                            self.arr[index].generationID = idVideo
-                            self.saveArr()
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 20) {
-                                self.checkStatusForIndex(index: index)
-                            }
-                        }
-                    }
-                } else {
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 20) {
-                        self.checkStatusForIndex(index: index)
-                    }
-                }
-            }
-            if let workItem = workItem {
-                workItems.append(workItem)
-                DispatchQueue.global().async(execute: workItem)
-            }
-        }
-    }
 
     private func loadVideoArrFromCache() -> [Video]? {
         let fileManager = FileManager.default
@@ -300,5 +329,43 @@ class MainModel {
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "dd.MM.yy"
         return dateFormatter.string(from: Date())
+    }
+
+    var activeGenerationsCount: Int {
+        return arr.filter { $0.status != "error" }.count
+    }
+
+    func hasReachedGenerationLimit() -> Bool {
+        return activeGenerationsCount >= 2
+    }
+
+    func cache(data: Data, for url: URL) {
+        let fileManager = FileManager.default
+        if #available(iOS 11.0, *) {
+            do {
+                let resourceValues = try url.resourceValues(forKeys: [.volumeAvailableCapacityForImportantUsageKey])
+                if let capacity = resourceValues.volumeAvailableCapacityForImportantUsage,
+                   capacity < Int64(data.count) {
+                    print("Недостаточно места на устройстве")
+                    return
+                }
+            } catch {
+                print("Ошибка при проверке свободного места: \(error)")
+                return
+            }
+        } else {
+            do {
+                let paths = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)
+                let systemAttributes = try fileManager.attributesOfFileSystem(forPath: paths[0])
+                if let freeSize = systemAttributes[.systemFreeSize] as? NSNumber,
+                   freeSize.int64Value < Int64(data.count) {
+                    print("Недостаточно места на устройстве")
+                    return
+                }
+            } catch {
+                print("Ошибка при проверке свободного места: \(error)")
+                return
+            }
+        }
     }
 }

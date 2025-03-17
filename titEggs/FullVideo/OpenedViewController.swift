@@ -41,6 +41,7 @@ class OpenedViewController: UIViewController {
     }()
 
     private lazy var taps = 0
+  private var cancellables = Set<AnyCancellable>()
 
     init(model: MainModel, index: Int) {
         self.model = model
@@ -57,12 +58,23 @@ class OpenedViewController: UIViewController {
         setupNavController()
     }
 
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        view.backgroundColor = .bgPrimary
-        hidesBottomBarWhenPushed = true
-        setupUI()
-    }
+  override func viewDidLoad() {
+      super.viewDidLoad()
+      view.backgroundColor = .bgPrimary
+      hidesBottomBarWhenPushed = true
+
+      // Подписка на обновление видео
+      model.publisherVideo
+          .receive(on: DispatchQueue.main)
+          .sink { [weak self] _ in
+              guard let self = self else { return }
+              print("⚡ Видео обновилось, перезапускаем setupUI()!")
+              self.setupUI()
+          }
+          .store(in: &cancellables)
+
+      setupUI()
+  }
 
     private func setupNavController() {
         self.title = "Result"
@@ -99,7 +111,21 @@ class OpenedViewController: UIViewController {
     }
 
     private func setupUI() {
+      print("🚀 setupUI вызван!")
 
+        guard index >= 0, index < model.arr.count else {
+            print("❌ Индекс вне диапазона! index = \(index), всего элементов: \(model.arr.count)")
+            return
+        }
+
+        guard let videoData = model.arr[index].video else {
+            print("❌ Видео отсутствует в model.arr[index]")
+            return
+        }
+
+        print("✅ Данные найдены, создаём UI!")
+
+      
         view.addSubview(shareButton)
         shareButton.snp.makeConstraints { make in
             make.height.equalTo(48)
@@ -131,20 +157,36 @@ class OpenedViewController: UIViewController {
         // Добавляем тап жест для видео
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(videoTapped))
         videoContainerView.addGestureRecognizer(tapGesture)
+         guard index >= 0, index < model.arr.count else {
+          print("Ошибка: индекс вне диапазона! index = \(index), размер массива = \(model.arr.count)")
+          return
+      }
         guard let videoData = model.arr[index].video else { return }
+
         videoContainerView.snp.makeConstraints { make in
             make.left.right.equalToSuperview().inset(15)
             make.bottom.equalTo(shareButton.snp.top).inset(-30)
             make.top.equalTo(view.safeAreaLayoutGuide.snp.top).inset(10)
         }
-        self.setupPlayer(with: videoData)
+
+      DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+          guard let videoData = self.model.arr[self.index].video else {
+              print("❌ Видео не найдено после задержки!")
+              return
+          }
+          print("🎥 Новое видео загружено, запускаем setupPlayer()")
+          self.setupPlayer(with: videoData)
+      }
         self.view.layoutIfNeeded()
     }
 
     private func setupPlayer(with videoData: Data) {
 
         let tempDirectory = FileManager.default.temporaryDirectory
-        tempURL = tempDirectory.appendingPathComponent("tempVideo.mp4")
+        removeOldTempVideos()
+
+         let uniqueFileName = "tempVideo_\(UUID().uuidString).mp4"
+          tempURL = tempDirectory.appendingPathComponent(uniqueFileName)
 
         // Пытаемся сохранить data как временный файл
         guard let tempFileURL = tempURL else { return }
@@ -167,6 +209,12 @@ class OpenedViewController: UIViewController {
         videoContainerView.layoutIfNeeded()
         playerLayer?.frame = videoContainerView.bounds
 
+      videoContainerView.layer.sublayers?.forEach { layer in
+          if layer is AVPlayerLayer {
+              layer.removeFromSuperlayer()
+          }
+      }
+
         if let playerLayer = playerLayer {
             videoContainerView.layer.addSublayer(playerLayer)
         }
@@ -181,10 +229,28 @@ class OpenedViewController: UIViewController {
         }
         playPauseButton.alpha = 0
         playPauseTapped()
-
-
     }
 
+  private func removeOldTempVideos() {
+      let tempDirectory = FileManager.default.temporaryDirectory
+      let fileManager = FileManager.default
+
+      do {
+          let files = try fileManager.contentsOfDirectory(at: tempDirectory, includingPropertiesForKeys: nil)
+          let videoFiles = files.filter { $0.lastPathComponent.hasPrefix("tempVideo_") && $0.pathExtension == "mp4" }
+
+          if videoFiles.count > 1 {
+              for file in videoFiles {
+                  if file != tempURL {
+                      try fileManager.removeItem(at: file)
+                      print("🗑 Удалён старый файл: \(file.path)")
+                  }
+              }
+          }
+      } catch {
+          print("❌ Ошибка очистки временных файлов: \(error.localizedDescription)")
+      }
+  }
 
     @objc private func shareVideo() {
         guard let tempURL = tempURL else {
@@ -485,7 +551,6 @@ class OpenedViewController: UIViewController {
 
 extension OpenedViewController: UIDocumentPickerDelegate {
     func documentPicker(_ controller: UIDocumentPickerViewController, didPickDocumentsAt urls: [URL]) {
-        // Обработка завершения выбора, если нужно
         print("Видео сохранено в: \(urls.first?.path ?? "Unknown")")
     }
 

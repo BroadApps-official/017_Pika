@@ -67,6 +67,18 @@ class GenerateVideoViewController: UIViewController {
     }
 
     private func uploadImageToVideo() {
+      let activeGenerations = model.workItems.count { item in
+          let index = model.arr.firstIndex { $0.status != "error" }
+          return index != nil
+      }
+
+      if activeGenerations >= 2 {
+          DispatchQueue.main.async {
+              self.limitAlert()
+          }
+          return
+      }
+      
         guard let imageData = image.first, let prompt = promptText else { return }
 
         model.imageToVideo(imageData: imageData, promptText: prompt) { [weak self] success, newId in
@@ -122,28 +134,43 @@ class GenerateVideoViewController: UIViewController {
   }
 
   private func openOpenedViewController() {
+      let lastIndex = model.arr.count - 1 
+
+      if lastIndex < 0 {
+          print("❌ Ошибка: В массиве нет видео, не открываем OpenedViewController")
+          return
+      }
+
+      print("📌 Открываем OpenedViewController с index = \(lastIndex)")
+
       if let navController = self.presentingViewController as? UINavigationController {
-          let openedVC = OpenedViewController(model: self.model, index: self.index)
+          let openedVC = OpenedViewController(model: self.model, index: lastIndex)
           navController.pushViewController(openedVC, animated: true)
       } else {
-
           if let window = UIApplication.shared.connectedScenes
               .compactMap({ $0 as? UIWindowScene })
               .first?.windows.first(where: { $0.isKeyWindow }),
              let navController = window.rootViewController as? UINavigationController {
-              let openedVC = OpenedViewController(model: self.model, index: self.index)
+              let openedVC = OpenedViewController(model: self.model, index: lastIndex)
               navController.pushViewController(openedVC, animated: true)
           }
       }
   }
 
+
     private func addImageInarr() {
-        if model.workItems.count >= 2 {
+        let activeGenerations = model.workItems.count { item in
+            let index = model.arr.firstIndex { $0.status != "error" }
+            return index != nil
+        }
+        
+        if activeGenerations >= 2 {
             DispatchQueue.main.async {
                 self.limitAlert()
             }
             return
         }
+        
         var videoLoad = video
         if video?.id == nil {
             let imageToUse: Data = image.first!
@@ -201,17 +228,27 @@ class GenerateVideoViewController: UIViewController {
     }
 
     private func openAlert() {
-        let alert = UIAlertController(title: "Video generation error", message: "Something went wrong or the server is not responding. Try again or do it later.", preferredStyle: .alert)
-        let cancelButton = UIAlertAction(title: "Cancel", style: .cancel) { _ in
-            self.closeVC()
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            
+            let alert = UIAlertController(title: "Video generation error", 
+                                        message: "Something went wrong or the server is not responding. Try again or do it later.", 
+                                        preferredStyle: .alert)
+            
+            let cancelButton = UIAlertAction(title: "Cancel", style: .cancel) { [weak self] _ in
+                self?.closeVC()
+            }
+            alert.addAction(cancelButton)
+            
+            let repeatButton = UIAlertAction(title: "Try Again", style: .default) { [weak self] _ in
+                guard let self = self else { return }
+                self.count = 0.0
+                self.addImageInarr()
+            }
+            alert.addAction(repeatButton)
+            
+            self.present(alert, animated: true)
         }
-        alert.addAction(cancelButton)
-        let repeatButton = UIAlertAction(title: "Try Again", style: .default) { _ in
-            self.count = 0.0
-            self.addImageInarr()
-        }
-        alert.addAction(repeatButton)
-        self.present(alert, animated: true)
     }
 
     private func setupUI() {
