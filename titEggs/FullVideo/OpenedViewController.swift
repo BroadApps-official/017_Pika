@@ -62,7 +62,15 @@ class OpenedViewController: UIViewController {
       super.viewDidLoad()
       view.backgroundColor = .bgPrimary
       hidesBottomBarWhenPushed = true
-
+      
+      // Проверяем наличие видео перед настройкой UI
+      guard index < model.arr.count,
+            let videoData = model.arr[index].video else {
+          print("❌ Видео отсутствует или индекс некорректен")
+          navigationController?.popViewController(animated: true)
+          return
+      }
+      
       // Подписка на обновление видео
       model.publisherVideo
           .receive(on: DispatchQueue.main)

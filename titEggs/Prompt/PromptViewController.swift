@@ -103,11 +103,9 @@ class PromptViewController: UIViewController, UIImagePickerControllerDelegate, U
         title = "Prompt"
 
         requestTextView.delegate = self
-        requestTextView.addDoneButtonOnKeyboard()  // Добавляем кнопку Done над клавиатурой
+        requestTextView.addDoneButtonOnKeyboard()
 
-        // Добавляем жест, чтобы скрывать клавиатуру по тапу вне текстового поля
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
-        // Позволяем распознавать тапы и на других сабвью
         tapGesture.cancelsTouchesInView = false
         view.addGestureRecognizer(tapGesture)
     }
@@ -118,10 +116,26 @@ class PromptViewController: UIViewController, UIImagePickerControllerDelegate, U
         setupNavController()
     }
 
+  override func viewWillDisappear(_ animated: Bool) {
+      super.viewWillDisappear(animated)
+      resetInputFields()
+  }
+
     // MARK: - Скрытие клавиатуры
     @objc private func dismissKeyboard() {
         view.endEditing(true)
     }
+
+  private func resetInputFields() {
+      selectedImage = nil
+      uploadImageView.image = nil
+      uploadImageView.isHidden = true
+
+      requestTextView.text = "Use English for best results"
+      requestTextView.textColor = .white.withAlphaComponent(0.4)
+
+      updateUIState()
+  }
 
     // MARK: - UI Setup
     private func setupUI() {
@@ -200,7 +214,6 @@ class PromptViewController: UIViewController, UIImagePickerControllerDelegate, U
         tabBarController?.navigationController?.navigationBar.standardAppearance = appearance
         tabBarController?.navigationController?.navigationBar.scrollEdgeAppearance = appearance
 
-        // Показываем кнопку Paywall, если нет подписки
         if purchaseManager.hasUnlockedPro == false {
             rightButton.addTarget(self, action: #selector(paywallButtonTapped), for: .touchUpInside)
             let barButtonItem = UIBarButtonItem(customView: rightButton)
@@ -278,7 +291,6 @@ class PromptViewController: UIViewController, UIImagePickerControllerDelegate, U
             return
         }
 
-        // Если подписка есть — переходим к генерации
         guard let imageData = selectedImage?.pngData() else { return }
         openGenerateVC(images: [imageData])
     }

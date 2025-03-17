@@ -134,27 +134,34 @@ class GenerateVideoViewController: UIViewController {
   }
 
   private func openOpenedViewController() {
-      let lastIndex = model.arr.count - 1 
-
-      if lastIndex < 0 {
-          print("❌ Ошибка: В массиве нет видео, не открываем OpenedViewController")
-          return
-      }
-
-      print("📌 Открываем OpenedViewController с index = \(lastIndex)")
-
-      if let navController = self.presentingViewController as? UINavigationController {
-          let openedVC = OpenedViewController(model: self.model, index: lastIndex)
-          navController.pushViewController(openedVC, animated: true)
-      } else {
-          if let window = UIApplication.shared.connectedScenes
-              .compactMap({ $0 as? UIWindowScene })
-              .first?.windows.first(where: { $0.isKeyWindow }),
-             let navController = window.rootViewController as? UINavigationController {
-              let openedVC = OpenedViewController(model: self.model, index: lastIndex)
-              navController.pushViewController(openedVC, animated: true)
-          }
-      }
+    // Находим индекс видео по его UUID
+    if let videoIndex = model.arr.firstIndex(where: { "\($0.id)" == uuidVideo }) {
+        print("📌 Открываем OpenedViewController с index = \(videoIndex)")
+        
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            
+            // Проверяем, что видео существует и загружено
+            guard videoIndex < self.model.arr.count,
+                  self.model.arr[videoIndex].video != nil else {
+                print("❌ Видео не найдено или не загружено")
+                return
+            }
+            
+            if let navController = self.presentingViewController as? UINavigationController {
+                let openedVC = OpenedViewController(model: self.model, index: videoIndex)
+                navController.pushViewController(openedVC, animated: true)
+            } else if let window = UIApplication.shared.connectedScenes
+                .compactMap({ $0 as? UIWindowScene })
+                .first?.windows.first(where: { $0.isKeyWindow }),
+                let navController = window.rootViewController as? UINavigationController {
+                let openedVC = OpenedViewController(model: self.model, index: videoIndex)
+                navController.pushViewController(openedVC, animated: true)
+            }
+        }
+    } else {
+        print("❌ Не удалось найти видео с UUID: \(uuidVideo)")
+    }
   }
 
 
