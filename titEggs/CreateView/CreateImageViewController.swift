@@ -14,6 +14,8 @@ class CreateImageViewController: UIViewController, UIImagePickerControllerDelega
 
     private var selectedImage1: UIImage?
     private var selectedImage2: UIImage?
+  private let photoContainer1 = UIView()
+  private let photoContainer2 = UIView()
 
     private var currentButton: UIButton?
 
@@ -203,21 +205,58 @@ class CreateImageViewController: UIViewController, UIImagePickerControllerDelega
         }
     }
 
-    private func setupAddPhotoArea() {
-        configureAddPhotoButton(addPhotoButton1, title: "Add 1 photo")
-        configureAddPhotoButton(addPhotoButton2, title: "Add 2 photo")
+  private func setupAddPhotoArea() {
+      configurePhotoContainer(photoContainer1, title: "Add 1 photo")
+      configurePhotoContainer(photoContainer2, title: "Add 2 photo")
 
-        let buttonStack = UIStackView(arrangedSubviews: [addPhotoButton1, addPhotoButton2])
-        buttonStack.axis = .horizontal
-        buttonStack.spacing = 10
-        buttonStack.distribution = .fillEqually
-        view.addSubview(buttonStack)
+      let containerStack = UIStackView(arrangedSubviews: [photoContainer1, photoContainer2])
+      containerStack.axis = .horizontal
+      containerStack.spacing = 10
+      containerStack.distribution = .fillEqually
+      view.addSubview(containerStack)
 
-        buttonStack.snp.makeConstraints { make in
-            make.top.equalTo(tabsStack.snp.bottom).offset(20)
-            make.left.right.equalToSuperview().inset(15)
-        }
-    }
+      containerStack.snp.makeConstraints { make in
+          make.top.equalTo(tabsStack.snp.bottom).offset(20)
+          make.left.right.equalToSuperview().inset(15)
+          make.height.equalTo(180)
+      }
+  }
+
+  private func configurePhotoContainer(_ container: UIView, title: String) {
+      container.backgroundColor = UIColor(hex: "#2C2C2C")
+      container.layer.cornerRadius = 10
+      container.clipsToBounds = true
+
+      let stackView = UIStackView()
+      stackView.axis = .vertical
+      stackView.alignment = .center
+      stackView.spacing = 8
+
+      let plusIcon = UIImageView(image: UIImage(systemName: "plus"))
+      plusIcon.tintColor = .white
+      plusIcon.contentMode = .scaleAspectFit
+      stackView.addArrangedSubview(plusIcon)
+
+      let label = UILabel()
+      label.text = title
+      label.font = .systemFont(ofSize: 16, weight: .medium)
+      label.textColor = .lightGray
+      label.textAlignment = .center
+      stackView.addArrangedSubview(label)
+
+      container.addSubview(stackView)
+      stackView.snp.makeConstraints { make in
+          make.center.equalToSuperview()
+      }
+
+      plusIcon.snp.makeConstraints { make in
+          make.height.width.equalTo(50)
+      }
+
+      let tapGesture = UITapGestureRecognizer(target: self, action: #selector(selectPhoto(_:)))
+      container.addGestureRecognizer(tapGesture)
+      container.isUserInteractionEnabled = true
+  }
 
     private func configureAddPhotoButton(_ button: UIButton, title: String) {
         button.subviews.forEach { $0.removeFromSuperview() }
@@ -267,29 +306,25 @@ class CreateImageViewController: UIViewController, UIImagePickerControllerDelega
 
     // MARK: - Image Picker
 
-    @objc private func selectPhoto(_ sender: UIButton) {
-        currentButton = sender
+  @objc private func selectPhoto(_ sender: UITapGestureRecognizer) {
+      guard let tappedView = sender.view else { return }
+      currentButton = (tappedView == photoContainer1) ? addPhotoButton1 : addPhotoButton2
 
-        DispatchQueue.main.async { [weak self] in
-            guard let self = self else { return }
+      let picker = UIImagePickerController()
+      picker.sourceType = .photoLibrary
+      picker.delegate = self
+      picker.modalPresentationStyle = .fullScreen
 
-            let picker = UIImagePickerController()
-            picker.sourceType = .photoLibrary
-            picker.delegate = self
-            picker.modalPresentationStyle = .fullScreen
-
-            // Проверяем и запрашиваем доступ перед открытием
-            self.checkPhotoLibraryPermission { granted in
-                if granted {
-                    DispatchQueue.main.async {
-                        self.present(picker, animated: true)
-                    }
-                } else {
-                    self.showPermissionAlert()
-                }
-            }
-        }
-    }
+      checkPhotoLibraryPermission { granted in
+          if granted {
+              DispatchQueue.main.async {
+                  self.present(picker, animated: true)
+              }
+          } else {
+              self.showPermissionAlert()
+          }
+      }
+  }
 
     private func checkPhotoLibraryPermission(completion: @escaping (Bool) -> Void) {
         let status = PHPhotoLibrary.authorizationStatus()
