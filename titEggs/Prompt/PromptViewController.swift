@@ -292,7 +292,7 @@ class PromptViewController: UIViewController, UIImagePickerControllerDelegate, U
         }
 
         guard let imageData = selectedImage?.pngData() else { return }
-        openGenerateVC(images: [imageData])
+        openGenerateVC(images: imageData)
     }
 
     // MARK: - Image Picker Delegate
@@ -333,7 +333,7 @@ class PromptViewController: UIViewController, UIImagePickerControllerDelegate, U
     }
 
     // MARK: - Open Generate VC
-    private func openGenerateVC(images: [Data]) {
+    private func openGenerateVC(images: Data) {
         let generateVC = GenerateVideoViewController(
             model: model,
             image: images,

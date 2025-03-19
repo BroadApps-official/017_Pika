@@ -193,21 +193,12 @@ class MainModel {
 
                 let effectID = "\(self.arr[index].effectID)"
                 let effectName = self.arr[index].effectName
-                let isHugAndKiss = effectName.contains("Hug") || effectName.contains("Kiss")
+                var imagesToSend: Data
+                imagesToSend = self.arr[index].image
 
-                var imagesToSend: [Data] = []
-                if isHugAndKiss {
-                    if let secondImage = self.arr[index].secondImage {
-                        imagesToSend = [self.arr[index].image, secondImage]
-                    } else {
-                        imagesToSend = [self.arr[index].image]
-                    }
-                } else {
-                    imagesToSend = [self.arr[index].image]
-                }
 
                 if self.arr[index].generationID == nil || self.arr[index].generationID == "error" {
-                    self.netWorking.createVideo(data: imagesToSend, idEffect: effectID, isHugAndKiss: isHugAndKiss) { [weak self] idVideo in
+                    self.netWorking.createVideo(data: imagesToSend, idEffect: effectID) { [weak self] idVideo in
                         guard let self = self else { return }
                         DispatchQueue.main.async {
                             guard index < self.arr.count else {

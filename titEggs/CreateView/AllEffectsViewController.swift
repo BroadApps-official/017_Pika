@@ -198,7 +198,7 @@ extension AllEffectsViewController: UICollectionViewDelegate, UICollectionViewDa
               model: model,
               publisher: PassthroughSubject<Bool, Never>(),
               effectID: selectedEffect.id,
-              effectTitle: selectedEffect.title ?? ""
+              effectTitle: selectedEffect.title
           )
           navigationController?.pushViewController(createImageVC, animated: true)
       } else {

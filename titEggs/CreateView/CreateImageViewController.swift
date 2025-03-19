@@ -14,8 +14,8 @@ class CreateImageViewController: UIViewController, UIImagePickerControllerDelega
 
     private var selectedImage1: UIImage?
     private var selectedImage2: UIImage?
-  private let photoContainer1 = UIView()
-  private let photoContainer2 = UIView()
+    private let photoContainer1 = UIView()
+    private let photoContainer2 = UIView()
 
     private var currentButton: UIButton?
 
@@ -178,7 +178,7 @@ class CreateImageViewController: UIViewController, UIImagePickerControllerDelega
     private func setupTabs() {
         tabsStack.axis = .horizontal
         tabsStack.spacing = 12
-        tabsStack.distribution = .fillProportionally
+        tabsStack.distribution = .fillEqually
         view.addSubview(tabsStack)
 
         tabsStack.snp.makeConstraints { make in
@@ -205,58 +205,61 @@ class CreateImageViewController: UIViewController, UIImagePickerControllerDelega
         }
     }
 
-  private func setupAddPhotoArea() {
-      configurePhotoContainer(photoContainer1, title: "Add 1 photo")
-      configurePhotoContainer(photoContainer2, title: "Add 2 photo")
+    private func setupAddPhotoArea() {
+        configurePhotoContainer(photoContainer1, title: "Add 1 photo")
+        configurePhotoContainer(photoContainer2, title: "Add 2 photo")
 
-      let containerStack = UIStackView(arrangedSubviews: [photoContainer1, photoContainer2])
-      containerStack.axis = .horizontal
-      containerStack.spacing = 10
-      containerStack.distribution = .fillEqually
-      view.addSubview(containerStack)
+        let containerStack = UIStackView(arrangedSubviews: [photoContainer1, photoContainer2])
+        containerStack.axis = .horizontal
+        containerStack.spacing = 10
+        containerStack.distribution = .fillEqually
+        view.addSubview(containerStack)
 
-      containerStack.snp.makeConstraints { make in
-          make.top.equalTo(tabsStack.snp.bottom).offset(20)
-          make.left.right.equalToSuperview().inset(15)
-          make.height.equalTo(180)
-      }
-  }
+        containerStack.snp.makeConstraints { make in
+            make.top.equalTo(tabsStack.snp.bottom).offset(20)
+            make.left.right.equalToSuperview().inset(15)
+            make.height.equalTo(180)
+        }
+    }
 
-  private func configurePhotoContainer(_ container: UIView, title: String) {
-      container.backgroundColor = UIColor(hex: "#2C2C2C")
-      container.layer.cornerRadius = 10
-      container.clipsToBounds = true
-
-      let stackView = UIStackView()
-      stackView.axis = .vertical
-      stackView.alignment = .center
-      stackView.spacing = 8
-
-      let plusIcon = UIImageView(image: UIImage(systemName: "plus"))
-      plusIcon.tintColor = .white
-      plusIcon.contentMode = .scaleAspectFit
-      stackView.addArrangedSubview(plusIcon)
-
-      let label = UILabel()
-      label.text = title
-      label.font = .systemFont(ofSize: 16, weight: .medium)
-      label.textColor = .lightGray
-      label.textAlignment = .center
-      stackView.addArrangedSubview(label)
-
-      container.addSubview(stackView)
-      stackView.snp.makeConstraints { make in
-          make.center.equalToSuperview()
-      }
-
-      plusIcon.snp.makeConstraints { make in
-          make.height.width.equalTo(50)
-      }
-
-      let tapGesture = UITapGestureRecognizer(target: self, action: #selector(selectPhoto(_:)))
-      container.addGestureRecognizer(tapGesture)
-      container.isUserInteractionEnabled = true
-  }
+    private func configurePhotoContainer(_ container: UIView, title: String) {
+        container.subviews.forEach { $0.removeFromSuperview() }
+        
+        container.backgroundColor = UIColor(hex: "#2C2C2C")
+        container.layer.cornerRadius = 10
+        container.clipsToBounds = true
+        
+        let stackView = UIStackView()
+        stackView.axis = .vertical
+        stackView.alignment = .center
+        stackView.spacing = 8
+        
+        let plusIcon = UIImageView(image: UIImage(systemName: "plus"))
+        plusIcon.tintColor = .white
+        plusIcon.contentMode = .scaleAspectFit
+        stackView.addArrangedSubview(plusIcon)
+        
+        let label = UILabel()
+        label.text = title
+        label.font = .systemFont(ofSize: 16, weight: .medium)
+        label.textColor = .lightGray
+        label.textAlignment = .center
+        stackView.addArrangedSubview(label)
+        
+        container.addSubview(stackView)
+        
+        stackView.snp.makeConstraints { make in
+            make.center.equalToSuperview()
+        }
+        
+        plusIcon.snp.makeConstraints { make in
+            make.height.width.equalTo(50)
+        }
+        
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(selectPhoto(_:)))
+        container.addGestureRecognizer(tapGesture)
+        container.isUserInteractionEnabled = true
+    }
 
     private func configureAddPhotoButton(_ button: UIButton, title: String) {
         button.subviews.forEach { $0.removeFromSuperview() }
@@ -306,25 +309,26 @@ class CreateImageViewController: UIViewController, UIImagePickerControllerDelega
 
     // MARK: - Image Picker
 
-  @objc private func selectPhoto(_ sender: UITapGestureRecognizer) {
-      guard let tappedView = sender.view else { return }
-      currentButton = (tappedView == photoContainer1) ? addPhotoButton1 : addPhotoButton2
-
-      let picker = UIImagePickerController()
-      picker.sourceType = .photoLibrary
-      picker.delegate = self
-      picker.modalPresentationStyle = .fullScreen
-
-      checkPhotoLibraryPermission { granted in
-          if granted {
-              DispatchQueue.main.async {
-                  self.present(picker, animated: true)
-              }
-          } else {
-              self.showPermissionAlert()
-          }
-      }
-  }
+    @objc private func selectPhoto(_ sender: UITapGestureRecognizer) {
+        guard let tappedView = sender.view else { return }
+        currentButton = (tappedView == photoContainer1) ? addPhotoButton1 : addPhotoButton2
+        
+        let picker = UIImagePickerController()
+        picker.sourceType = .photoLibrary
+        picker.delegate = self
+        picker.modalPresentationStyle = .fullScreen
+        
+        checkPhotoLibraryPermission { [weak self] granted in
+            guard let self = self else { return }
+            if granted {
+                DispatchQueue.main.async {
+                    self.present(picker, animated: true)
+                }
+            } else {
+                self.showPermissionAlert()
+            }
+        }
+    }
 
     private func checkPhotoLibraryPermission(completion: @escaping (Bool) -> Void) {
         let status = PHPhotoLibrary.authorizationStatus()
@@ -361,68 +365,64 @@ class CreateImageViewController: UIViewController, UIImagePickerControllerDelega
     }
 
     func imagePickerController(_ picker: UIImagePickerController,
-                               didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
-        if let selectedImage = info[.originalImage] as? UIImage {
-            if currentButton == addPhotoButton1 {
-                selectedImage1 = selectedImage
-                configureButtonWithImage(addPhotoButton1, selectedImage)
-            } else if currentButton == addPhotoButton2 {
-                selectedImage2 = selectedImage
-                configureButtonWithImage(addPhotoButton2, selectedImage)
+                             didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
+        picker.dismiss(animated: true) { [weak self] in
+            guard let self = self,
+                  let selectedImage = info[.originalImage] as? UIImage else { return }
+            
+            DispatchQueue.main.async {
+                if self.currentButton == self.addPhotoButton1 {
+                    self.selectedImage1 = selectedImage
+                    self.updatePhotoContainer(self.photoContainer1, with: selectedImage)
+                } else if self.currentButton == self.addPhotoButton2 {
+                    self.selectedImage2 = selectedImage
+                    self.updatePhotoContainer(self.photoContainer2, with: selectedImage)
+                }
+                self.updateCreateButtonState()
             }
-            updateCreateButtonState() // Обновляем доступность кнопки "Create"
         }
-        picker.dismiss(animated: true, completion: nil)
     }
 
-    func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
-        picker.dismiss(animated: true, completion: nil)
-    }
-
-    private func configureButtonWithImage(_ button: UIButton, _ image: UIImage) {
-        button.subviews.forEach { $0.removeFromSuperview() }
-
-        // Добавляем само изображение
+    private func updatePhotoContainer(_ container: UIView, with image: UIImage) {
+        container.subviews.forEach { $0.removeFromSuperview() }
+        
         let imageView = UIImageView(image: image)
         imageView.contentMode = .scaleAspectFill
         imageView.clipsToBounds = true
-        button.addSubview(imageView)
+        container.addSubview(imageView)
+        
         imageView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
         }
-
-        // Кнопка удаления (X)
+        
         let closeButton = UIButton(type: .system)
         closeButton.setImage(UIImage(systemName: "xmark.circle.fill"), for: .normal)
         closeButton.tintColor = .white
-
-        // Добавляем полупрозрачный ободок
-        closeButton.layer.borderWidth = 1.5
-        closeButton.layer.borderColor = UIColor.white.withAlphaComponent(0.5).cgColor
+        closeButton.backgroundColor = .black.withAlphaComponent(0.3)
         closeButton.layer.cornerRadius = 16
         closeButton.clipsToBounds = true
-
-        // Обработчик нажатия
-        closeButton.addTarget(self, action: #selector(onRemovePhoto(_:)), for: .touchUpInside)
-        button.addSubview(closeButton)
-
+        container.addSubview(closeButton)
+        
         closeButton.snp.makeConstraints { make in
             make.top.equalToSuperview().offset(8)
             make.right.equalToSuperview().inset(8)
             make.width.height.equalTo(32)
         }
+        
+        closeButton.addTarget(self, action: #selector(removePhoto(_:)), for: .touchUpInside)
     }
 
-    @objc private func onRemovePhoto(_ sender: UIButton) {
-        guard let parentButton = sender.superview as? UIButton else { return }
-
-        if parentButton == addPhotoButton1 {
+    @objc private func removePhoto(_ sender: UIButton) {
+        guard let container = sender.superview else { return }
+        
+        if container == photoContainer1 {
             selectedImage1 = nil
-            configureAddPhotoButton(addPhotoButton1, title: "Add 1 photo")
-        } else if parentButton == addPhotoButton2 {
+            configurePhotoContainer(photoContainer1, title: "Add 1 photo")
+        } else if container == photoContainer2 {
             selectedImage2 = nil
-            configureAddPhotoButton(addPhotoButton2, title: "Add 2 photo")
+            configurePhotoContainer(photoContainer2, title: "Add 2 photo")
         }
+        
         updateCreateButtonState()
     }
 
@@ -430,7 +430,6 @@ class CreateImageViewController: UIViewController, UIImagePickerControllerDelega
 
     private func updateCreateButtonState() {
         if isSplitMode {
-            // Нужны обе картинки
             if selectedImage1 != nil && selectedImage2 != nil {
                 createButton.isEnabled = true
                 createButton.backgroundColor = UIColor(hex: "#FFEBCD")
@@ -462,27 +461,37 @@ class CreateImageViewController: UIViewController, UIImagePickerControllerDelega
             return
         }
 
+        var finalImageData: Data?
+
         if isSplitMode {
             guard let img1 = selectedImage1,
                   let img2 = selectedImage2,
-                  let data1 = img1.jpegData(compressionQuality: 1.0),
-                  let data2 = img2.jpegData(compressionQuality: 1.0) else {
+                  let combinedImage = combineImages(img1, img2),
+                  let combinedData = combinedImage.jpegData(compressionQuality: 0.8) else {
+                print("❌ Ошибка при объединении изображений")
                 return
             }
-            openGenerateVC(images: [data1, data2])
+            finalImageData = combinedData
+            print("📸 Создано объединенное изображение размером: \(combinedData.count) байт")
         } else {
             guard let img = selectedImage1,
-                  let data = img.jpegData(compressionQuality: 1.0) else {
+                  let data = img.jpegData(compressionQuality: 0.8) else {
+                print("❌ Ошибка при подготовке изображения")
                 return
             }
-            openGenerateVC(images: [data])
+            finalImageData = data
+            print("📸 Подготовлено одиночное изображение размером: \(data.count) байт")
         }
+
+        guard let imageData = finalImageData else { return }
+
+        openGenerateVC(images: imageData)
     }
 
-    private func openGenerateVC(images: [Data]) {
+    private func openGenerateVC(images: Data) {
         let generateVC = GenerateVideoViewController(
             model: model,
-            image: images, // Теперь передаётся всегда массив
+            image: images,
             index: 0,
             publisher: publisher,
             video: nil, promptText: nil
@@ -495,6 +504,52 @@ class CreateImageViewController: UIViewController, UIImagePickerControllerDelega
         present(generateVC, animated: true)
     }
 
+    // Обновленный метод combineImages для лучшего результата
+    private func combineImages(_ image1: UIImage, _ image2: UIImage) -> UIImage? {
+        let maxWidth: CGFloat = 3800
+        let maxHeight: CGFloat = 2300
+        
+        // Вычисляем размеры для итогового изображения
+        let targetHeight = maxHeight / 3
+        let targetWidth = targetHeight * (16/9) // Поддерживаем соотношение сторон 16:9
+        
+        // Создаем контекст для объединенного изображения
+        let finalSize = CGSize(width: targetWidth * 2, height: targetHeight)
+        
+        UIGraphicsBeginImageContextWithOptions(finalSize, false, 1.0)
+        
+        // Функция для масштабирования и отрисовки изображения
+        func drawImage(_ image: UIImage, in rect: CGRect) {
+            // Масштабируем изображение, сохраняя пропорции
+            let aspectRatio = image.size.width / image.size.height
+            var drawRect = rect
+            
+            if aspectRatio > rect.width / rect.height {
+                let newHeight = rect.width / aspectRatio
+                drawRect.origin.y += (rect.height - newHeight) / 2
+                drawRect.size.height = newHeight
+            } else {
+                let newWidth = rect.height * aspectRatio
+                drawRect.origin.x += (rect.width - newWidth) / 2
+                drawRect.size.width = newWidth
+            }
+            
+            image.draw(in: drawRect)
+        }
+        
+        // Рисуем изображения
+        let rect1 = CGRect(x: 0, y: 0, width: targetWidth, height: targetHeight)
+        let rect2 = CGRect(x: targetWidth, y: 0, width: targetWidth, height: targetHeight)
+        
+        drawImage(image1, in: rect1)
+        drawImage(image2, in: rect2)
+        
+        let combinedImage = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsEndImageContext()
+        
+        print("📐 Размеры объединенного изображения: \(finalSize.width) x \(finalSize.height)")
+        return combinedImage
+    }
 
     @objc private func onSplitTapped() {
         isSplitMode = true
@@ -514,6 +569,15 @@ class CreateImageViewController: UIViewController, UIImagePickerControllerDelega
 
             leftImageView.image = UIImage(named: "exampleSplit1")
             rightImageView.image = UIImage(named: "exampleSplit2")
+            
+            photoContainer2.isHidden = false
+            
+            photoContainer1.snp.remakeConstraints { make in
+                make.height.equalTo(180)
+            }
+            photoContainer2.snp.remakeConstraints { make in
+                make.height.equalTo(180)
+            }
         } else {
             splitButton.backgroundColor = .bgTeriary
             splitButton.setTitleColor(.white, for: .normal)
@@ -522,41 +586,15 @@ class CreateImageViewController: UIViewController, UIImagePickerControllerDelega
 
             leftImageView.image = UIImage(named: "exampleSingle1")
             rightImageView.image = UIImage(named: "exampleSingle2")
-        }
-
-        // Перестраиваем размер кнопок Add
-        guard let buttonStack = view.subviews.first(where: {
-            $0 is UIStackView && $0.subviews.contains(addPhotoButton2)
-        }) as? UIStackView else {
-            return
-        }
-
-        if isSplitMode {
-            addPhotoButton2.isHidden = false
-            addPhotoButton1.snp.remakeConstraints { make in
-                make.height.equalTo(180)
-            }
-            addPhotoButton2.snp.remakeConstraints { make in
-                make.height.equalTo(180)
-            }
-
-            buttonStack.snp.remakeConstraints { make in
-                make.top.equalTo(tabsStack.snp.bottom).offset(50)
-                make.left.right.equalToSuperview().inset(15)
-                make.height.equalTo(180)
-            }
-        } else {
-            addPhotoButton2.isHidden = true
-            addPhotoButton1.snp.remakeConstraints { make in
-                make.height.equalTo(360)
-            }
-
-            buttonStack.snp.remakeConstraints { make in
-                make.top.equalTo(tabsStack.snp.bottom).offset(50)
-                make.left.right.equalToSuperview().inset(15)
-                make.height.equalTo(360)
+            
+            photoContainer2.isHidden = true
+            
+            let squareSize = UIScreen.main.bounds.width - 30
+            photoContainer1.snp.remakeConstraints { make in
+                make.height.equalTo(squareSize)
             }
         }
+        
         view.layoutIfNeeded()
     }
 }

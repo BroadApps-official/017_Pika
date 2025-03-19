@@ -280,11 +280,11 @@ class CreateViewController: UIViewController, UIImagePickerControllerDelegate, U
         self.present(alert, animated: true)
     }
 
-    private func selectedPhoto(image: [Data]) {
+    private func selectedPhoto(image: Data) {
         openGenerateVC(image: image)
     }
 
-    private func openGenerateVC(image: [Data]) {
+    private func openGenerateVC(image: Data) {
         let generateVC = GenerateVideoViewController(
             model: model,
             image: image,
@@ -374,7 +374,7 @@ class CreateViewController: UIViewController, UIImagePickerControllerDelegate, U
         if let image = info[.originalImage] as? UIImage {
             if let imageData = image.jpegData(compressionQuality: 1.0) {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                    self.selectedPhoto(image: [imageData])
+                    self.selectedPhoto(image: imageData)
                 }
             }
         }

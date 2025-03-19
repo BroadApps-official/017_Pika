@@ -140,7 +140,7 @@ class NetWorking {
   }
 
     
-  func createVideo(data: [Data], idEffect: String, isHugAndKiss: Bool, escaping: @escaping (String) -> Void) {
+  func createVideo(data: Data, idEffect: String, escaping: @escaping (String) -> Void) {
       let token = "rE176kzVVqjtWeGToppo4lRcbz3HRLoBrZREEvgQ8fKdWuxySCw6tv52BdLKBkZTOHWda5ISwLUVTyRoZEF0A33Xpk63lF9wTCtDxOs8XK3YArAiqIXVb7ZS4IK61TYPQMu5WqzFWwXtZc1jo8w"
 
       let headers: HTTPHeaders = [
@@ -149,41 +149,26 @@ class NetWorking {
       ]
 
       AF.upload(multipartFormData: { multipartFormData in
-          print("➡️ Отправка запроса на генерацию видео")
-          print("✅ templateId: \(idEffect)")
-          print("✅ userId: \(userID)")
-          print("✅ appId: \(Bundle.main.bundleIdentifier ?? "pika")")
-          print("✅ Количество изображений: \(data.count)")
-
           multipartFormData.append(Data(idEffect.utf8), withName: "templateId")
+          multipartFormData.append(data, withName: "image", fileName: "image.jpg", mimeType: "image/jpeg")
           multipartFormData.append(Data(userID.utf8), withName: "userId")
           multipartFormData.append(Data((Bundle.main.bundleIdentifier ?? "pika").utf8), withName: "appId")
 
-        for (index, imageData) in data.enumerated() {
-            print("🖼 Отправляется изображение \(index + 1)")
-            print("📏 Размер: \(imageData.count) байт")
+          print("➡️ Отправка запроса на генерацию видео")
+          print("✅ templateId: \(idEffect)")
+          print("✅ userId: \(userID)")
+          print("✅ appId: \(Bundle.main.bundleIdentifier ?? "com.test.test")")
+          print("📏 Размер изображения: \(data.count) байт")
 
-            if isHugAndKiss {
-                multipartFormData.append(data[0], withName: "image", fileName: "image1.jpg", mimeType: "image/jpeg")
-
-                if data.count > 1 { // Проверяем, есть ли второе изображение
-                    multipartFormData.append(data[1], withName: "image", fileName: "image2.jpg", mimeType: "image/jpeg")
-                } else {
-                    print("⚠️ Внимание! Hug/Kiss режим, но второе изображение отсутствует.")
-                }
-            } else {
-                multipartFormData.append(imageData, withName: "image", fileName: "image.jpg", mimeType: "image/jpeg")
-            }
-        }
-
-
-      }, to: "https://vewapnew.online/api/generate", headers: headers)
+      }, to: "https://vewapnew.online/api/generate", method: .post, headers: headers)
       .validate(statusCode: 200..<300)
       .responseData { response in
           print("📡 HTTP Код ответа:", response.response?.statusCode ?? "нет данных")
+          print("📡 HTTP Заголовки:", response.response?.allHeaderFields ?? [:])
 
-          if let jsonString = String(data: response.data ?? Data(), encoding: .utf8) {
-              print("📝 Ответ сервера: \(jsonString)")
+          if let data = response.data,
+             let jsonString = String(data: data, encoding: .utf8) {
+              print("📝 Ответ сервера:", jsonString)
           }
 
           switch response.result {
@@ -193,15 +178,33 @@ class NetWorking {
                   escaping(effects.data.generationId)
               } catch {
                   print("❌ Ошибка декодирования JSON:", error.localizedDescription)
+                  if let data = response.data,
+                     let str = String(data: data, encoding: .utf8) {
+                      print("📄 Полученные данные:", str)
+                  }
                   escaping("error")
               }
           case .failure(let error):
               print("❌ Ошибка запроса:", error.localizedDescription)
+              if let data = response.data,
+                 let str = String(data: data, encoding: .utf8) {
+                  print("📄 Тело ответа при ошибке:", str)
+              }
               escaping("error")
           }
       }
   }
 
+  // Добавляем структуру для декодирования ответа
+  struct Generate: Codable {
+      let error: Bool
+      let messages: [String]
+      let data: GenerationData
+      
+      struct GenerationData: Codable {
+          let generationId: String
+      }
+  }
 
     
     //status & url

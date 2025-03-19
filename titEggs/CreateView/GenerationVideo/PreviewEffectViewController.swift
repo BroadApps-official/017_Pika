@@ -354,11 +354,11 @@ class PreviewEffectViewController: UIViewController, UIImagePickerControllerDele
         self.present(alert, animated: true)
     }
     
-    private func selectedPhoto(image: [Data]) {
+    private func selectedPhoto(image: Data) {
         openGenerateVC(image: image)
     }
     
-    private func openGenerateVC(image: [Data]) {
+    private func openGenerateVC(image: Data) {
       let generateVC = GenerateVideoViewController(model: model, image: image, index: index, publisher: publisher, video: nil, promptText: nil)
         generateVC.modalPresentationStyle = .fullScreen
         generateVC.modalTransitionStyle = .coverVertical
@@ -403,7 +403,7 @@ class PreviewEffectViewController: UIViewController, UIImagePickerControllerDele
             }
             if let imageData = image.jpegData(compressionQuality: 1.0) {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                    self.selectedPhoto(image: [imageData])
+                    self.selectedPhoto(image: imageData)
                 }
             }
         }

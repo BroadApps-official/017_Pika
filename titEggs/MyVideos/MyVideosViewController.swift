@@ -534,7 +534,7 @@ class MyVideosViewController: UIViewController {
     }
     
     private func openGenerateVC(video: Video) {
-      let generateVC = GenerateVideoViewController(model: self.model, image: [video.image], index: video.effectID, publisher: publisher, video: video, promptText: nil)
+      let generateVC = GenerateVideoViewController(model: self.model, image: video.image, index: video.effectID, publisher: publisher, video: video, promptText: nil)
         generateVC.modalPresentationStyle = .fullScreen
         generateVC.modalTransitionStyle = .coverVertical
         if #available(iOS 13.0, *) {

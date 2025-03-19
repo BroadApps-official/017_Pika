@@ -12,7 +12,7 @@ import Combine
 class GenerateVideoViewController: UIViewController {
 
     var model: MainModel
-    var image: [Data]
+    var image: Data
     var index: Int
     var publisher: PassthroughSubject<Bool, Never>
     var video: Video?
@@ -34,7 +34,7 @@ class GenerateVideoViewController: UIViewController {
     }()
 
     // Основной инициализатор
-    init(model: MainModel, image: [Data], index: Int, publisher: PassthroughSubject<Bool, Never>, video: Video?, promptText: String?) {
+    init(model: MainModel, image: Data, index: Int, publisher: PassthroughSubject<Bool, Never>, video: Video?, promptText: String?) {
         self.model = model
         self.image = image
         self.index = index
@@ -79,9 +79,9 @@ class GenerateVideoViewController: UIViewController {
           return
       }
       
-        guard let imageData = image.first, let prompt = promptText else { return }
+        guard let prompt = promptText else { return }
 
-        model.imageToVideo(imageData: imageData, promptText: prompt) { [weak self] success, newId in
+        model.imageToVideo(imageData: image, promptText: prompt) { [weak self] success, newId in
             guard let self = self else { return }
             if success, let videoId = newId {
                 self.uuidVideo = videoId
@@ -180,8 +180,8 @@ class GenerateVideoViewController: UIViewController {
         
         var videoLoad = video
         if video?.id == nil {
-            let imageToUse: Data = image.first!
-            let secondImageToUse: Data? = image.count == 2 ? image[1] : nil
+            let imageToUse: Data = image
+
             videoLoad = Video(
                 image: imageToUse,
                 effectID: model.effectsArr[index].id,
@@ -190,8 +190,7 @@ class GenerateVideoViewController: UIViewController {
                 resultURL: nil,
                 dataGenerate: self.getTodayFormattedDate(),
                 effectName: model.effectsArr[index].effect,
-                status: nil,
-                secondImage: secondImageToUse
+                status: nil
             )
             model.arr.append(videoLoad!)
             model.saveArr()
@@ -356,7 +355,7 @@ class GenerateVideoViewController: UIViewController {
 
     deinit {
         self.index = 0
-        self.image = [Data()]
+        self.image = Data()
         timer?.invalidate()
         timer = nil
     }
