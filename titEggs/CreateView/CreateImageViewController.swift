@@ -53,6 +53,7 @@ class CreateImageViewController: UIViewController, UIImagePickerControllerDelega
     private let leftImageView = UIImageView()
     private let rightTabView = UIView()
     private let rightImageView = UIImageView()
+    private let containerStack = UIStackView()
 
     private let addPhotoButton1 = UIButton()
     private let addPhotoButton2 = UIButton()
@@ -209,11 +210,13 @@ class CreateImageViewController: UIViewController, UIImagePickerControllerDelega
         configurePhotoContainer(photoContainer1, title: "Add 1 photo")
         configurePhotoContainer(photoContainer2, title: "Add 2 photo")
 
-        let containerStack = UIStackView(arrangedSubviews: [photoContainer1, photoContainer2])
         containerStack.axis = .horizontal
         containerStack.spacing = 10
         containerStack.distribution = .fillEqually
         view.addSubview(containerStack)
+
+        containerStack.addArrangedSubview(photoContainer1)
+        containerStack.addArrangedSubview(photoContainer2)
 
         containerStack.snp.makeConstraints { make in
             make.top.equalTo(tabsStack.snp.bottom).offset(20)
@@ -298,10 +301,11 @@ class CreateImageViewController: UIViewController, UIImagePickerControllerDelega
 
     private func setupCreateButton() {
         view.addSubview(createButton)
+
         createButton.snp.makeConstraints { make in
+            make.left.right.equalToSuperview().inset(15)
             make.bottom.equalTo(view.safeAreaLayoutGuide).inset(20)
-            make.left.right.equalToSuperview().inset(20)
-            make.height.equalTo(50)
+            make.height.equalTo(48)
         }
 
         createButton.addTarget(self, action: #selector(onCreateTapped), for: .touchUpInside)
@@ -506,43 +510,31 @@ class CreateImageViewController: UIViewController, UIImagePickerControllerDelega
 
     // Обновленный метод combineImages для лучшего результата
     private func combineImages(_ image1: UIImage, _ image2: UIImage) -> UIImage? {
-        let maxWidth: CGFloat = 3800
-        let maxHeight: CGFloat = 2300
+        // Получаем размеры изображений
+        let width1 = image1.size.width
+        let height1 = image1.size.height
+        let width2 = image2.size.width
+        let height2 = image2.size.height
         
-        // Вычисляем размеры для итогового изображения
-        let targetHeight = maxHeight / 3
-        let targetWidth = targetHeight * (16/9) // Поддерживаем соотношение сторон 16:9
+        // Находим максимальную высоту из двух изображений
+        let maxHeight = max(height1, height2)
         
-        // Создаем контекст для объединенного изображения
-        let finalSize = CGSize(width: targetWidth * 2, height: targetHeight)
+        // Вычисляем новые размеры с сохранением пропорций
+        let newWidth1 = (width1 * maxHeight) / height1
+        let newWidth2 = (width2 * maxHeight) / height2
+        
+        // Создаем контекст для объединенного изображения с точной высотой
+        let finalSize = CGSize(width: newWidth1 + newWidth2, height: maxHeight)
         
         UIGraphicsBeginImageContextWithOptions(finalSize, false, 1.0)
         
-        // Функция для масштабирования и отрисовки изображения
-        func drawImage(_ image: UIImage, in rect: CGRect) {
-            // Масштабируем изображение, сохраняя пропорции
-            let aspectRatio = image.size.width / image.size.height
-            var drawRect = rect
-            
-            if aspectRatio > rect.width / rect.height {
-                let newHeight = rect.width / aspectRatio
-                drawRect.origin.y += (rect.height - newHeight) / 2
-                drawRect.size.height = newHeight
-            } else {
-                let newWidth = rect.height * aspectRatio
-                drawRect.origin.x += (rect.width - newWidth) / 2
-                drawRect.size.width = newWidth
-            }
-            
-            image.draw(in: drawRect)
-        }
+        // Рисуем первое изображение
+        let rect1 = CGRect(x: 0, y: 0, width: newWidth1, height: maxHeight)
+        image1.draw(in: rect1)
         
-        // Рисуем изображения
-        let rect1 = CGRect(x: 0, y: 0, width: targetWidth, height: targetHeight)
-        let rect2 = CGRect(x: targetWidth, y: 0, width: targetWidth, height: targetHeight)
-        
-        drawImage(image1, in: rect1)
-        drawImage(image2, in: rect2)
+        // Рисуем второе изображение
+        let rect2 = CGRect(x: newWidth1, y: 0, width: newWidth2, height: maxHeight)
+        image2.draw(in: rect2)
         
         let combinedImage = UIGraphicsGetImageFromCurrentImageContext()
         UIGraphicsEndImageContext()
@@ -557,6 +549,72 @@ class CreateImageViewController: UIViewController, UIImagePickerControllerDelega
 
     @objc private func onSingleTapped() {
         isSplitMode = false
+    }
+
+    @objc private func onPreviewTapped() {
+        guard let img1 = selectedImage1,
+              let img2 = selectedImage2,
+              let combinedImage = combineImages(img1, img2) else {
+            return
+        }
+
+        let previewVC = UIViewController()
+        previewVC.view.backgroundColor = .white
+        previewVC.modalPresentationStyle = .fullScreen
+
+        // Создаем контейнер для изображения с обводкой
+        let containerView = UIView()
+        containerView.backgroundColor = .white
+        containerView.layer.borderWidth = 2
+        containerView.layer.borderColor = UIColor.red.cgColor
+        previewVC.view.addSubview(containerView)
+
+        // Создаем ImageView для отображения объединенного изображения
+        let imageView = UIImageView(image: combinedImage)
+        imageView.contentMode = .scaleAspectFit
+        imageView.backgroundColor = .white
+        containerView.addSubview(imageView)
+
+        // Устанавливаем констрейнты
+        containerView.snp.makeConstraints { make in
+            make.center.equalToSuperview()
+            make.width.equalTo(previewVC.view.snp.width)
+            make.height.equalTo(combinedImage.size.height * (previewVC.view.bounds.width / combinedImage.size.width))
+        }
+
+        imageView.snp.makeConstraints { make in
+            make.edges.equalToSuperview()
+        }
+
+        // Добавляем label с размером изображения
+        let sizeLabel = UILabel()
+        sizeLabel.text = "Размер: \(Int(combinedImage.size.width))x\(Int(combinedImage.size.height))"
+        sizeLabel.textColor = .black
+        sizeLabel.font = .systemFont(ofSize: 16)
+        sizeLabel.textAlignment = .center
+        previewVC.view.addSubview(sizeLabel)
+        sizeLabel.snp.makeConstraints { make in
+            make.top.equalTo(previewVC.view.safeAreaLayoutGuide).offset(20)
+            make.centerX.equalToSuperview()
+        }
+
+        // Добавляем кнопку закрытия
+        let closeButton = UIButton(type: .system)
+        closeButton.setImage(UIImage(systemName: "xmark.circle.fill"), for: .normal)
+        closeButton.tintColor = .black
+        closeButton.addTarget(self, action: #selector(closePreview), for: .touchUpInside)
+        previewVC.view.addSubview(closeButton)
+        closeButton.snp.makeConstraints { make in
+            make.top.equalTo(previewVC.view.safeAreaLayoutGuide).offset(20)
+            make.right.equalToSuperview().inset(20)
+            make.width.height.equalTo(44)
+        }
+
+        present(previewVC, animated: true)
+    }
+
+    @objc private func closePreview() {
+        dismiss(animated: true)
     }
 
     // Обновляет внешний вид (примерно как раньше)
@@ -590,8 +648,15 @@ class CreateImageViewController: UIViewController, UIImagePickerControllerDelega
             photoContainer2.isHidden = true
             
             let squareSize = UIScreen.main.bounds.width - 30
-            photoContainer1.snp.remakeConstraints { make in
+            containerStack.snp.remakeConstraints { make in
+                make.top.equalTo(tabsStack.snp.bottom).offset(20)
+                make.centerX.equalToSuperview()
+                make.width.equalTo(squareSize)
                 make.height.equalTo(squareSize)
+            }
+            
+            photoContainer1.snp.remakeConstraints { make in
+                make.edges.equalToSuperview()
             }
         }
         
