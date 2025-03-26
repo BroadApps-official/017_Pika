@@ -805,7 +805,7 @@
 				DEVELOPMENT_TEAM = "";
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = titEggs/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "Kiss AI";
+				INFOPLIST_KEY_CFBundleDisplayName = "MiniMax - Video Generator";
 				INFOPLIST_KEY_NSCameraUsageDescription = "Add a photo so we can do a cool effect with it";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "We need access to your photo library to save videos and photos from the app.";
 				INFOPLIST_KEY_NSUserTrackingUsageDescription = "We use the data to provide more personalized advertising and improve your user experience.";
@@ -818,7 +818,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 3.2.1;
+				MARKETING_VERSION = 3.2.2;
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_BUNDLE_IDENTIFIER = com.agh.p1i1ka;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -845,7 +845,7 @@
 				DEVELOPMENT_TEAM = "";
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = titEggs/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "Kiss AI";
+				INFOPLIST_KEY_CFBundleDisplayName = "MiniMax - Video Generator";
 				INFOPLIST_KEY_NSCameraUsageDescription = "Add a photo so we can do a cool effect with it";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "We need access to your photo library to save videos and photos from the app.";
 				INFOPLIST_KEY_NSUserTrackingUsageDescription = "We use the data to provide more personalized advertising and improve your user experience.";
@@ -858,7 +858,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 3.2.1;
+				MARKETING_VERSION = 3.2.2;
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_BUNDLE_IDENTIFIER = com.agh.p1i1ka;
 				PRODUCT_NAME = "$(TARGET_NAME)";
