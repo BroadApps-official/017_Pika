@@ -274,36 +274,6 @@
             endingLineNumber = "201"
             landmarkName = "checkStatus()"
             landmarkType = "7">
-            <Locations>
-               <Location
-                  uuid = "26C2DDB6-BA3B-4487-AB71-62BE8195175D - 8208c354d7404d98"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "closure #2 () -&gt; () in titEggs.MainModel.checkStatus() -&gt; ()"
-                  moduleName = "titEggs.debug.dylib"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/aleksandrasavcuk/017_Pika/titEggs/MainModel/MainModel.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "201"
-                  endingLineNumber = "201">
-               </Location>
-               <Location
-                  uuid = "26C2DDB6-BA3B-4487-AB71-62BE8195175D - 9a0951637c856e46"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "closure #1 (Swift.String) -&gt; () in closure #2 () -&gt; () in titEggs.MainModel.checkStatus() -&gt; ()"
-                  moduleName = "titEggs.debug.dylib"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/aleksandrasavcuk/017_Pika/titEggs/MainModel/MainModel.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "201"
-                  endingLineNumber = "201">
-               </Location>
-            </Locations>
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
